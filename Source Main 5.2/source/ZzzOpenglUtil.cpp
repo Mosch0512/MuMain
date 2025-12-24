@@ -11,6 +11,9 @@
 #include "ZzzInfomation.h"
 #include "NewUISystem.h"
 #include "wglext.h"
+#include "CustomCamera3D.h"
+
+extern CHARACTER* Hero;
 
 int     OpenglWindowX;
 int     OpenglWindowY;
@@ -597,11 +600,40 @@ void BeginOpengl(int x, int y, int Width, int Height)
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-    glRotatef(CameraAngle[1], 0.f, 1.f, 0.f);
+
+    // Get modified camera angle (with custom camera rotation applied)
+    vec3_t modifiedAngle;
+    CCustomCamera3D::GetModifiedCameraAngle(CameraAngle, modifiedAngle);
+
+    glRotatef(modifiedAngle[1], 0.f, 1.f, 0.f);
     if (CameraTopViewEnable == false)
-        glRotatef(CameraAngle[0], 1.f, 0.f, 0.f);
-    glRotatef(CameraAngle[2], 0.f, 0.f, 1.f);
-    glTranslatef(-CameraPosition[0], -CameraPosition[1], -CameraPosition[2]);
+        glRotatef(modifiedAngle[0], 1.f, 0.f, 0.f);
+    glRotatef(modifiedAngle[2], 0.f, 0.f, 1.f);
+
+    // Get modified camera position (with zoom applied)
+    vec3_t modifiedPos;
+    vec3_t originalCameraPos;
+    VectorCopy(CameraPosition, originalCameraPos);  // Save original
+
+    if (Hero != nullptr)
+    {
+        // Pass character position to properly calculate camera zoom relative to character
+        CCustomCamera3D::GetModifiedCameraPosition(CameraPosition, Hero->Object.Position, modifiedPos);
+    }
+    else
+    {
+        // Fallback if Hero not available
+        vec3_t origin = { 0.0f, 0.0f, 0.0f };
+        CCustomCamera3D::GetModifiedCameraPosition(CameraPosition, origin, modifiedPos);
+    }
+
+    // Update CameraPosition so frustum culling uses the correct position
+    if (CCustomCamera3D::IsEnabled())
+    {
+        VectorCopy(modifiedPos, CameraPosition);
+    }
+
+    glTranslatef(-modifiedPos[0], -modifiedPos[1], -modifiedPos[2]);
 
     glDisable(GL_ALPHA_TEST);
     glEnable(GL_TEXTURE_2D);
