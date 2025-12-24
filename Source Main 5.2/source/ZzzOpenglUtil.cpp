@@ -180,9 +180,18 @@ void CreateScreenVector(int sx, int sy, vec3_t Target, bool bFixView)
     vec3_t p1, p2;
     if (bFixView)
     {
-        p1[0] = (float)(sx - ScreenCenterX) * CameraViewFar * PerspectiveX;
-        p1[1] = -(float)(sy - ScreenCenterY) * CameraViewFar * PerspectiveY;
-        p1[2] = -CameraViewFar;
+        // Adjust far distance for 3D camera zoom to ensure ray reaches far enough
+        float adjustedViewFar = CameraViewFar;
+        if (CCustomCamera3D::IsEnabled())
+        {
+            float zoomScale = CCustomCamera3D::GetZoomDistance() / 100.0f;
+            // Use same multiplier as rendering to ensure ray reaches visible terrain
+            adjustedViewFar = CameraViewFar * (3.0f + zoomScale * 4.0f) * 2.5f;
+        }
+
+        p1[0] = (float)(sx - ScreenCenterX) * adjustedViewFar * PerspectiveX;
+        p1[1] = -(float)(sy - ScreenCenterY) * adjustedViewFar * PerspectiveY;
+        p1[2] = -adjustedViewFar;
     }
     else
     {
@@ -604,13 +613,12 @@ void BeginOpengl(int x, int y, int Width, int Height)
     float adjustedViewFar = CameraViewFar;
     if (CCustomCamera3D::IsEnabled())
     {
-        // Increase far clipping plane when zoomed out
-        // Scale more aggressively: at 2x zoom (200 units), we get ~12.6x render distance
-        // Formula: base * (2.0 + zoomScale * 2.5) * 1.8
-        // At 1.0x zoom: 2.0 + 1.0 * 2.5 = 4.5x * 1.8 = 8.1x
-        // At 2.0x zoom: 2.0 + 2.0 * 2.5 = 7.0x * 1.8 = 12.6x
+        // Increase far clipping plane dramatically when zoomed out
+        // Formula: base * (3.0 + zoomScale * 4.0) * 2.5
+        // At 1.0x zoom: 3.0 + 1.0 * 4.0 = 7.0x * 2.5 = 17.5x
+        // At 2.0x zoom: 3.0 + 2.0 * 4.0 = 11.0x * 2.5 = 27.5x
         float zoomScale = CCustomCamera3D::GetZoomDistance() / 100.0f;
-        adjustedViewFar = CameraViewFar * (2.0f + zoomScale * 2.5f) * 1.8f;
+        adjustedViewFar = CameraViewFar * (3.0f + zoomScale * 4.0f) * 2.5f;
     }
     else
     {
@@ -713,7 +721,40 @@ void UpdateMousePositionn()
     vec3_t vPos;
 
     glLoadIdentity();
-    glTranslatef(-CameraPosition[0], -CameraPosition[1], -CameraPosition[2]);
+
+    // Use modified camera position/angle for mouse picking when 3D camera is enabled
+    vec3_t modifiedAngle;
+    vec3_t modifiedPos;
+
+    if (CCustomCamera3D::IsEnabled())
+    {
+        // Get the modified camera angle
+        CCustomCamera3D::GetModifiedCameraAngle(CameraAngle, modifiedAngle);
+
+        // Apply the same rotations as in BeginOpengl
+        glRotatef(modifiedAngle[1], 0.f, 1.f, 0.f);
+        if (CameraTopViewEnable == false)
+            glRotatef(modifiedAngle[0], 1.f, 0.f, 0.f);
+        glRotatef(modifiedAngle[2], 0.f, 0.f, 1.f);
+
+        // Get the modified camera position
+        if (Hero != nullptr)
+        {
+            CCustomCamera3D::GetModifiedCameraPosition(CameraPosition, Hero->Object.Position, modifiedPos);
+        }
+        else
+        {
+            vec3_t origin = { 0.0f, 0.0f, 0.0f };
+            CCustomCamera3D::GetModifiedCameraPosition(CameraPosition, origin, modifiedPos);
+        }
+
+        glTranslatef(-modifiedPos[0], -modifiedPos[1], -modifiedPos[2]);
+    }
+    else
+    {
+        glTranslatef(-CameraPosition[0], -CameraPosition[1], -CameraPosition[2]);
+    }
+
     GetOpenGLMatrix(CameraMatrix);
 
     Vector(-CameraMatrix[0][3], -CameraMatrix[1][3], -CameraMatrix[2][3], vPos);
