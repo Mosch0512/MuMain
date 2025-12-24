@@ -583,6 +583,11 @@ float ConvertY(float y)
     return y * (float)WindowHeight / 480.f;
 }
 
+// Store original camera state for restoration
+static vec3_t g_SavedCameraAngle;
+static vec3_t g_SavedCameraPosition;
+static bool g_bCameraStateSaved = false;
+
 void BeginOpengl(int x, int y, int Width, int Height)
 {
     x = x * WindowWidth / 640;
@@ -595,7 +600,24 @@ void BeginOpengl(int x, int y, int Width, int Height)
     glLoadIdentity();
     glViewport2(x, y, Width, Height);
 
-    gluPerspective2(CameraFOV, (float)Width / (float)Height, CameraViewNear, CameraViewFar * 1.4f);
+    // Adjust far clipping plane for custom 3D camera zoom
+    float adjustedViewFar = CameraViewFar;
+    if (CCustomCamera3D::IsEnabled())
+    {
+        // Increase far clipping plane when zoomed out
+        // Scale more aggressively: at 2x zoom (200 units), we get ~12.6x render distance
+        // Formula: base * (2.0 + zoomScale * 2.5) * 1.8
+        // At 1.0x zoom: 2.0 + 1.0 * 2.5 = 4.5x * 1.8 = 8.1x
+        // At 2.0x zoom: 2.0 + 2.0 * 2.5 = 7.0x * 1.8 = 12.6x
+        float zoomScale = CCustomCamera3D::GetZoomDistance() / 100.0f;
+        adjustedViewFar = CameraViewFar * (2.0f + zoomScale * 2.5f) * 1.8f;
+    }
+    else
+    {
+        adjustedViewFar = CameraViewFar * 1.4f;
+    }
+
+    gluPerspective2(CameraFOV, (float)Width / (float)Height, CameraViewNear, adjustedViewFar);
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -605,6 +627,17 @@ void BeginOpengl(int x, int y, int Width, int Height)
     vec3_t modifiedAngle;
     CCustomCamera3D::GetModifiedCameraAngle(CameraAngle, modifiedAngle);
 
+    // Save original camera state before modifying
+    if (CCustomCamera3D::IsEnabled())
+    {
+        VectorCopy(CameraAngle, g_SavedCameraAngle);
+        VectorCopy(CameraPosition, g_SavedCameraPosition);
+        g_bCameraStateSaved = true;
+
+        // Update CameraAngle so frustum culling uses the correct view direction
+        VectorCopy(modifiedAngle, CameraAngle);
+    }
+
     glRotatef(modifiedAngle[1], 0.f, 1.f, 0.f);
     if (CameraTopViewEnable == false)
         glRotatef(modifiedAngle[0], 1.f, 0.f, 0.f);
@@ -612,9 +645,6 @@ void BeginOpengl(int x, int y, int Width, int Height)
 
     // Get modified camera position (with zoom applied)
     vec3_t modifiedPos;
-    vec3_t originalCameraPos;
-    VectorCopy(CameraPosition, originalCameraPos);  // Save original
-
     if (Hero != nullptr)
     {
         // Pass character position to properly calculate camera zoom relative to character
@@ -668,6 +698,14 @@ void EndOpengl()
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
+
+    // Restore original camera state if it was modified
+    if (g_bCameraStateSaved)
+    {
+        VectorCopy(g_SavedCameraAngle, CameraAngle);
+        VectorCopy(g_SavedCameraPosition, CameraPosition);
+        g_bCameraStateSaved = false;
+    }
 }
 
 void UpdateMousePositionn()
