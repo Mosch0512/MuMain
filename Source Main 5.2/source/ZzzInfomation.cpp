@@ -456,6 +456,130 @@ void OpenItemScript(wchar_t* FileName)
     }
 }
 
+void OpenItemScriptCSV(wchar_t* FileName)
+{
+    std::fwprintf(stderr, L"[CSV Loader] Opening CSV file: %ls\n", FileName);
+    std::fflush(stderr);
+
+    FILE* fp = _wfopen(FileName, L"r, ccs=UTF-8");
+    if (fp != NULL)
+    {
+        wchar_t line[2048];
+
+        // Skip header line
+        if (!fgetws(line, sizeof(line) / sizeof(wchar_t), fp))
+        {
+            wchar_t Text[256];
+            swprintf_s(Text, 256, L"%ls - Cannot read header.", FileName);
+            g_ErrorReport.Write(Text);
+            MessageBox(g_hWnd, Text, NULL, MB_OK);
+            fclose(fp);
+            SendMessage(g_hWnd, WM_DESTROY, 0, 0);
+            return;
+        }
+
+        std::fwprintf(stderr, L"[CSV Loader] Header read successfully, loading items...\n");
+        std::fflush(stderr);
+
+        int itemsLoaded = 0;
+        while (fgetws(line, sizeof(line) / sizeof(wchar_t), fp))
+        {
+            int index;
+            wchar_t name[MAX_ITEM_NAME] = {0};
+            int twoHand, level, itemSlot, skillIndex, width, height;
+            int damageMin, damageMax, successfulBlocking, defense, magicDefense;
+            int weaponSpeed, walkSpeed, durability, magicDur, magicPower;
+            int reqStr, reqDex, reqEne, reqVit, reqCha, reqLevel;
+            int value, zen, attType;
+            int reqClass[MAX_CLASS];
+            int resistance[MAX_RESISTANCE + 1];
+
+            int result = swscanf_s(line, L"%d,\"%31[^\"]\",%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+                &index, name, (unsigned int)MAX_ITEM_NAME, &twoHand, &level, &itemSlot, &skillIndex,
+                &width, &height, &damageMin, &damageMax, &successfulBlocking,
+                &defense, &magicDefense, &weaponSpeed, &walkSpeed,
+                &durability, &magicDur, &magicPower,
+                &reqStr, &reqDex, &reqEne, &reqVit, &reqCha, &reqLevel,
+                &value, &zen, &attType,
+                &reqClass[0], &reqClass[1], &reqClass[2], &reqClass[3], &reqClass[4], &reqClass[5], &reqClass[6],
+                &resistance[0], &resistance[1], &resistance[2], &resistance[3], &resistance[4], &resistance[5], &resistance[6], &resistance[7]);
+
+            if (result >= 27 && index >= 0 && index < MAX_ITEM)  // At least read main fields
+            {
+                wcscpy_s(ItemAttribute[index].Name, MAX_ITEM_NAME, name);
+                ItemAttribute[index].TwoHand = (twoHand != 0);
+                ItemAttribute[index].Level = (WORD)level;
+                ItemAttribute[index].m_byItemSlot = (BYTE)itemSlot;
+                ItemAttribute[index].m_wSkillIndex = (WORD)skillIndex;
+                ItemAttribute[index].Width = (BYTE)width;
+                ItemAttribute[index].Height = (BYTE)height;
+                ItemAttribute[index].DamageMin = (BYTE)damageMin;
+                ItemAttribute[index].DamageMax = (BYTE)damageMax;
+                ItemAttribute[index].SuccessfulBlocking = (BYTE)successfulBlocking;
+                ItemAttribute[index].Defense = (BYTE)defense;
+                ItemAttribute[index].MagicDefense = (BYTE)magicDefense;
+                ItemAttribute[index].WeaponSpeed = (BYTE)weaponSpeed;
+                ItemAttribute[index].WalkSpeed = (BYTE)walkSpeed;
+                ItemAttribute[index].Durability = (BYTE)durability;
+                ItemAttribute[index].MagicDur = (BYTE)magicDur;
+                ItemAttribute[index].MagicPower = (BYTE)magicPower;
+                ItemAttribute[index].RequireStrength = (WORD)reqStr;
+                ItemAttribute[index].RequireDexterity = (WORD)reqDex;
+                ItemAttribute[index].RequireEnergy = (WORD)reqEne;
+                ItemAttribute[index].RequireVitality = (WORD)reqVit;
+                ItemAttribute[index].RequireCharisma = (WORD)reqCha;
+                ItemAttribute[index].RequireLevel = (WORD)reqLevel;
+                ItemAttribute[index].Value = (BYTE)value;
+                ItemAttribute[index].iZen = zen;
+                ItemAttribute[index].AttType = (BYTE)attType;
+
+                if (result >= 34)  // RequireClass read
+                {
+                    for (int c = 0; c < MAX_CLASS; c++)
+                    {
+                        ItemAttribute[index].RequireClass[c] = (BYTE)reqClass[c];
+                    }
+                }
+                else
+                {
+                    memset(ItemAttribute[index].RequireClass, 0, sizeof(ItemAttribute[index].RequireClass));
+                }
+
+                if (result >= 42)  // Resistance read
+                {
+                    for (int r = 0; r < MAX_RESISTANCE + 1; r++)
+                    {
+                        ItemAttribute[index].Resistance[r] = (BYTE)resistance[r];
+                    }
+                }
+                else
+                {
+                    memset(ItemAttribute[index].Resistance, 0, sizeof(ItemAttribute[index].Resistance));
+                }
+
+                itemsLoaded++;
+            }
+        }
+
+        fclose(fp);
+
+        std::fwprintf(stderr, L"[CSV Loader] Successfully loaded %d items from %ls\n", itemsLoaded, FileName);
+        std::fflush(stderr);
+
+        wchar_t Text[256];
+        swprintf_s(Text, 256, L"Successfully loaded %d items from %ls", itemsLoaded, FileName);
+        g_ErrorReport.Write(Text);
+    }
+    else
+    {
+        wchar_t Text[256];
+        swprintf(Text, L"%ls - File not exist.", FileName);
+        g_ErrorReport.Write(Text);
+        MessageBox(g_hWnd, Text, NULL, MB_OK);
+        SendMessage(g_hWnd, WM_DESTROY, 0, 0);
+    }
+}
+
 void PrintItem(wchar_t* FileName)
 {
     FILE* fp = _wfopen(FileName, L"wt");

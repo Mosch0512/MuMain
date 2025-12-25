@@ -5366,8 +5366,21 @@ void OpenBasicData(HDC hDC)
     swprintf(Text, L"Data\\Local\\%ls\\Dialog_%ls.bmd", g_strSelectedML.c_str(), g_strSelectedML.c_str());
     OpenDialogFile(Text);
 
-    swprintf(Text, L"Data\\Local\\%ls\\Item_%ls.bmd", g_strSelectedML.c_str(), g_strSelectedML.c_str());
-    OpenItemScript(Text);
+    // Convert Item.bmd to Item.csv on startup
+    std::fwprintf(stderr, L"[DEBUG] About to convert Item BMD to CSV...\n");
+    std::fflush(stderr);
+    
+    wchar_t ItemBmdPath[256];
+    wchar_t ItemCsvPath[256];
+    swprintf_s(ItemBmdPath, 256, L"Data\\Local\\%ls\\Item_%ls.bmd", g_strSelectedML.c_str(), g_strSelectedML.c_str());
+    swprintf_s(ItemCsvPath, 256, L"Data\\Local\\%ls\\Item_%ls.csv", g_strSelectedML.c_str(), g_strSelectedML.c_str());
+    ConvertItemBmdToCsv(ItemBmdPath, ItemCsvPath);
+    
+    std::fwprintf(stderr, L"[DEBUG] Item conversion completed, about to load CSV...\n");
+    std::fflush(stderr);
+    
+    swprintf(Text, L"Data\\Local\\%ls\\Item_%ls.csv", g_strSelectedML.c_str(), g_strSelectedML.c_str());
+    OpenItemScriptCSV(Text);
 
     swprintf(Text, L"Data\\Local\\%ls\\movereq_%ls.bmd", g_strSelectedML.c_str(), g_strSelectedML.c_str());
     SEASON3B::CMoveCommandData::OpenMoveReqScript(Text);
