@@ -8,7 +8,7 @@
 // Shared camera height offset constant
 // Used by both default camera and 3D camera to ensure consistent framing
 // This value represents the vertical offset added to the camera target point
-// to focus on the character's instead of their feet
+// to focus on the character's upper body instead of their feet
 constexpr float CAMERA_HEIGHT_OFFSET = 80.0f;
 
 class CCustomCamera3D
@@ -16,11 +16,15 @@ class CCustomCamera3D
 private:
     static bool m_bEnabled;              // Is 3D camera mode active?
     static float m_fZoomDistance;        // Current zoom distance from character
-    static float m_fRotationAngle;       // Camera rotation angle around character (in degrees)
+    static float m_fRotationAngle;       // Camera rotation angle around character (in degrees, horizontal)
+    static float m_fPitchAngle;          // Camera pitch angle (in degrees, vertical)
     static float m_fMinZoom;             // Minimum zoom distance (closest)
     static float m_fMaxZoom;             // Maximum zoom distance (farthest)
+    static float m_fMinPitch;            // Minimum pitch angle (looking down)
+    static float m_fMaxPitch;            // Maximum pitch angle (looking up)
     static bool m_bRotating;             // Is middle mouse button held for rotation?
     static int m_iLastMouseX;            // Last mouse X position for rotation calculation
+    static int m_iLastMouseY;            // Last mouse Y position for pitch calculation
     static bool m_bF9KeyPressed;         // To prevent toggle spam
     static float m_fInitialCameraOffset[3]; // Initial camera offset from character (saved on first frame)
 
@@ -41,10 +45,10 @@ public:
     static void ProcessMouseWheel(int delta);
 
     // Process middle mouse button for rotation
-    static void ProcessMouseRotation(int currentMouseX);
+    static void ProcessMouseRotation(int currentMouseX, int currentMouseY);
 
     // Start rotation when middle mouse is pressed
-    static void StartRotation(int mouseX);
+    static void StartRotation(int mouseX, int mouseY);
 
     // Stop rotation when middle mouse is released
     static void StopRotation();

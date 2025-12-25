@@ -1669,9 +1669,9 @@ void MoveMainScene()
         // Middle Mouse Button Rotation
         if (buttonHeld)
         {
-            // Button is held - start/continue rotation
-            CCustomCamera3D::StartRotation(MouseX);
-            CCustomCamera3D::ProcessMouseRotation(MouseX);
+            // Button is held - start/continue rotation (both horizontal and vertical)
+            CCustomCamera3D::StartRotation(MouseX, MouseY);
+            CCustomCamera3D::ProcessMouseRotation(MouseX, MouseY);
         }
         else
         {
