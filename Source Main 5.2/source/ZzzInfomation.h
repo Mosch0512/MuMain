@@ -28,6 +28,7 @@ extern ITEM_ATTRIBUTE* ItemAttribute;
 
 extern void OpenItemScript(wchar_t* FileName);
 extern void OpenItemScriptCSV(wchar_t* FileName);
+extern void ConvertItemBmdToCsv(const wchar_t* bmdFile, const wchar_t* csvFile);
 extern ActionSkillType GetSkillByBook(int Type);
 void SetItemAttributes(ITEM* ip);
 extern float CalcDurabilityPercent(BYTE dur, BYTE maxDur, int Level, int excellentFlags, int ancientDiscriminator = 0);
