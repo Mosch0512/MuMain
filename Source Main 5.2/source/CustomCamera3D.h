@@ -5,6 +5,12 @@
 // - Mouse wheel: Zoom in/out
 // - Middle mouse button + move: Rotate around character
 
+// Shared camera height offset constant
+// Used by both default camera and 3D camera to ensure consistent framing
+// This value represents the vertical offset added to the camera target point
+// to focus on the character's instead of their feet
+constexpr float CAMERA_HEIGHT_OFFSET = 80.0f;
+
 class CCustomCamera3D
 {
 private:

@@ -1456,7 +1456,7 @@ bool MoveMainCamera()
         else if (CCameraMove::GetInstancePtr()->IsTourMode());
         else
         {
-            CameraPosition[2] = Hero->Object.Position[2];//700
+            CameraPosition[2] = Hero->Object.Position[2] + CAMERA_HEIGHT_OFFSET; // Add offset to better center the char on screen
         }
 
         if ((TerrainWall[iIndex] & TW_HEIGHT) == TW_HEIGHT)

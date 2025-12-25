@@ -184,10 +184,29 @@ void CCustomCamera3D::GetModifiedCameraPosition(float inPos[3], float charPos[3]
     float rotatedY = scaledX * sinf(angleRad) + scaledY * cosf(angleRad);
     float rotatedZ = scaledZ; // Z stays the same for horizontal rotation
 
-    // Convert back to world coordinates
+    // Calculate additional vertical offset beyond the default camera's base offset
+    // The default camera already has CAMERA_HEIGHT_OFFSET units baked into the initial offset
+    const float maxHeightOffset = 150.0f;  // Maximum offset at min zoom in (50)
+
+    // Calculate zoom factor
+    float zoomFactor = 0.0f;
+    if (m_fZoomDistance < 100.0f)  // Only add extra offset when zooming in from default
+    {
+        zoomFactor = (100.0f - m_fZoomDistance) / (100.0f - m_fMinZoom);
+        zoomFactor = std::max(0.0f, std::min(1.0f, zoomFactor));  // Clamp to 0-1
+    }
+
+    // Calculate the target offset for current zoom level
+    float targetHeightOffset = CAMERA_HEIGHT_OFFSET + ((maxHeightOffset - CAMERA_HEIGHT_OFFSET) * zoomFactor);
+
+    // Calculate additional offset beyond what's already in the initial position
+    // Since the initial position already has CAMERA_HEIGHT_OFFSET units, we only add the difference
+    float additionalOffset = targetHeightOffset - CAMERA_HEIGHT_OFFSET;
+
+    // Convert back to world coordinates with additional height offset
     outPos[0] = charPos[0] + rotatedX;
     outPos[1] = charPos[1] + rotatedY;
-    outPos[2] = charPos[2] + rotatedZ;
+    outPos[2] = charPos[2] + rotatedZ + additionalOffset;
 }
 
 void CCustomCamera3D::GetModifiedCameraAngle(float inAngle[3], float outAngle[3])
