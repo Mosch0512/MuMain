@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "CustomCamera3D.h"
 #include "ZzzOpenglUtil.h"
+#include "ZzzScene.h"
 #include <cmath>
 #include <algorithm>
 
@@ -144,7 +145,8 @@ void CCustomCamera3D::StopRotation()
 
 void CCustomCamera3D::GetModifiedCameraPosition(float inPos[3], float charPos[3], float outPos[3])
 {
-    if (!m_bEnabled)
+    // Only apply 3D camera in main game scene
+    if (!m_bEnabled || SceneFlag != MAIN_SCENE)
     {
         outPos[0] = inPos[0];
         outPos[1] = inPos[1];
@@ -190,7 +192,8 @@ void CCustomCamera3D::GetModifiedCameraPosition(float inPos[3], float charPos[3]
 
 void CCustomCamera3D::GetModifiedCameraAngle(float inAngle[3], float outAngle[3])
 {
-    if (!m_bEnabled)
+    // Only apply 3D camera in main game scene
+    if (!m_bEnabled || SceneFlag != MAIN_SCENE)
     {
         outAngle[0] = inAngle[0];
         outAngle[1] = inAngle[1];
