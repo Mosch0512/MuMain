@@ -389,7 +389,7 @@ void CMuEditor::RenderItemEditor()
                 ImGui::TableSetColumnIndex(3);
                 ImGui::PushID(i);
                 int reqStr = ItemAttribute[i].RequireStrength;
-                if (ImGui::InputInt("##str", &reqStr, 1, 10))
+                if (ImGui::InputInt("##str", &reqStr, 0, 0))
                 {
                     if (reqStr >= 0 && reqStr <= 65535)
                     {
