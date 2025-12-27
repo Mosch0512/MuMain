@@ -1247,10 +1247,8 @@ void LoadingScene(HDC hDC)
     extern bool g_bRenderGameCursor;
     if (g_bRenderGameCursor)
     {
-        EnableAlphaTest();
-        glColor3f(1.f, 1.f, 1.f);
         BeginBitmap();
-        RenderBitmap(BITMAP_CURSOR, (float)MouseX - 2.f, (float)MouseY - 2.f, 24.f, 24.f);
+        RenderCursor();
         EndBitmap();
     }
 #endif
@@ -2183,10 +2181,8 @@ void MainScene(HDC hDC)
             extern bool g_bRenderGameCursor;
             if (g_bRenderGameCursor)
             {
-                EnableAlphaTest();
-                glColor3f(1.f, 1.f, 1.f);
                 BeginBitmap();
-                RenderBitmap(BITMAP_CURSOR, (float)MouseX - 2.f, (float)MouseY - 2.f, 24.f, 24.f);
+                RenderCursor();
                 EndBitmap();
             }
 #endif

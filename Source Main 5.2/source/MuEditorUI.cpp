@@ -49,13 +49,6 @@ void CMuEditorUI::RenderToolbarOpen(bool& editorEnabled)
 
     if (ImGui::Begin("ToolbarClosed", nullptr, flags))
     {
-        // NoInputs flag prevents hover detection, so manually check mouse position
-        // Toolbar is at top, full width, 40px height
-        if (io.MousePos.y >= 0 && io.MousePos.y < 40)
-        {
-            g_MuEditor.SetHoveringUI(true);
-        }
-
         ImGui::Spacing();
         ImGui::Indent(10.0f);
 
@@ -73,10 +66,14 @@ void CMuEditorUI::RenderToolbarOpen(bool& editorEnabled)
 
         ImGui::PopStyleColor(2);
 
-        // Manually check if mouse is over button and clicked (since NoInputs prevents normal interaction)
-        if (io.MousePos.x >= buttonMin.x && io.MousePos.x <= buttonMax.x &&
-            io.MousePos.y >= buttonMin.y && io.MousePos.y <= buttonMax.y)
+        // Check if mouse is hovering over the button specifically
+        bool isHoveringButton = (io.MousePos.x >= buttonMin.x && io.MousePos.x <= buttonMax.x &&
+                                 io.MousePos.y >= buttonMin.y && io.MousePos.y <= buttonMax.y);
+
+        if (isHoveringButton)
         {
+            g_MuEditor.SetHoveringUI(true);
+
             if (ImGui::IsMouseClicked(0)) // Left click
             {
                 editorEnabled = true;
