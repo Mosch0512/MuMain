@@ -133,34 +133,36 @@ void CMuEditor::Update()
         m_bFrameStarted = true;
     }
 
-    // When editor is closed, check if mouse is over "Open Editor" button area and block input
-    if (!m_bEditorMode)
+    // Block game input when interacting with editor UI
+    extern EGameScene SceneFlag;
+    ImGuiIO& io = ImGui::GetIO();
+
+    if (SceneFlag == MAIN_SCENE)
     {
-        ImGuiIO& io = ImGui::GetIO();
-        io.WantCaptureMouse = false;
-        io.WantCaptureKeyboard = false;
-
-        // Check if mouse is over button area (top-right corner)
-        float buttonX = io.DisplaySize.x - 110;
-        float buttonY = 8.0f;
-        float buttonWidth = 100.0f;
-        float buttonHeight = 24.0f;
-
-        if (io.MousePos.x >= buttonX && io.MousePos.x <= (buttonX + buttonWidth) &&
-            io.MousePos.y >= buttonY && io.MousePos.y <= (buttonY + buttonHeight))
-        {
-            // Mouse is over button - block game input
-            extern bool MouseLButton, MouseLButtonPop, MouseLButtonPush, MouseLButtonDBClick;
-            MouseLButton = false;
-            MouseLButtonPop = false;
-            MouseLButtonPush = false;
-            MouseLButtonDBClick = false;
-        }
+        // In main game scene, block input when hovering UI
+        g_MuInputBlocker.ProcessInputBlocking();
     }
-    // Only block game input when editor is fully open and ImGui is capturing mouse/keyboard
     else
     {
-        g_MuInputBlocker.ProcessInputBlocking();
+        // In login/character scenes, block game input only when ImGui wants it
+        // (e.g., when typing in item editor fields)
+        if (io.WantCaptureKeyboard || io.WantCaptureMouse)
+        {
+            // Block game input
+            extern bool MouseLButton, MouseLButtonPop, MouseLButtonPush, MouseLButtonDBClick;
+            extern bool MouseRButton, MouseRButtonPop, MouseRButtonPush;
+
+            if (io.WantCaptureMouse)
+            {
+                MouseLButton = false;
+                MouseLButtonPop = false;
+                MouseLButtonPush = false;
+                MouseLButtonDBClick = false;
+                MouseRButton = false;
+                MouseRButtonPop = false;
+                MouseRButtonPush = false;
+            }
+        }
     }
 }
 
@@ -248,6 +250,9 @@ void CMuEditor::RenderAfterGame()
 {
     if (!m_bInitialized || !m_bFrameStarted)
         return;
+
+    // Render 3D item preview (must be called with OpenGL state, before ImGui overlay)
+    g_MuEditorUI.Render3DItemPreview();
 
     // Now render the ImGui draw data on top of the game
     ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());

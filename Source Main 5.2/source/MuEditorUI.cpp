@@ -9,6 +9,8 @@
 #include "ZzzOpenglUtil.h"
 #include "Input.h"
 #include "imgui.h"
+#include "NewUI3DRenderMng.h"
+#include "ZzzInventory.h"
 
 // Define framebuffer extension function pointers manually (avoiding GLEW dependency)
 typedef void (APIENTRY * PFNGLGENFRAMEBUFFERSEXTPROC)(GLsizei n, GLuint* framebuffers);
@@ -80,6 +82,38 @@ static void LoadFramebufferExtension()
 #define GL_FRAMEBUFFER_COMPLETE_EXT 0x8CD5
 #define GL_DEPTH_COMPONENT24 0x81A6
 #endif
+
+// 3D Item Preview for right panel - renders via 3D render manager
+class CItemPreviewPanel3D : public SEASON3B::INewUI3DRenderObj
+{
+public:
+    virtual void Render3D() override
+    {
+        extern void RenderItem3D(float sx, float sy, float Width, float Height, int Type, int Level, int excellentFlags, int ancientDiscriminator, bool PickUp);
+
+        int selectedItemIndex = g_MuItemEditor.GetSelectedItemIndex();
+        if (selectedItemIndex >= 0)
+        {
+            // Get the cached preview panel position from the UI manager
+            float x = g_MuEditorUI.m_fPreviewPanelX;
+            float y = g_MuEditorUI.m_fPreviewPanelY;
+            float size = g_MuEditorUI.m_fPreviewPanelSize;
+
+            if (size > 0)
+            {
+                RenderItem3D(x, y, size, size, selectedItemIndex, 0, 0, 0, false);
+            }
+        }
+    }
+
+    virtual bool IsVisible() const override
+    {
+        return g_MuItemEditor.GetSelectedItemIndex() >= 0 && g_MuEditorUI.m_fPreviewPanelSize > 0;
+    }
+};
+
+static CItemPreviewPanel3D g_ItemPreviewPanel3D;
+static bool g_bItemPreviewPanel3DRegistered = false;
 
 // UI Layout constants
 constexpr float TOOLBAR_HEIGHT = 40.0f;
@@ -446,9 +480,77 @@ void CMuEditorUI::RenderItemPreview()
     ImGui::Unindent();
     ImGui::Separator();
 
-    // TODO: Add 3D model preview here when model rendering is implemented
-    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "3D Model Preview");
-    ImGui::Text("(Model rendering coming soon)");
+    // Model Preview
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Model Preview");
+    ImGui::Separator();
+
+    // Calculate item group and subindex
+    // Item Type system: Type = (Group * 512) + SubIndex
+    // ItemAttribute array is flat: [0-511]=Swords, [512-1023]=Axes, etc.
+    // selectedIndex IS the Type value (confirmed by ItemAttribute[ip->Type] pattern)
+    int itemGroup = selectedIndex / 512;  // 0=SWORD, 1=AXE, 2=MACE, etc.
+    int subIndex = selectedIndex % 512;
+
+    const char* groupNames[] = {
+        "Sword", "Axe", "Mace", "Spear", "Bow", "Staff",
+        "Shield", "Helm", "Armor", "Pants", "Gloves", "Boots",
+        "Wing", "Helper", "Potion", "Etc"
+    };
+
+    if (itemGroup < 16)
+    {
+        ImGui::Text("Group: %s (%d)", groupNames[itemGroup], itemGroup);
+        ImGui::Text("SubIndex: %d", subIndex);
+        ImGui::Separator();
+    }
+
+    // Get available space for 3D preview
+    ImVec2 availableSize = ImGui::GetContentRegionAvail();
+    float previewSize = (availableSize.x < availableSize.y) ? availableSize.x : availableSize.y;
+    previewSize = (previewSize - 40 < 300.0f) ? (previewSize - 40) : 300.0f;
+
+    ImVec2 previewPos = ImGui::GetCursorScreenPos();
+    float centerX = previewPos.x + availableSize.x * 0.5f;
+    float centerY = previewPos.y + previewSize * 0.5f;
+
+    // Center the preview box
+    ImGui::SetCursorScreenPos(ImVec2(centerX - previewSize * 0.5f, previewPos.y));
+
+    // Create a dummy to reserve space
+    ImGui::Dummy(ImVec2(previewSize, previewSize));
+
+    // Show explanation why 3D preview doesn't work
+    ImGui::TextWrapped("3D Preview Not Available");
+    ImGui::Separator();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.8f, 0.2f, 1.0f));
+    ImGui::TextWrapped("RenderItem3D requires full game scene setup (lighting, camera, world state) which isn't available in the editor's framebuffer context.");
+    ImGui::PopStyleColor();
+    ImGui::Spacing();
+    ImGui::TextWrapped("Item data is displayed above. To see the 3D model, equip the item in-game or check the inventory.");
+}
+
+void CMuEditorUI::Render3DItemPreview()
+{
+    if (!m_bShouldRender3DPreview)
+        return;
+
+    // Render 3D item preview using the game's rendering system
+    // This is called between ImGui passes with proper OpenGL state
+    extern void RenderItem3D(float sx, float sy, float Width, float Height, int Type, int Level, int excellentFlags, int ancientDiscriminator, bool PickUp);
+
+    RenderItem3D(
+        m_fPreview3DX,      // sx
+        m_fPreview3DY,      // sy
+        m_fPreview3DSize,   // Width
+        m_fPreview3DSize,   // Height
+        m_iPreview3DType,   // Type (ItemAttribute index = Type)
+        m_iPreview3DLevel,  // Level
+        0,                  // excellentFlags
+        0,                  // ancientDiscriminator
+        false               // PickUp
+    );
+
+    m_bShouldRender3DPreview = false;  // Reset for next frame
 }
 
 void CMuEditorUI::RenderGameViewportWindow()

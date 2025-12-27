@@ -1968,6 +1968,12 @@ bool RenderMainScene()
     g_pPartyManager->Render();
     g_pNewUISystem->Render();
 
+#ifdef _EDITOR
+    // Render 3D item at cursor BEFORE EndOpengl (while still in 3D mode)
+    extern void Render3DItemAtCursor();
+    Render3DItemAtCursor();
+#endif
+
     BeginBitmap();
 
     RenderInfomation();

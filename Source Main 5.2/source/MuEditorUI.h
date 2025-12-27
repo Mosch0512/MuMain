@@ -54,7 +54,8 @@ private:
                     m_framebuffer(0), m_gameTexture(0), m_depthRenderbuffer(0),
                     m_framebufferInitialized(false), m_savedWindowWidth(0), m_savedWindowHeight(0),
                     m_savedInputWidth(0), m_savedInputHeight(0), m_savedMouseX(0), m_savedMouseY(0),
-                    m_savedScreenRateX(0.0f), m_savedScreenRateY(0.0f), m_fBottomPanelHeight(250.0f) {}
+                    m_savedScreenRateX(0.0f), m_savedScreenRateY(0.0f), m_fBottomPanelHeight(250.0f),
+                    m_fPreviewPanelX(0), m_fPreviewPanelY(0), m_fPreviewPanelSize(0) {}
     ~CMuEditorUI() { CleanupFramebuffer(); }
 
     void RenderToolbarOpen(bool& editorEnabled);
@@ -63,6 +64,10 @@ private:
     void RenderGameConsole();         // Render game console in tab
     void RenderItemPreview();         // Render item preview in right panel
 
+public:
+    void InitItemPreview3D();  // Initialize 3D item preview for right panel
+
+private:
     float m_fZoomLevel;  // Zoom level for game viewport (0.25 to 3.0)
     float m_fBottomPanelHeight;  // Resizable height of bottom panel
 
@@ -87,6 +92,11 @@ private:
     int m_savedMouseY;
     float m_savedScreenRateX;
     float m_savedScreenRateY;
+
+    // Preview panel 3D rendering position (cached for 3D render object)
+    float m_fPreviewPanelX;
+    float m_fPreviewPanelY;
+    float m_fPreviewPanelSize;
 
     void CleanupFramebuffer();
     void ResizeFramebuffer(int width, int height);

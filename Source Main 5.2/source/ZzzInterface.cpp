@@ -49,6 +49,12 @@
 #include "SkillManager.h"
 #include "MUHelper/MuHelper.h"
 
+#ifdef _EDITOR
+#include "MuItemEditor.h"
+#include "MuEditorConsole.h"
+#include "NewUI3DRenderMng.h"
+#endif
+
 #include "ZzzInterface.h"
 
 extern CUITextInputBox* g_pSingleTextInputBox;
@@ -8992,6 +8998,58 @@ void RenderCursor()
         }
     }
 }
+
+#ifdef _EDITOR
+// Editor 3D item preview object - renders via 3D render manager like picked items
+class CEditorItemPreview : public SEASON3B::INewUI3DRenderObj
+{
+public:
+    virtual void Render3D() override
+    {
+        extern void RenderItem3D(float sx, float sy, float Width, float Height, int Type, int Level, int excellentFlags, int ancientDiscriminator, bool PickUp);
+        extern ITEM_ATTRIBUTE* ItemAttribute;
+
+        int selectedItemIndex = g_MuItemEditor.GetSelectedItemIndex();
+        if (selectedItemIndex >= 0)
+        {
+            static int frameCount = 0;
+            if (frameCount++ % 60 == 0)
+            {
+                char debugMsg[256];
+                char itemName[128];
+                wcstombs(itemName, ItemAttribute[selectedItemIndex].Name, sizeof(itemName));
+                sprintf(debugMsg, "[3D Test] Rendering %s via 3D RenderMng!", itemName);
+                g_MuEditorConsole.Write(debugMsg);
+            }
+
+            RenderItem3D((float)MouseX, (float)MouseY, 100.f, 100.f, selectedItemIndex, 0, 0, 0, true);
+        }
+    }
+
+    virtual bool IsVisible() const override
+    {
+        return g_MuItemEditor.GetSelectedItemIndex() >= 0;
+    }
+};
+
+static CEditorItemPreview g_EditorItemPreview;
+static bool g_bEditorItemPreviewRegistered = false;
+
+void InitEditorItemPreview()
+{
+    if (!g_bEditorItemPreviewRegistered && g_pNewUI3DRenderMng)
+    {
+        g_pNewUI3DRenderMng->Add3DRenderObj(&g_EditorItemPreview, INFORMATION_CAMERA_Z_ORDER);
+        g_bEditorItemPreviewRegistered = true;
+        g_MuEditorConsole.Write("[3D Test] Editor preview registered with 3D RenderMng!");
+    }
+}
+
+void Render3DItemAtCursor()
+{
+    InitEditorItemPreview();
+}
+#endif
 
 void BackSelectModel()
 {
