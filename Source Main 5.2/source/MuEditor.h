@@ -13,8 +13,11 @@ public:
     void Shutdown();
     void Update();
     void Render();
+    void RenderBeforeGame();  // Render ImGui UI, prepare for game rendering
+    void RenderAfterGame();   // Finish ImGui rendering after game
 
     bool IsEnabled() const { return m_bEditorMode; }
+    bool IsEditorMode() const { return m_bEditorMode; }  // Alias for clarity
     void SetEnabled(bool enabled) { m_bEditorMode = enabled; }
     void ToggleEditor() { m_bEditorMode = !m_bEditorMode; }
 

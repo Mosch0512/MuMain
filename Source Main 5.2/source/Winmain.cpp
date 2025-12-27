@@ -608,6 +608,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         MouseX = (float)LOWORD(lParam) / g_fScreenRate_x;
         MouseY = (float)HIWORD(lParam) / g_fScreenRate_y;
+
+#ifdef _EDITOR
+        // In editor mode with 1:1 screen rate, clamp to window dimensions
+        if (MouseX < 0)
+            MouseX = 0;
+        if (MouseX > WindowWidth)
+            MouseX = WindowWidth;
+        if (MouseY < 0)
+            MouseY = 0;
+        if (MouseY > WindowHeight)
+            MouseY = WindowHeight;
+#else
+        // In normal mode, clamp to virtual 640x480 space
         if (MouseX < 0)
             MouseX = 0;
         if (MouseX > 640)
@@ -616,6 +629,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             MouseY = 0;
         if (MouseY > 480)
             MouseY = 480;
+#endif
     }
     break;
     case WM_LBUTTONDOWN:
@@ -1119,8 +1133,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLin
         break;
     }
 
+#ifdef _EDITOR
+    // In editor mode, use 1:1 mapping since framebuffer matches window size
+    g_fScreenRate_x = 1.0f;
+    g_fScreenRate_y = 1.0f;
+#else
     g_fScreenRate_x = (float)WindowWidth / 640;
     g_fScreenRate_y = (float)WindowHeight / 480;
+#endif
 
 
     pMultiLanguage = new CMultiLanguage(g_strSelectedML);
@@ -1193,10 +1213,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLin
     if (g_bUseWindowMode == TRUE)
     {
         RECT rc = { 0, 0, WindowWidth, WindowHeight };
-        AdjustWindowRect(&rc, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_BORDER | WS_CLIPCHILDREN, NULL);
+        // Add WS_THICKFRAME for resizing and WS_MAXIMIZEBOX for maximize button
+        DWORD windowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX |
+                           WS_MAXIMIZEBOX | WS_THICKFRAME | WS_CLIPCHILDREN;
+        AdjustWindowRect(&rc, windowStyle, NULL);
         g_hWnd = CreateWindow(
             windowName, windowName,
-            WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_BORDER | WS_CLIPCHILDREN,
+            windowStyle,
             (GetSystemMetrics(SM_CXSCREEN) - rc.right) / 2,
             (GetSystemMetrics(SM_CYSCREEN) - rc.bottom) / 2,
             rc.right - rc.left,

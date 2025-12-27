@@ -832,7 +832,12 @@ bool SEASON3B::CNewUIChatLogWindow::UpdateMouseEvent()
                         return false;
                     }
                 }
+
+#ifdef _EDITOR
+                if (SEASON3B::CheckMouseIn(0, 0, WindowWidth, m_WndPos.y - (SCROLL_MIDDLE_PART_HEIGHT * 15 + RESIZING_BTN_HEIGHT + SCROLL_TOP_BOTTOM_PART_HEIGHT * 2)))
+#else
                 if (SEASON3B::CheckMouseIn(0, 0, 640, m_WndPos.y - (SCROLL_MIDDLE_PART_HEIGHT * 15 + RESIZING_BTN_HEIGHT + SCROLL_TOP_BOTTOM_PART_HEIGHT * 2)))
+#endif
                 {
                     SetNumberOfShowingLines(15);
                 }

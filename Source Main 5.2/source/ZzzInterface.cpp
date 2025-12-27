@@ -7422,10 +7422,17 @@ void MoveHero()
     {
         int mousePosY = MouseY;
 
+#ifdef _EDITOR
+        if (mousePosY > WindowHeight)
+        {
+            mousePosY = WindowHeight;
+        }
+#else
         if (mousePosY > 480)
         {
             mousePosY = 480;
         }
+#endif
         Hero->Object.HeadTargetAngle[0] = (float)Angle;
         Hero->Object.HeadTargetAngle[1] = (HeroY - mousePosY) * 0.05f;
 
@@ -9103,7 +9110,12 @@ void EditObjects()
                     PickObject->Scale += 0.02f;
                 if (HIBYTE(GetAsyncKeyState('F')) == 128)
                     PickObject->Scale -= 0.02f;
+
+#ifdef _EDITOR
+                if (MouseX >= WindowWidth - 100 && MouseY < 100)
+#else
                 if (MouseX >= 640 - 100 && MouseY < 100)
+#endif
                 {
                     DeleteObject(PickObject, &ObjectBlock[PickObject->Block]);
                     PickObject = NULL;

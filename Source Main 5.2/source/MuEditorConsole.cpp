@@ -363,8 +363,16 @@ void CMuEditorConsole::Render()
     CaptureConsoleOutput();
 
     ImGuiIO& io = ImGui::GetIO();
+
+#ifdef _EDITOR
+    // Position console at the bottom spanning full width
+    float consoleHeight = 250.0f; // Match BOTTOM_PANEL_HEIGHT from EditorLayout
+    ImVec2 bottom_pos = ImVec2(0, io.DisplaySize.y - consoleHeight);
+    ImVec2 bottom_size = ImVec2(io.DisplaySize.x, consoleHeight);
+#else
     ImVec2 bottom_pos = ImVec2(0, io.DisplaySize.y - 200);
     ImVec2 bottom_size = ImVec2(io.DisplaySize.x, 200);
+#endif
 
     ImGui::SetNextWindowPos(bottom_pos, ImGuiCond_Always);
     ImGui::SetNextWindowSize(bottom_size, ImGuiCond_Always);

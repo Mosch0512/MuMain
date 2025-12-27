@@ -1157,17 +1157,28 @@ BOOL CUIBaseWindow::DoMouseAction()
             MouseOnWindow = true;
 
             if (m_iPos_x + MouseX - m_iMouseClickPos_x < 0) m_iPos_x = 0;
+#ifdef _EDITOR
+            else if (m_iPos_x + m_iWidth + MouseX - m_iMouseClickPos_x > WindowWidth) m_iPos_x = WindowWidth - m_iWidth;
+#else
             else if (m_iPos_x + m_iWidth + MouseX - m_iMouseClickPos_x > 640) m_iPos_x = 640 - m_iWidth;
+#endif
             else m_iPos_x += MouseX - m_iMouseClickPos_x;
 
             if (m_iPos_y + MouseY - m_iMouseClickPos_y < 0)
             {
                 m_iPos_y = 0;
             }
+#ifdef _EDITOR
+            else if (m_iPos_y + m_iHeight + MouseY - m_iMouseClickPos_y > WindowHeight)
+            {
+                m_iPos_y = WindowHeight - m_iHeight;
+            }
+#else
             else if (m_iPos_y + m_iHeight + MouseY - m_iMouseClickPos_y > 480)
             {
                 m_iPos_y = 480 - m_iHeight;
             }
+#endif
             else
             {
                 m_iPos_y += MouseY - m_iMouseClickPos_y;
@@ -1191,7 +1202,12 @@ BOOL CUIBaseWindow::DoMouseAction()
                 if (g_dwMouseUseUIID == 0) g_dwMouseUseUIID = GetUIID();
                 MouseOnWindow = true;
 
+
+#ifdef _EDITOR
+                if (m_iPos_x + m_iWidth + MouseX - m_iMouseClickPos_x > WindowWidth) m_iWidth = WindowWidth - m_iPos_x;
+#else
                 if (m_iPos_x + m_iWidth + MouseX - m_iMouseClickPos_x > 640) m_iWidth = 640 - m_iPos_x;
+#endif
                 else m_iWidth += MouseX - m_iMouseClickPos_x;
 
                 if (m_iWidth < m_iMinWidth)
@@ -1204,7 +1220,11 @@ BOOL CUIBaseWindow::DoMouseAction()
                 }
                 else m_iMouseClickPos_x = MouseX;
 
+#ifdef _EDITOR
+                if (m_iPos_y + m_iHeight + MouseY - m_iMouseClickPos_y > WindowHeight) m_iHeight = WindowHeight - m_iPos_y;
+#else
                 if (m_iPos_y + m_iHeight + MouseY - m_iMouseClickPos_y > 480) m_iHeight = 480 - m_iPos_y;
+#endif
                 else m_iHeight += MouseY - m_iMouseClickPos_y;
 
                 if (m_iHeight < m_iMinHeight)

@@ -19,6 +19,7 @@
 
 #ifdef _EDITOR
 #include "MuEditor.h"
+#include "MuEditorUI.h"
 #endif
 
 #define	DOCK_EXTENT		10
@@ -137,6 +138,11 @@ void CUIMng::ReleaseTitleSceneUI()
 
 void CUIMng::RenderTitleSceneUI(HDC hDC, DWORD dwNow, DWORD dwTotal)
 {
+#ifdef _EDITOR
+    // Render splash screen to framebuffer in editor mode
+    g_MuEditorUI.BeginGameViewport();
+#endif
+
     ::BeginOpengl();
     ::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ::BeginBitmap();
@@ -153,11 +159,21 @@ void CUIMng::RenderTitleSceneUI(HDC hDC, DWORD dwNow, DWORD dwTotal)
 
     ::EndBitmap();
     ::EndOpengl();
-    ::glFlush();
+
 #ifdef _EDITOR
-    // Always render ImGui (shows "Open Editor" button when closed, or full UI when open)
+    // End framebuffer rendering
+    g_MuEditorUI.EndGameViewport();
+#endif
+
+    ::glFlush();
+
+#ifdef _EDITOR
+    // Clear screen and render ImGui with splash screen
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     g_MuEditor.Render();
 #endif
+
     ::SwapBuffers(hDC);
 }
 

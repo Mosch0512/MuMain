@@ -18,6 +18,8 @@ CLoadingScene::~CLoadingScene()
 void CLoadingScene::Create()
 {
     CInput rInput = CInput::Instance();
+
+    // Use normal screen-based scaling
     float fScaleX = (float)rInput.GetScreenWidth() / 800.0f;
     float fScaleY = (float)rInput.GetScreenHeight() / 600.0f;
 

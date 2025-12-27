@@ -21,6 +21,7 @@
 
 #ifdef _EDITOR
 #include "MuEditor.h"
+#include "MuEditorUI.h"
 #include "MuEditorConsole.h"
 #include "imgui.h"
 #endif
@@ -235,6 +236,7 @@ void WebzenScene(HDC hDC)
 
     g_pNewUISystem->LoadMainSceneInterface();
 
+    // RenderTitleSceneUI handles framebuffer wrapping internally in editor mode
     CUIMng::Instance().RenderTitleSceneUI(hDC, 11, 11);
 
     rUIMng.ReleaseTitleSceneUI();
@@ -449,6 +451,7 @@ void RenderInfomation()
 
     CUIMng::Instance().Render();
 
+    // Render cursor inside framebuffer for all modes
     if (SceneFlag == LOG_IN_SCENE || SceneFlag == CHARACTER_SCENE)
     {
         RenderCursor();
@@ -1211,6 +1214,10 @@ void LoadingScene(HDC hDC)
 {
     g_ConsoleDebug->Write(MCD_NORMAL, L"LoadingScene_Start");
 
+#ifdef _EDITOR
+    g_MuEditorConsole.Log("=== LoadingScene() START ===", ConsoleCategory::Editor);
+#endif
+
     CUIMng& rUIMng = CUIMng::Instance();
     if (!InitLoading)
     {
@@ -1230,6 +1237,16 @@ void LoadingScene(HDC hDC)
     }
 
     FogEnable = false;
+
+#ifdef _EDITOR
+    // Render loading screen to framebuffer
+    g_MuEditorConsole.Log("LoadingScene: About to call BeginGameViewport()", ConsoleCategory::Editor);
+    g_MuEditorUI.BeginGameViewport();
+#else
+    // This should never be reached if _EDITOR is defined!
+    MessageBoxA(NULL, "_EDITOR not defined in LoadingScene!", "ERROR", MB_OK);
+#endif
+
     ::BeginOpengl();
     ::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ::BeginBitmap();
@@ -1238,19 +1255,21 @@ void LoadingScene(HDC hDC)
 
     ::EndBitmap();
     ::EndOpengl();
-    ::glFlush();
-#ifdef _EDITOR
-    // Always render ImGui (shows "Open Editor" button when closed, or full UI when open)
-    g_MuEditor.Render();
 
-    // Render game cursor on top of ImGui if not hovering UI
-    extern bool g_bRenderGameCursor;
-    if (g_bRenderGameCursor)
-    {
-        BeginBitmap();
-        RenderCursor();
-        EndBitmap();
-    }
+#ifdef _EDITOR
+    // End framebuffer rendering
+    g_MuEditorUI.EndGameViewport();
+#endif
+
+    ::glFlush();
+
+#ifdef _EDITOR
+    // Clear screen and render ImGui
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Render ImGui with loading screen texture in center
+    g_MuEditor.Render();
 #endif
     ::SwapBuffers(hDC);
 
@@ -1803,6 +1822,8 @@ bool RenderMainScene()
         glClearColor(0 / 256.f, 0 / 256.f, 0 / 256.f, 1.f);
     }
 
+    // Note: BeginGameViewport is now called in MainScene() before all scene rendering
+
     BeginOpengl(0, 0, Width, Height);
 
     CreateFrustrum((float)Width / (float)640, (float)Height / 480.f, pos);
@@ -1955,12 +1976,15 @@ bool RenderMainScene()
 #endif //ENABLE_EDIT
 
     EndBitmap();
+
+    // Render cursor inside framebuffer for all modes
     BeginBitmap();
-
     RenderCursor();
-
     EndBitmap();
+
     EndOpengl();
+
+    // Note: EndGameViewport is now called in MainScene() after all scene rendering
 
     return true;
 }
@@ -2132,6 +2156,11 @@ void MainScene(HDC hDC)
         glClearColor(0 / 256.f, 0 / 256.f, 0 / 256.f, 1.f);
     }
 
+#ifdef _EDITOR
+    // Wrap all scenes with framebuffer rendering
+    g_MuEditorUI.BeginGameViewport();
+#endif
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     bool Success = false;
@@ -2174,17 +2203,21 @@ void MainScene(HDC hDC)
         if (Success)
         {
 #ifdef _EDITOR
-            // Always render ImGui (shows "Open Editor" button when closed, or full UI when open)
-            g_MuEditor.Render();
+            // End framebuffer rendering
+            g_MuEditorUI.EndGameViewport();
 
-            // Render game cursor on top of ImGui if not hovering UI
-            extern bool g_bRenderGameCursor;
-            if (g_bRenderGameCursor)
-            {
-                BeginBitmap();
-                RenderCursor();
-                EndBitmap();
-            }
+            // Clear the screen before rendering ImGui (so game doesn't show through)
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            // Always use split rendering with editor
+            // Render ImGui UI panels and generate draw data
+            g_MuEditor.RenderBeforeGame();
+
+            // Game already rendered to framebuffer in center viewport
+            // Now render ImGui on top
+            g_MuEditor.RenderAfterGame();
+
 #endif
             SwapBuffers(hDC);
         }

@@ -302,7 +302,12 @@ bool SEASON3B::CNewUIMiniMap::UpdateMouseEvent()
         }
     }
 
+
+#ifdef _EDITOR
+    if (CheckMouseIn(0, 0, WindowWidth, WindowHeight - 50))
+#else
     if (CheckMouseIn(0, 0, 640, 430))
+#endif
     {
         return false;
     }

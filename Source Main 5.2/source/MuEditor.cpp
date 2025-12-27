@@ -17,7 +17,7 @@
 constexpr int CURSOR_VISIBLE_THRESHOLD = 0;
 
 CMuEditor::CMuEditor()
-    : m_bEditorMode(false)
+    : m_bEditorMode(true)  // Start with editor enabled by default
     , m_bInitialized(false)
     , m_bFrameStarted(false)
     , m_bShowItemEditor(false)
@@ -69,6 +69,9 @@ void CMuEditor::Initialize(HWND hwnd, HDC hdc)
 
     m_bInitialized = true;
     g_MuEditorConsole.LogEditor("MU Editor initialized");
+
+    // Initialize framebuffer for game viewport
+    g_MuEditorUI.InitializeFramebuffer();
 
     fwprintf(stderr, L"[MuEditor] Initialize() completed\n");
     fflush(stderr);
@@ -218,6 +221,68 @@ void CMuEditor::Render()
     // Render ImGui and reset frame state
     ImGui::Render();
     ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+
+    // Frame is complete, reset for next frame
+    m_bFrameStarted = false;
+}
+
+void CMuEditor::RenderBeforeGame()
+{
+    if (!m_bInitialized || !m_bFrameStarted)
+        return;
+
+    // Reset hover state at start of frame
+    m_bHoveringUI = false;
+
+    // Render toolbar (handles both open and closed states)
+    g_MuEditorUI.RenderToolbar(m_bEditorMode, m_bShowItemEditor, m_bShowConsole);
+
+    if (m_bEditorMode)
+    {
+        // Render center viewport panels (left, right)
+        g_MuEditorUI.RenderCenterViewport();
+
+        // Render console with filter flags
+        g_MuEditorConsole.Render(m_bShowConsole, m_bFilterNetwork, m_bFilterFileIO,
+                                 m_bFilterEditor, m_bFilterError, m_bFilterGeneral);
+
+        // Render editor windows
+        if (m_bShowItemEditor)
+        {
+            g_MuItemEditor.Render(m_bShowItemEditor);
+        }
+    }
+
+    // Prepare ImGui for rendering (generate draw data but don't render yet)
+    ImGui::Render();
+}
+
+void CMuEditor::RenderAfterGame()
+{
+    if (!m_bInitialized || !m_bFrameStarted)
+        return;
+
+    // Now render the ImGui draw data on top of the game
+    ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+
+    // Control game cursor rendering via global flag
+    extern bool g_bRenderGameCursor;
+    g_bRenderGameCursor = !m_bHoveringUI;
+
+    // Manage Windows cursor visibility
+    static bool lastHoveringState = false;
+    if (m_bHoveringUI != lastHoveringState)
+    {
+        if (m_bHoveringUI)
+        {
+            while (ShowCursor(TRUE) < CURSOR_VISIBLE_THRESHOLD);
+        }
+        else
+        {
+            while (ShowCursor(FALSE) >= CURSOR_VISIBLE_THRESHOLD);
+        }
+        lastHoveringState = m_bHoveringUI;
+    }
 
     // Frame is complete, reset for next frame
     m_bFrameStarted = false;

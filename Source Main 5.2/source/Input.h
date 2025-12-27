@@ -87,6 +87,10 @@ public:
 
     long GetScreenWidth() { return m_lScreenWidth; }
     long GetScreenHeight() { return m_lScreenHeight; }
+
+    // Editor mode: temporarily override screen dimensions
+    void SetScreenDimensions(long width, long height) { m_lScreenWidth = width; m_lScreenHeight = height; }
+
     void SetLeftHandMode(bool bLeftHand) { m_bLeftHand = bLeftHand; }
     bool IsLeftHandMode() { return m_bLeftHand; }
     void SetTextEditMode(bool bTextEditMode) { m_bTextEditMode = bTextEditMode; }
