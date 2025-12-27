@@ -6,6 +6,13 @@
 #include "MuEditor.h"
 #include "imgui.h"
 
+// UI Layout constants
+constexpr float TOOLBAR_HEIGHT = 40.0f;
+constexpr float TOOLBAR_PADDING = 8.0f;
+constexpr float TOOLBAR_INDENT = 10.0f;
+constexpr float BUTTON_WIDTH_OFFSET = 110.0f;
+constexpr int MOUSE_BUTTON_LEFT = 0;
+
 CMuEditorUI& CMuEditorUI::GetInstance()
 {
     static CMuEditorUI instance;
@@ -34,7 +41,7 @@ void CMuEditorUI::RenderToolbarOpen(bool& editorEnabled)
     io.WantCaptureMouse = false;
     io.WantCaptureKeyboard = false;
 
-    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, 40), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, TOOLBAR_HEIGHT), ImGuiCond_Always);
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
     // NoInputs prevents ImGui from capturing mouse/keyboard, allowing game cursor to work
@@ -45,15 +52,15 @@ void CMuEditorUI::RenderToolbarOpen(bool& editorEnabled)
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.15f, 0.15f, 0.15f, 0.0f));
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(TOOLBAR_PADDING, TOOLBAR_PADDING));
 
     if (ImGui::Begin("ToolbarClosed", nullptr, flags))
     {
         ImGui::Spacing();
-        ImGui::Indent(10.0f);
+        ImGui::Indent(TOOLBAR_INDENT);
 
         // Open button on the far right (same position as Close button)
-        ImGui::SameLine(ImGui::GetWindowWidth() - 110);
+        ImGui::SameLine(ImGui::GetWindowWidth() - BUTTON_WIDTH_OFFSET);
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.7f, 0.3f, 1.0f));
 
@@ -74,7 +81,7 @@ void CMuEditorUI::RenderToolbarOpen(bool& editorEnabled)
         {
             g_MuEditor.SetHoveringUI(true);
 
-            if (ImGui::IsMouseClicked(0)) // Left click
+            if (ImGui::IsMouseClicked(MOUSE_BUTTON_LEFT))
             {
                 editorEnabled = true;
 
@@ -96,7 +103,7 @@ void CMuEditorUI::RenderToolbarOpen(bool& editorEnabled)
 
 void CMuEditorUI::RenderToolbarFull(bool& editorEnabled, bool& showItemEditor)
 {
-    ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x, 40), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x, TOOLBAR_HEIGHT), ImGuiCond_Always);
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |

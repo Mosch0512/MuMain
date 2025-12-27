@@ -11,6 +11,11 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_opengl2.h"
 
+// Windows cursor display counter thresholds
+// The cursor is visible when the counter is >= CURSOR_VISIBLE_THRESHOLD
+// The cursor is hidden when the counter is < CURSOR_VISIBLE_THRESHOLD
+constexpr int CURSOR_VISIBLE_THRESHOLD = 0;
+
 CMuEditor::CMuEditor()
     : m_bEditorMode(false)
     , m_bInitialized(false)
@@ -186,33 +191,26 @@ void CMuEditor::Render()
         }
     }
 
-    // Cursor management based on ImGui hover state
-    // m_bHoveringUI is set by each UI component that detects hover
-    static bool lastHoveringState = false;
-
     // Control game cursor rendering via global flag
+    // When hovering UI, hide game cursor; otherwise show it
     extern bool g_bRenderGameCursor;
     g_bRenderGameCursor = !m_bHoveringUI;
 
+    // Manage Windows cursor visibility
+    // Windows maintains an internal display counter - cursor is visible when counter >= 0
+    // We need to loop to force the counter to the correct state
+    static bool lastHoveringState = false;
     if (m_bHoveringUI != lastHoveringState)
     {
         if (m_bHoveringUI)
         {
-            // Show Windows cursor
-            int cursorCount = ShowCursor(TRUE);
-            while (cursorCount < 0)
-            {
-                cursorCount = ShowCursor(TRUE);
-            }
+            // Force cursor visible (counter >= CURSOR_VISIBLE_THRESHOLD)
+            while (ShowCursor(TRUE) < CURSOR_VISIBLE_THRESHOLD);
         }
         else
         {
-            // Hide Windows cursor (game cursor will show)
-            int cursorCount = ShowCursor(FALSE);
-            while (cursorCount >= 0)
-            {
-                cursorCount = ShowCursor(FALSE);
-            }
+            // Force cursor hidden (counter < CURSOR_VISIBLE_THRESHOLD)
+            while (ShowCursor(FALSE) >= CURSOR_VISIBLE_THRESHOLD);
         }
         lastHoveringState = m_bHoveringUI;
     }
