@@ -186,10 +186,9 @@ void CMuEditor::Render()
         }
     }
 
-    // Smart cursor management based on ImGui hover state
+    // Cursor management based on ImGui hover state
     // m_bHoveringUI is set by each UI component that detects hover
     static bool lastHoveringState = false;
-    static int frameCounter = 0;
 
     // Control game cursor rendering via global flag
     extern bool g_bRenderGameCursor;
@@ -197,19 +196,14 @@ void CMuEditor::Render()
 
     if (m_bHoveringUI != lastHoveringState)
     {
-        // State changed, update cursor
         if (m_bHoveringUI)
         {
-            // Show Windows cursor - make it VERY visible
+            // Show Windows cursor
             int cursorCount = ShowCursor(TRUE);
-            while (cursorCount < 10) // Force it to be very positive
+            while (cursorCount < 0)
             {
                 cursorCount = ShowCursor(TRUE);
             }
-
-            // Debug log
-            std::string msg = "Frame " + std::to_string(frameCounter) + ": Hovering UI - Windows cursor ON (count=" + std::to_string(cursorCount) + "), Game cursor OFF";
-            g_MuEditorConsole.LogEditor(msg);
         }
         else
         {
@@ -219,14 +213,9 @@ void CMuEditor::Render()
             {
                 cursorCount = ShowCursor(FALSE);
             }
-
-            // Debug log
-            std::string msg = "Frame " + std::to_string(frameCounter) + ": NOT hovering UI - Windows cursor OFF (count=" + std::to_string(cursorCount) + "), Game cursor ON";
-            g_MuEditorConsole.LogEditor(msg);
         }
         lastHoveringState = m_bHoveringUI;
     }
-    frameCounter++;
 
     // Render ImGui and reset frame state
     ImGui::Render();
