@@ -3,6 +3,7 @@
 #ifdef _EDITOR
 
 #include "MuEditorUI.h"
+#include "MuEditor.h"
 #include "imgui.h"
 
 CMuEditorUI& CMuEditorUI::GetInstance()
@@ -25,14 +26,20 @@ void CMuEditorUI::RenderToolbar(bool& editorEnabled, bool& showItemEditor)
 
 void CMuEditorUI::RenderToolbarOpen(bool& editorEnabled)
 {
-    // When editor is disabled, show only "Open Editor" button (fully transparent background)
+    // When editor is disabled, show only "Open Editor" button
+    // Use NoInputs flag to allow game mouse to pass through, but handle button clicks manually
     ImGuiIO& io = ImGui::GetIO();
+
+    // Prevent ImGui from wanting mouse input when editor is closed
+    io.WantCaptureMouse = false;
+    io.WantCaptureKeyboard = false;
+
     ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, 40), ImGuiCond_Always);
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
-    // NoMouseInputs allows game cursor to be visible and clickable, but ImGui widgets inside still work
+    // NoInputs prevents ImGui from capturing mouse/keyboard, allowing game cursor to work
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMouseInputs;
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoInputs;
 
     // Use same window background and border as Toolbar but fully transparent
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.15f, 0.15f, 0.15f, 0.0f));
@@ -42,6 +49,13 @@ void CMuEditorUI::RenderToolbarOpen(bool& editorEnabled)
 
     if (ImGui::Begin("ToolbarClosed", nullptr, flags))
     {
+        // NoInputs flag prevents hover detection, so manually check mouse position
+        // Toolbar is at top, full width, 40px height
+        if (io.MousePos.y >= 0 && io.MousePos.y < 40)
+        {
+            g_MuEditor.SetHoveringUI(true);
+        }
+
         ImGui::Spacing();
         ImGui::Indent(10.0f);
 
@@ -49,11 +63,32 @@ void CMuEditorUI::RenderToolbarOpen(bool& editorEnabled)
         ImGui::SameLine(ImGui::GetWindowWidth() - 110);
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.7f, 0.3f, 1.0f));
-        if (ImGui::Button("Open Editor"))
-        {
-            editorEnabled = true;
-        }
+
+        // Draw the button (won't be interactive due to NoInputs flag)
+        ImGui::Button("Open Editor");
+
+        // Get button rect for manual click detection
+        ImVec2 buttonMin = ImGui::GetItemRectMin();
+        ImVec2 buttonMax = ImGui::GetItemRectMax();
+
         ImGui::PopStyleColor(2);
+
+        // Manually check if mouse is over button and clicked (since NoInputs prevents normal interaction)
+        if (io.MousePos.x >= buttonMin.x && io.MousePos.x <= buttonMax.x &&
+            io.MousePos.y >= buttonMin.y && io.MousePos.y <= buttonMax.y)
+        {
+            if (ImGui::IsMouseClicked(0)) // Left click
+            {
+                editorEnabled = true;
+
+                // Clear game mouse button states to prevent click from going through to game
+                extern bool MouseLButton, MouseLButtonPop, MouseLButtonPush, MouseLButtonDBClick;
+                MouseLButton = false;
+                MouseLButtonPop = false;
+                MouseLButtonPush = false;
+                MouseLButtonDBClick = false;
+            }
+        }
 
         ImGui::Unindent(10.0f);
     }
@@ -74,6 +109,12 @@ void CMuEditorUI::RenderToolbarFull(bool& editorEnabled, bool& showItemEditor)
 
     if (ImGui::Begin("Toolbar", nullptr, flags))
     {
+        // Check if hovering this window
+        if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
+        {
+            g_MuEditor.SetHoveringUI(true);
+        }
+
         ImGui::Spacing();
         ImGui::Indent(10.0f);
 
