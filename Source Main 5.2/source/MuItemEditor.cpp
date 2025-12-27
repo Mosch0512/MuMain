@@ -27,38 +27,20 @@ void CMuItemEditor::Render(bool& showEditor)
     if (!ItemAttribute)
         return;
 
-    // Fill the entire center view area (between toolbar and console)
-    ImGuiIO& io = ImGui::GetIO();
-    float width = io.DisplaySize.x;
-    float height = io.DisplaySize.y - 40 - 200; // Full height minus toolbar (40px) and console (200px)
-    ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
-    ImGui::SetNextWindowPos(ImVec2(0, 40), ImGuiCond_Always); // Start below toolbar
+    // Render directly in the tab (no separate window)
+    ImGui::SameLine();
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
-    if (ImGui::Begin("Item Editor", &showEditor, flags))
-    {
-        // Check if hovering this window
-        if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
-        {
-            g_MuEditor.SetHoveringUI(true);
-        }
+    RenderSaveButton();
+    ImGui::Separator();
 
-        ImGui::Text("Edit Item Attributes - Total Items: %d", MAX_ITEM);
-        ImGui::SameLine();
+    RenderSearchBar();
+    ImGui::Separator();
 
-        RenderSaveButton();
-        ImGui::Separator();
+    // Convert search to lowercase for case-insensitive search
+    std::string searchLower = m_szItemSearchBuffer;
+    std::transform(searchLower.begin(), searchLower.end(), searchLower.begin(), ::tolower);
 
-        RenderSearchBar();
-        ImGui::Separator();
-
-        // Convert search to lowercase for case-insensitive search
-        std::string searchLower = m_szItemSearchBuffer;
-        std::transform(searchLower.begin(), searchLower.end(), searchLower.begin(), ::tolower);
-
-        RenderItemTable(searchLower);
-    }
-    ImGui::End();
+    RenderItemTable(searchLower);
 }
 
 void CMuItemEditor::RenderSaveButton()

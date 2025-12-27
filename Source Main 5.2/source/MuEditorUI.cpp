@@ -5,6 +5,7 @@
 #include "MuEditorUI.h"
 #include "MuEditor.h"
 #include "MuEditorConsole.h"
+#include "MuItemEditor.h"
 #include "ZzzOpenglUtil.h"
 #include "Input.h"
 #include "imgui.h"
@@ -191,11 +192,26 @@ void CMuEditorUI::RenderToolbarFull(bool& editorEnabled, bool& showItemEditor)
         ImGui::Indent(10.0f);
 
         ImGui::Text("MU Editor");
-        ImGui::SameLine();
 
-        if (ImGui::Button("Item Editor"))
+        ImGui::SameLine();
+        ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 250);
+        ImGui::Text("Zoom:");
+        ImGui::SameLine();
+        if (ImGui::Button("-"))
         {
-            showItemEditor = !showItemEditor;
+            ZoomOut();
+        }
+        ImGui::SameLine();
+        ImGui::Text("%.0f%%", m_fZoomLevel * 100.0f);
+        ImGui::SameLine();
+        if (ImGui::Button("+"))
+        {
+            ZoomIn();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Reset"))
+        {
+            ResetZoom();
         }
 
         // No close button - editor is always on
@@ -212,11 +228,12 @@ void CMuEditorUI::RenderCenterViewport()
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
 
+    // Calculate center panel height based on dynamic bottom panel
+    float centerHeight = io.DisplaySize.y - EditorLayout::TOP_TOOLBAR_HEIGHT - m_fBottomPanelHeight;
+
     // Render left panel
     ImGui::SetNextWindowPos(ImVec2(0, EditorLayout::TOP_TOOLBAR_HEIGHT), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(EditorLayout::SIDE_PANEL_WIDTH,
-                                     EditorLayout::GetCenterPanelHeight(io.DisplaySize.y)),
-                             ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(EditorLayout::SIDE_PANEL_WIDTH, centerHeight), ImGuiCond_Always);
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.12f, 0.12f, 0.12f, 0.95f));
     if (ImGui::Begin("LeftPanel", nullptr, flags))
@@ -239,9 +256,7 @@ void CMuEditorUI::RenderCenterViewport()
     ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - EditorLayout::SIDE_PANEL_WIDTH,
                                     EditorLayout::TOP_TOOLBAR_HEIGHT),
                             ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(EditorLayout::SIDE_PANEL_WIDTH,
-                                     EditorLayout::GetCenterPanelHeight(io.DisplaySize.y)),
-                             ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(EditorLayout::SIDE_PANEL_WIDTH, centerHeight), ImGuiCond_Always);
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.12f, 0.12f, 0.12f, 0.95f));
     if (ImGui::Begin("RightPanel", nullptr, flags))
@@ -258,14 +273,137 @@ void CMuEditorUI::RenderCenterViewport()
     ImGui::PopStyleColor();
 }
 
+void CMuEditorUI::RenderBottomPanel(bool& showItemEditor)
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    // Clamp bottom panel height
+    const float minHeight = 100.0f;
+    const float maxHeight = io.DisplaySize.y - EditorLayout::TOP_TOOLBAR_HEIGHT - 100.0f;
+    if (m_fBottomPanelHeight < minHeight) m_fBottomPanelHeight = minHeight;
+    if (m_fBottomPanelHeight > maxHeight) m_fBottomPanelHeight = maxHeight;
+
+    // Position at bottom, spanning full width
+    float bottomY = io.DisplaySize.y - m_fBottomPanelHeight;
+    ImGui::SetNextWindowPos(ImVec2(0, bottomY), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, m_fBottomPanelHeight));
+    ImGui::SetNextWindowSizeConstraints(ImVec2(io.DisplaySize.x, minHeight), ImVec2(io.DisplaySize.x, maxHeight));
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.12f, 0.12f, 0.12f, 0.95f));
+    if (ImGui::Begin("BottomPanel", nullptr, flags))
+    {
+        // Check if hovering this window or any of its children (including tabs)
+        if (ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
+        {
+            g_MuEditor.SetHoveringUI(true);
+        }
+
+        // Update stored height from ImGui's resize
+        m_fBottomPanelHeight = ImGui::GetWindowHeight();
+
+        // Create tab bar
+        if (ImGui::BeginTabBar("BottomTabs", ImGuiTabBarFlags_None))
+        {
+            // Editor Console tab
+            if (ImGui::BeginTabItem("Editor Console"))
+            {
+                RenderEditorConsole();
+                ImGui::EndTabItem();
+            }
+
+            // Game Console tab
+            if (ImGui::BeginTabItem("Game Console"))
+            {
+                RenderGameConsole();
+                ImGui::EndTabItem();
+            }
+
+            // Item Editor tab (always visible)
+            if (ImGui::BeginTabItem("Item Editor"))
+            {
+                g_MuItemEditor.Render(showItemEditor);
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
+        }
+    }
+    ImGui::End();
+    ImGui::PopStyleColor();
+}
+
+void CMuEditorUI::RenderEditorConsole()
+{
+    // Render single console view (Editor Console only)
+    ImGui::BeginChild("EditorConsoleTab", ImVec2(0, 0), true);
+
+    // Fixed header - not scrollable
+    ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), "Editor Console");
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20);
+    if (ImGui::SmallButton("Copy"))
+    {
+        ImGui::SetClipboardText(g_MuEditorConsole.GetEditorLog().c_str());
+    }
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Clear"))
+    {
+        g_MuEditorConsole.ClearEditorLog();
+    }
+    ImGui::Separator();
+
+    // Scrollable content area
+    ImGui::BeginChild("EditorConsoleContent", ImVec2(0, 0), false);
+    ImGui::TextWrapped("%s", g_MuEditorConsole.GetEditorLog().c_str());
+    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+        ImGui::SetScrollHereY(1.0f);
+    ImGui::EndChild();
+
+    ImGui::EndChild();
+}
+
+void CMuEditorUI::RenderGameConsole()
+{
+    // Render single console view (Game Console only)
+    ImGui::BeginChild("GameConsoleTab", ImVec2(0, 0), true);
+
+    // Fixed header - not scrollable
+    ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), "Game Console");
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20);
+    if (ImGui::SmallButton("Copy"))
+    {
+        ImGui::SetClipboardText(g_MuEditorConsole.GetGameLog().c_str());
+    }
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Clear"))
+    {
+        g_MuEditorConsole.ClearGameLog();
+    }
+    ImGui::Separator();
+
+    // Scrollable content area
+    ImGui::BeginChild("GameConsoleContent", ImVec2(0, 0), false);
+    ImGui::TextWrapped("%s", g_MuEditorConsole.GetGameLog().c_str());
+    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+        ImGui::SetScrollHereY(1.0f);
+    ImGui::EndChild();
+
+    ImGui::EndChild();
+}
+
 void CMuEditorUI::RenderGameViewportWindow()
 {
     ImGuiIO& io = ImGui::GetIO();
 
+    // Calculate center panel height based on dynamic bottom panel
+    float centerHeight = io.DisplaySize.y - EditorLayout::TOP_TOOLBAR_HEIGHT - m_fBottomPanelHeight;
+
     // Position center window between left and right panels
     ImVec2 centerPos = ImVec2(EditorLayout::GetCenterPanelX(), EditorLayout::GetCenterPanelY());
-    ImVec2 centerSize = ImVec2(EditorLayout::GetCenterPanelWidth(io.DisplaySize.x),
-                                EditorLayout::GetCenterPanelHeight(io.DisplaySize.y));
+    ImVec2 centerSize = ImVec2(EditorLayout::GetCenterPanelWidth(io.DisplaySize.x), centerHeight);
 
     ImGui::SetNextWindowPos(centerPos, ImGuiCond_Always);
     ImGui::SetNextWindowSize(centerSize, ImGuiCond_Always);
@@ -281,30 +419,7 @@ void CMuEditorUI::RenderGameViewportWindow()
             g_MuEditor.SetHoveringUI(true);
         }
 
-        // Zoom controls
-        ImGui::Text("Game View");
-        ImGui::SameLine();
-        ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 200);
-        if (ImGui::Button("-"))
-        {
-            ZoomOut();
-        }
-        ImGui::SameLine();
-        ImGui::Text("%.0f%%", m_fZoomLevel * 100.0f);
-        ImGui::SameLine();
-        if (ImGui::Button("+"))
-        {
-            ZoomIn();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Reset"))
-        {
-            ResetZoom();
-        }
-
-        ImGui::Separator();
-
-        // Scrollable child window for game viewport
+        // Scrollable child window for game viewport (no header)
         ImGui::BeginChild("GameViewportScroll", ImVec2(0, 0), false,
                           ImGuiWindowFlags_HorizontalScrollbar);
 

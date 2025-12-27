@@ -362,99 +362,69 @@ void CMuEditorConsole::Render()
     // Capture new console output each frame
     CaptureConsoleOutput();
 
-    ImGuiIO& io = ImGui::GetIO();
+    // Render directly in the tab (no separate window)
+    // Split horizontally
+    float split_width = ImGui::GetContentRegionAvail().x * 0.5f;
 
-#ifdef _EDITOR
-    // Position console at the bottom spanning full width
-    float consoleHeight = 250.0f; // Match BOTTOM_PANEL_HEIGHT from EditorLayout
-    ImVec2 bottom_pos = ImVec2(0, io.DisplaySize.y - consoleHeight);
-    ImVec2 bottom_size = ImVec2(io.DisplaySize.x, consoleHeight);
-#else
-    ImVec2 bottom_pos = ImVec2(0, io.DisplaySize.y - 200);
-    ImVec2 bottom_size = ImVec2(io.DisplaySize.x, 200);
-#endif
+    // Editor Console (Left)
+    ImGui::BeginChild("EditorConsole", ImVec2(split_width - 5, 0), true);
 
-    ImGui::SetNextWindowPos(bottom_pos, ImGuiCond_Always);
-    ImGui::SetNextWindowSize(bottom_size, ImGuiCond_Always);
-
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
-
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.9f));
-
-    if (ImGui::Begin("Console", nullptr, flags))
+    // Fixed header - not scrollable
+    ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), "Editor Console");
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20);
+    if (ImGui::SmallButton("Copy"))
     {
-        // Check if hovering this window or any of its children
-        if (ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
-        {
-            g_MuEditor.SetHoveringUI(true);
-        }
-
-        // Split horizontally
-        float split_width = ImGui::GetContentRegionAvail().x * 0.5f;
-
-        // Editor Console (Left)
-        ImGui::BeginChild("EditorConsole", ImVec2(split_width - 5, 0), true);
-
-        // Fixed header - not scrollable
-        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), "Editor Console");
-        ImGui::SameLine();
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20);
-        if (ImGui::SmallButton("Copy"))
-        {
-            ImGui::SetClipboardText(m_strEditorConsole.c_str());
-        }
-        ImGui::SameLine();
-        if (ImGui::SmallButton("Clear"))
-        {
-            ClearEditorLog();
-        }
-        ImGui::Separator();
-
-        // Scrollable content area
-        ImGui::BeginChild("EditorConsoleContent", ImVec2(0, 0), false);
-        ImGui::TextWrapped("%s", m_strEditorConsole.c_str());
-        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-            ImGui::SetScrollHereY(1.0f);
-        ImGui::EndChild();
-
-        ImGui::EndChild();
-
-        ImGui::SameLine();
-
-        // Game Console (Right)
-        ImGui::BeginChild("GameConsole", ImVec2(0, 0), true);
-
-        // Fixed header - not scrollable
-        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), "Game Console");
-        ImGui::SameLine();
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20);
-        if (ImGui::SmallButton("Copy##Game"))
-        {
-            ImGui::SetClipboardText(m_strGameConsole.c_str());
-        }
-        ImGui::SameLine();
-        if (ImGui::SmallButton("Clear##Game"))
-        {
-            ClearGameLog();
-        }
-        ImGui::Separator();
-
-        // Scrollable content area
-        ImGui::BeginChild("GameConsoleContent", ImVec2(0, 0), false);
-        ImGui::TextWrapped("%s", m_strGameConsole.c_str());
-        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-            ImGui::SetScrollHereY(1.0f);
-        ImGui::EndChild();
-
-        ImGui::EndChild();
-
-        // Show log file path at bottom
-        ImGui::Separator();
-        ImGui::Text("Log file: %s", m_strLogFilePath.c_str());
+        ImGui::SetClipboardText(m_strEditorConsole.c_str());
     }
-    ImGui::End();
-    ImGui::PopStyleColor();
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Clear"))
+    {
+        ClearEditorLog();
+    }
+    ImGui::Separator();
+
+    // Scrollable content area
+    ImGui::BeginChild("EditorConsoleContent", ImVec2(0, 0), false);
+    ImGui::TextWrapped("%s", m_strEditorConsole.c_str());
+    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+        ImGui::SetScrollHereY(1.0f);
+    ImGui::EndChild();
+
+    ImGui::EndChild();
+
+    ImGui::SameLine();
+
+    // Game Console (Right)
+    ImGui::BeginChild("GameConsole", ImVec2(0, 0), true);
+
+    // Fixed header - not scrollable
+    ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), "Game Console");
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20);
+    if (ImGui::SmallButton("Copy##Game"))
+    {
+        ImGui::SetClipboardText(m_strGameConsole.c_str());
+    }
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Clear##Game"))
+    {
+        ClearGameLog();
+    }
+    ImGui::Separator();
+
+    // Scrollable content area
+    ImGui::BeginChild("GameConsoleContent", ImVec2(0, 0), false);
+    ImGui::TextWrapped("%s", m_strGameConsole.c_str());
+    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+        ImGui::SetScrollHereY(1.0f);
+    ImGui::EndChild();
+
+    ImGui::EndChild();
+
+    // Show log file path at bottom
+    ImGui::Separator();
+    ImGui::Text("Log file: %s", m_strLogFilePath.c_str());
 }
 
 #endif // _EDITOR

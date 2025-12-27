@@ -903,24 +903,6 @@ MSG MainLoop()
             if (g_bUseWindowMode || g_bWndActive || g_HasInactiveFpsOverride)
             {
 #ifdef _EDITOR
-                // F12 key toggle for editor
-                static bool wasF12Pressed = false;
-                if (GetAsyncKeyState(VK_F12) & 0x8000)
-                {
-                    if (!wasF12Pressed)
-                    {
-                        g_MuEditor.ToggleEditor();
-                        fwprintf(stderr, L"[Editor] Toggled: %s\n",
-                            g_MuEditor.IsEnabled() ? L"ON" : L"OFF");
-                        fflush(stderr);
-                        wasF12Pressed = true;
-                    }
-                }
-                else
-                {
-                    wasF12Pressed = false;
-                }
-
                 // Update editor UI (must be before RenderScene)
                 g_MuEditor.Update();
 #endif

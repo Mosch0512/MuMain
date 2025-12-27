@@ -184,14 +184,8 @@ void CMuEditor::Render()
         // Render center viewport
         g_MuEditorUI.RenderCenterViewport();
 
-        // Render console
-        g_MuEditorConsole.Render();
-
-        // Render editor windows
-        if (m_bShowItemEditor)
-        {
-            g_MuItemEditor.Render(m_bShowItemEditor);
-        }
+        // Render bottom panel with tabs (console and item editor)
+        g_MuEditorUI.RenderBottomPanel(m_bShowItemEditor);
     }
 
     // Control game cursor rendering via global flag
@@ -242,14 +236,8 @@ void CMuEditor::RenderBeforeGame()
         // Render center viewport panels (left, right)
         g_MuEditorUI.RenderCenterViewport();
 
-        // Render console
-        g_MuEditorConsole.Render();
-
-        // Render editor windows
-        if (m_bShowItemEditor)
-        {
-            g_MuItemEditor.Render(m_bShowItemEditor);
-        }
+        // Render bottom panel with tabs (console and item editor)
+        g_MuEditorUI.RenderBottomPanel(m_bShowItemEditor);
     }
 
     // Prepare ImGui for rendering (generate draw data but don't render yet)
