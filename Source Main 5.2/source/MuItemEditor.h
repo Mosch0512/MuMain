@@ -12,6 +12,8 @@ public:
     void Render(bool& showEditor);
     void ClearSearch() { m_szItemSearchBuffer[0] = '\0'; }
 
+    int GetSelectedItemIndex() const { return m_iSelectedItemIndex; }
+
 private:
     CMuItemEditor();
     ~CMuItemEditor() = default;
@@ -21,6 +23,7 @@ private:
     void RenderSaveButton();
 
     char m_szItemSearchBuffer[256];
+    int m_iSelectedItemIndex;
 };
 
 #define g_MuItemEditor CMuItemEditor::GetInstance()

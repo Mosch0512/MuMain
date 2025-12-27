@@ -10,6 +10,7 @@
 #include <cctype>
 
 CMuItemEditor::CMuItemEditor()
+    : m_iSelectedItemIndex(-1)
 {
     memset(m_szItemSearchBuffer, 0, sizeof(m_szItemSearchBuffer));
 }
@@ -156,8 +157,22 @@ void CMuItemEditor::RenderItemTable(const std::string& searchLower)
 
             ImGui::TableNextRow();
 
-            // Index
+            // Highlight selected row
+            if (m_iSelectedItemIndex == i)
+            {
+                ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(ImVec4(0.3f, 0.5f, 0.8f, 0.3f)));
+            }
+
+            // Make row selectable
             ImGui::TableSetColumnIndex(0);
+            if (ImGui::Selectable(("##row" + std::to_string(i)).c_str(), m_iSelectedItemIndex == i,
+                ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap))
+            {
+                m_iSelectedItemIndex = i;
+            }
+
+            // Index
+            ImGui::SameLine();
             ImGui::Text("%d", i);
 
             // Name

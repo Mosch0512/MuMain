@@ -61,6 +61,7 @@ private:
     void RenderGameViewportWindow();  // Render center scrollable game viewport
     void RenderEditorConsole();       // Render editor console in tab
     void RenderGameConsole();         // Render game console in tab
+    void RenderItemPreview();         // Render item preview in right panel
 
     float m_fZoomLevel;  // Zoom level for game viewport (0.25 to 3.0)
     float m_fBottomPanelHeight;  // Resizable height of bottom panel

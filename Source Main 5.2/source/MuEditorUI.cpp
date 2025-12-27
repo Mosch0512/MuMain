@@ -265,9 +265,11 @@ void CMuEditorUI::RenderCenterViewport()
         {
             g_MuEditor.SetHoveringUI(true);
         }
-        ImGui::Text("Right Panel");
+        ImGui::Text("Item Inspector");
         ImGui::Separator();
-        // Add right panel content here (e.g., properties, inspector)
+
+        // Show selected item preview
+        RenderItemPreview();
     }
     ImGui::End();
     ImGui::PopStyleColor();
@@ -392,6 +394,61 @@ void CMuEditorUI::RenderGameConsole()
     ImGui::EndChild();
 
     ImGui::EndChild();
+}
+
+void CMuEditorUI::RenderItemPreview()
+{
+    int selectedIndex = g_MuItemEditor.GetSelectedItemIndex();
+
+    if (selectedIndex < 0)
+    {
+        ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "No item selected");
+        ImGui::Text("Select an item from the Item Editor tab to preview");
+        return;
+    }
+
+    // Access item data
+    extern ITEM_ATTRIBUTE* ItemAttribute;
+    if (!ItemAttribute)
+    {
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Error: Item data not available");
+        return;
+    }
+
+    ITEM_ATTRIBUTE& item = ItemAttribute[selectedIndex];
+
+    // Display item information
+    char nameBuffer[128];
+    wcstombs(nameBuffer, item.Name, sizeof(nameBuffer));
+
+    ImGui::Text("Selected Item: %s", nameBuffer);
+    ImGui::Separator();
+
+    ImGui::Text("Index: %d", selectedIndex);
+    ImGui::Text("Level: %d", item.Level);
+    ImGui::Separator();
+
+    ImGui::Text("Requirements:");
+    ImGui::Indent();
+    ImGui::Text("Strength: %d", item.RequireStrength);
+    ImGui::Text("Dexterity: %d", item.RequireDexterity);
+    ImGui::Text("Energy: %d", item.RequireEnergy);
+    ImGui::Text("Vitality: %d", item.RequireVitality);
+    ImGui::Unindent();
+    ImGui::Separator();
+
+    ImGui::Text("Stats:");
+    ImGui::Indent();
+    ImGui::Text("Damage: %d - %d", item.DamageMin, item.DamageMax);
+    ImGui::Text("Attack Speed: %d", item.WeaponSpeed);
+    ImGui::Text("Defense: %d", item.Defense);
+    ImGui::Text("Durability: %d", item.Durability);
+    ImGui::Unindent();
+    ImGui::Separator();
+
+    // TODO: Add 3D model preview here when model rendering is implemented
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "3D Model Preview");
+    ImGui::Text("(Model rendering coming soon)");
 }
 
 void CMuEditorUI::RenderGameViewportWindow()
