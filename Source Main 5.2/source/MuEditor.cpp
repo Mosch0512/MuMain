@@ -235,16 +235,15 @@ void CMuEditor::RenderBeforeGame()
     m_bHoveringUI = false;
 
     // Render toolbar (handles both open and closed states)
-    g_MuEditorUI.RenderToolbar(m_bEditorMode, m_bShowItemEditor, m_bShowConsole);
+    g_MuEditorUI.RenderToolbar(m_bEditorMode, m_bShowItemEditor);
 
     if (m_bEditorMode)
     {
         // Render center viewport panels (left, right)
         g_MuEditorUI.RenderCenterViewport();
 
-        // Render console with filter flags
-        g_MuEditorConsole.Render(m_bShowConsole, m_bFilterNetwork, m_bFilterFileIO,
-                                 m_bFilterEditor, m_bFilterError, m_bFilterGeneral);
+        // Render console
+        g_MuEditorConsole.Render();
 
         // Render editor windows
         if (m_bShowItemEditor)

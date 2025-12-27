@@ -35,6 +35,7 @@ public:
 
     void LogEditor(const std::string& message);
     void LogGame(const std::string& message);
+    void Write(const std::string& message) { LogEditor(message); } // Simple write method
 
     const std::string& GetEditorLog() const { return m_strEditorConsole; }
     const std::string& GetGameLog() const { return m_strGameConsole; }

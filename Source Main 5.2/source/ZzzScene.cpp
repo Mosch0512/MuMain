@@ -1215,7 +1215,7 @@ void LoadingScene(HDC hDC)
     g_ConsoleDebug->Write(MCD_NORMAL, L"LoadingScene_Start");
 
 #ifdef _EDITOR
-    g_MuEditorConsole.Log("=== LoadingScene() START ===", ConsoleCategory::Editor);
+    g_MuEditorConsole.Write("=== LoadingScene() START ===");
 #endif
 
     CUIMng& rUIMng = CUIMng::Instance();
@@ -1240,7 +1240,7 @@ void LoadingScene(HDC hDC)
 
 #ifdef _EDITOR
     // Render loading screen to framebuffer
-    g_MuEditorConsole.Log("LoadingScene: About to call BeginGameViewport()", ConsoleCategory::Editor);
+    g_MuEditorConsole.Write("LoadingScene: About to call BeginGameViewport()");
     g_MuEditorUI.BeginGameViewport();
 #else
     // This should never be reached if _EDITOR is defined!

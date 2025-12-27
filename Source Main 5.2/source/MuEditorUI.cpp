@@ -39,7 +39,7 @@ static void LoadFramebufferExtension()
     if (g_FramebufferExtensionLoaded)
         return;
 
-    g_MuEditorConsole.Log("Loading framebuffer extension functions...", ConsoleCategory::Editor);
+    g_MuEditorConsole.Write("Loading framebuffer extension functions...");
 
     glGenFramebuffersEXT_func = (PFNGLGENFRAMEBUFFERSEXTPROC)wglGetProcAddress("glGenFramebuffersEXT");
     glBindFramebufferEXT_func = (PFNGLBINDFRAMEBUFFEREXTPROC)wglGetProcAddress("glBindFramebufferEXT");
@@ -58,15 +58,15 @@ static void LoadFramebufferExtension()
 
     if (g_FramebufferExtensionLoaded)
     {
-        g_MuEditorConsole.Log("Framebuffer extension functions loaded successfully", ConsoleCategory::Editor);
+        g_MuEditorConsole.Write("Framebuffer extension functions loaded successfully");
     }
     else
     {
-        g_MuEditorConsole.Log("ERROR: Failed to load framebuffer extension functions!", ConsoleCategory::Error);
+        g_MuEditorConsole.Write("ERROR: Failed to load framebuffer extension functions!");
         char msg[256];
         sprintf_s(msg, "glGenFramebuffersEXT: %p, glBindFramebufferEXT: %p, glFramebufferTexture2DEXT: %p",
                   glGenFramebuffersEXT_func, glBindFramebufferEXT_func, glFramebufferTexture2DEXT_func);
-        g_MuEditorConsole.Log(msg, ConsoleCategory::Error);
+        g_MuEditorConsole.Write(msg);
     }
 }
 
@@ -96,7 +96,7 @@ CMuEditorUI& CMuEditorUI::GetInstance()
 void CMuEditorUI::RenderToolbar(bool& editorEnabled, bool& showItemEditor)
 {
     // Always render full toolbar (no open/close functionality)
-    RenderToolbarFull(editorEnabled, showItemEditor, showConsole);
+    RenderToolbarFull(editorEnabled, showItemEditor);
 }
 
 void CMuEditorUI::RenderToolbarOpen(bool& editorEnabled)
@@ -434,7 +434,7 @@ void CMuEditorUI::InitializeFramebuffer()
     if (m_framebufferInitialized)
         return;
 
-    g_MuEditorConsole.Log("Initializing framebuffer...", ConsoleCategory::Editor);
+    g_MuEditorConsole.Write("Initializing framebuffer...");
 
     // Load framebuffer extension functions
     LoadFramebufferExtension();
@@ -442,14 +442,14 @@ void CMuEditorUI::InitializeFramebuffer()
     // Check if the framebuffer extension is available
     if (!g_FramebufferExtensionLoaded)
     {
-        g_MuEditorConsole.Log("Framebuffer objects not supported! Using fallback rendering.", ConsoleCategory::Error);
+        g_MuEditorConsole.Write("Framebuffer objects not supported! Using fallback rendering.");
         m_framebufferInitialized = false;
         return;
     }
 
     // Generate framebuffer
     glGenFramebuffersEXT_func(1, &m_framebuffer);
-    g_MuEditorConsole.Log("Framebuffer generated", ConsoleCategory::Editor);
+    g_MuEditorConsole.Write("Framebuffer generated");
 
     glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, m_framebuffer);
 
@@ -466,7 +466,7 @@ void CMuEditorUI::InitializeFramebuffer()
     char msg[128];
     sprintf_s(msg, "Texture created: %u (%dx%d)", m_gameTexture,
               EditorLayout::GAME_NATIVE_WIDTH, EditorLayout::GAME_NATIVE_HEIGHT);
-    g_MuEditorConsole.Log(msg, ConsoleCategory::Editor);
+    g_MuEditorConsole.Write(msg);
 
     // Create renderbuffer for depth and stencil
     glGenRenderbuffersEXT_func(1, &m_depthRenderbuffer);
@@ -481,13 +481,13 @@ void CMuEditorUI::InitializeFramebuffer()
     if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
     {
         sprintf_s(msg, "Framebuffer incomplete! Status: 0x%X", status);
-        g_MuEditorConsole.Log(msg, ConsoleCategory::Error);
+        g_MuEditorConsole.Write(msg);
         m_framebufferInitialized = false;
     }
     else
     {
         m_framebufferInitialized = true;
-        g_MuEditorConsole.Log("Game viewport framebuffer initialized successfully!", ConsoleCategory::Editor);
+        g_MuEditorConsole.Write("Game viewport framebuffer initialized successfully!");
     }
 
     // Unbind framebuffer

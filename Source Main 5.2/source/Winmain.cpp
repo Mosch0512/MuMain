@@ -521,8 +521,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         switch (wParam)
         {
         case HACK_TIMER:
-                CheckHack();
-                break;
+            CheckHack();
+            break;
         case WINDOWMINIMIZED_TIMER:
             PostMessage(g_hWnd, WM_CLOSE, 0, 0);
             break;
@@ -641,7 +641,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_LBUTTONUP:
         g_iNoMouseTime = 0;
         MouseLButtonPush = false;
-        if(MouseLButton) MouseLButtonPop = true;
+        if (MouseLButton) MouseLButtonPop = true;
         MouseLButton = false;
         g_iMousePopPosition_x = MouseX;
         g_iMousePopPosition_y = MouseY;
@@ -1180,6 +1180,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLin
 
     g_ErrorReport.Write(L"> Screen size = %d x %d.\r\n", WindowWidth, WindowHeight);
 
+    g_ConsoleDebug->Write(MCD_NORMAL, L"Screen size = %d x %d", WindowWidth, WindowHeight);
+
     g_hInst = hInstance;
 
     wchar_t* windowName = L"MU Online";
@@ -1310,7 +1312,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLin
     }
 #endif
 
-    g_ErrorReport.WriteImeInfo( g_hWnd);
+    g_ErrorReport.WriteImeInfo(g_hWnd);
     g_ErrorReport.AddSeparator();
 
     InitVSync();
