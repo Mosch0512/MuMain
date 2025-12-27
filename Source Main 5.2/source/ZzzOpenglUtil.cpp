@@ -572,20 +572,12 @@ void glViewport2(int x, int y, int Width, int Height)
 
 float ConvertX(float x)
 {
-#ifdef _EDITOR
-    return x; // 1:1 mapping in editor mode
-#else
     return x * (float)WindowWidth / 640.f;
-#endif
 }
 
 float ConvertY(float y)
 {
-#ifdef _EDITOR
-    return y; // 1:1 mapping in editor mode
-#else
     return y * (float)WindowHeight / 480.f;
-#endif
 }
 
 void BeginOpengl(int x, int y, int Width, int Height)

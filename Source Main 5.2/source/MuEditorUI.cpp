@@ -336,9 +336,10 @@ void CMuEditorUI::RenderGameViewportWindow()
             {
                 g_MuEditor.SetHoveringUI(false);  // Allow game interaction
 
-                // Tell ImGui not to capture mouse - allow game to receive mouse input
+                // Tell ImGui not to capture mouse/keyboard - allow game to receive input
                 ImGuiIO& io = ImGui::GetIO();
                 io.WantCaptureMouse = false;
+                io.WantCaptureKeyboard = false;
             }
         }
         else
