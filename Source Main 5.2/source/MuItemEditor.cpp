@@ -111,7 +111,7 @@ void CMuItemEditor::RenderItemTable(const std::string& searchLower)
 {
     extern ITEM_ATTRIBUTE* ItemAttribute;
 
-    // Create a table with scrolling
+    // Create a table with scrolling - use clipper for performance
     if (ImGui::BeginTable("ItemTable", 11, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY | ImGuiTableFlags_ScrollX | ImGuiTableFlags_Resizable))
     {
         // Setup columns
@@ -129,8 +129,13 @@ void CMuItemEditor::RenderItemTable(const std::string& searchLower)
         ImGui::TableSetupColumn("Durability", ImGuiTableColumnFlags_WidthFixed, 80.0f);
         ImGui::TableHeadersRow();
 
-        // Render all items with filtering
-        for (int i = 0; i < MAX_ITEM; i++)
+        // Use ImGuiListClipper for efficient rendering of large lists
+        ImGuiListClipper clipper;
+        clipper.Begin(MAX_ITEM);
+
+        while (clipper.Step())
+        {
+            for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
         {
             // Get item name
             char nameBuffer[128];
@@ -310,6 +315,7 @@ void CMuItemEditor::RenderItemTable(const std::string& searchLower)
                 }
             }
             ImGui::PopID();
+        }
         }
 
         ImGui::EndTable();
