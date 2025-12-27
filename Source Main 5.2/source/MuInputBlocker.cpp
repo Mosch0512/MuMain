@@ -3,6 +3,7 @@
 #ifdef _EDITOR
 
 #include "MuInputBlocker.h"
+#include "MuEditor.h"
 #include "imgui.h"
 
 CMuInputBlocker& CMuInputBlocker::GetInstance()
@@ -13,6 +14,12 @@ CMuInputBlocker& CMuInputBlocker::GetInstance()
 
 void CMuInputBlocker::ProcessInputBlocking()
 {
+    // Don't block input if hovering game viewport
+    if (!g_MuEditor.IsHoveringUI())
+    {
+        return; // Allow all game input
+    }
+
     // Block game input when ImGui is capturing mouse/keyboard
     ImGuiIO& io = ImGui::GetIO();
     if (io.WantCaptureMouse || io.WantCaptureKeyboard)

@@ -606,18 +606,28 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
     case WM_MOUSEMOVE:
     {
-        MouseX = (float)LOWORD(lParam) / g_fScreenRate_x;
-        MouseY = (float)HIWORD(lParam) / g_fScreenRate_y;
+#ifdef _EDITOR
+        // In editor mode, only update mouse for non-MAIN_SCENE (login, character screens)
+        // For MAIN_SCENE, mouse is updated by ImGui viewport in MuEditorUI.cpp
+        if (SceneFlag != MAIN_SCENE)
+        {
+#endif
+            // Convert to virtual coordinates
+            MouseX = (float)LOWORD(lParam) / g_fScreenRate_x;
+            MouseY = (float)HIWORD(lParam) / g_fScreenRate_y;
 
-        // Clamp to virtual 640x480 space
-        if (MouseX < 0)
-            MouseX = 0;
-        if (MouseX > 640)
-            MouseX = 640;
-        if (MouseY < 0)
-            MouseY = 0;
-        if (MouseY > 480)
-            MouseY = 480;
+            // Clamp to virtual 640x480 space
+            if (MouseX < 0)
+                MouseX = 0;
+            if (MouseX > 640)
+                MouseX = 640;
+            if (MouseY < 0)
+                MouseY = 0;
+            if (MouseY > 480)
+                MouseY = 480;
+#ifdef _EDITOR
+        }
+#endif
     }
     break;
     case WM_LBUTTONDOWN:

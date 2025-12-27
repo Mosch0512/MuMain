@@ -1792,6 +1792,7 @@ bool RenderMainScene()
     }
 
     Width = GetScreenWidth();
+
     if (gMapManager.WorldActive == WD_0LORENCIA)
     {
         glClearColor(10 / 256.f, 20 / 256.f, 14 / 256.f, 1.f);
@@ -1977,12 +1978,12 @@ bool RenderMainScene()
 
     EndBitmap();
 
-    // Render cursor inside framebuffer for all modes
+    EndOpengl();
+
+    // Render cursor after EndOpengl so it uses full framebuffer viewport, not the reduced viewport
     BeginBitmap();
     RenderCursor();
     EndBitmap();
-
-    EndOpengl();
 
     // Note: EndGameViewport is now called in MainScene() after all scene rendering
 

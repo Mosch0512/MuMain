@@ -340,6 +340,34 @@ void CMuEditorUI::RenderGameViewportWindow()
                 ImGuiIO& io = ImGui::GetIO();
                 io.WantCaptureMouse = false;
                 io.WantCaptureKeyboard = false;
+
+                // Only override mouse coordinates for MAIN_SCENE (in-game)
+                // Login and character screens work fine with default Windows coordinates
+                if (SceneFlag == MAIN_SCENE)
+                {
+                    // Update game mouse coordinates based on ImGui viewport position
+                    // Get mouse position relative to the game viewport image
+                    ImVec2 mousePos = ImGui::GetMousePos();
+                    ImVec2 imagePosMin = ImGui::GetItemRectMin();
+
+                    // Calculate mouse position relative to the game viewport (in actual pixels)
+                    float relativeX = mousePos.x - imagePosMin.x;
+                    float relativeY = mousePos.y - imagePosMin.y;
+
+                    // Account for zoom level to get position in the framebuffer
+                    relativeX /= m_fZoomLevel;
+                    relativeY /= m_fZoomLevel;
+
+                    // Convert to game virtual coordinates (framebuffer is in WindowWidth/Height, game uses 640x480)
+                    MouseX = relativeX / g_fScreenRate_x;
+                    MouseY = relativeY / g_fScreenRate_y;
+
+                    // Clamp to virtual 640x480 space
+                    if (MouseX < 0) MouseX = 0;
+                    if (MouseX > 640) MouseX = 640;
+                    if (MouseY < 0) MouseY = 0;
+                    if (MouseY > 480) MouseY = 480;
+                }
             }
         }
         else
