@@ -5,7 +5,7 @@
 #include "MuEditor.h"
 #include "MuEditorUI.h"
 #include "MuEditorConsole.h"
-#include "MuItemEditor.h"
+#include "MuItemEditor/MuItemEditor.h"
 #include "MuInputBlocker.h"
 #include "imgui.h"
 #include "imgui_impl_win32.h"

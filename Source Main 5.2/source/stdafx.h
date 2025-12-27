@@ -106,7 +106,7 @@
 
 // Redirect console output to ImGui when editor is enabled
 #ifdef _EDITOR
-#include "MuEditorConsoleRedirect.h"
+#include "MuEditor/MuEditorConsoleRedirect.h"
 #endif
 
 #include "w_MapHeaders.h"

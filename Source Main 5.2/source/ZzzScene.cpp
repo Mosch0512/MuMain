@@ -20,8 +20,8 @@
 #include "DSPlaySound.h"
 
 #ifdef _EDITOR
-#include "MuEditor.h"
-#include "MuEditorConsole.h"
+#include "MuEditor/MuEditor.h"
+#include "MuEditor/MuEditorConsole.h"
 #include "imgui.h"
 #endif
 

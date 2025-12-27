@@ -17,7 +17,7 @@
 #include "ZzzScene.h"
 
 #ifdef _EDITOR
-#include "MuEditorConsole.h"
+#include "MuEditor/MuEditorConsole.h"
 #endif
 #ifdef CSK_DEBUG_MAP_PATHFINDING
 #include "ZzzPath.h"

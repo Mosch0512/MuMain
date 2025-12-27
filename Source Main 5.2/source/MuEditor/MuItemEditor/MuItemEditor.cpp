@@ -3,8 +3,8 @@
 #ifdef _EDITOR
 
 #include "MuItemEditor.h"
-#include "MuEditor.h"
-#include "MuEditorConsole.h"
+#include "../MuEditor.h"
+#include "../MuEditorConsole.h"
 #include "imgui.h"
 #include <algorithm>
 #include <cctype>

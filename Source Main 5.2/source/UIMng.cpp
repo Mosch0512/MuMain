@@ -18,7 +18,7 @@
 #include "ServerListManager.h"
 
 #ifdef _EDITOR
-#include "MuEditor.h"
+#include "MuEditor/MuEditor.h"
 #endif
 
 #define	DOCK_EXTENT		10
