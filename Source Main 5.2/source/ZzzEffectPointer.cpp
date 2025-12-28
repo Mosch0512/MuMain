@@ -16,6 +16,10 @@
 #include "Random.h"
 #include "Camera/CustomCamera3D.h"
 
+// Pointer scaling multiplier for 3D camera zoom
+// Controls how aggressively pointer size increases when zoomed out
+constexpr float POINTER_ZOOM_SCALE_MULTIPLIER = 2.0f;
+
 PARTICLE  Pointers[MAX_POINTERS];
 
 void CreatePointer(int Type, vec3_t Position, float Angle, vec3_t Light, float Scale)
@@ -115,7 +119,7 @@ void RenderPointers()
                 // Scale much more aggressively so indicator is visible when far away
                 // At 1.0x zoom: 1.0 + 1.0 * 2.0 = 3.0x scale
                 // At 2.0x zoom: 1.0 + 2.0 * 2.0 = 5.0x scale
-                effectiveScale = o->Scale * (1.0f + zoomScale * 2.0f);
+                effectiveScale = o->Scale * (1.0f + zoomScale * POINTER_ZOOM_SCALE_MULTIPLIER);
             }
 
             RenderTerrainAlphaBitmap(o->Type, o->Position[0], o->Position[1], effectiveScale, effectiveScale, o->Light, -o->Angle[2], o->Alpha, o->Position[2]);
