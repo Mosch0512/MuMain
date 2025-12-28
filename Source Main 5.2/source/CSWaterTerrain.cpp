@@ -22,6 +22,7 @@
 #include "ZzzLodTerrain.h"
 #include "CSWaterTerrain.h"
 #include "MapManager.h"
+#include "ModernGL.h"
 
 extern  double   WorldTime;
 extern  float   TerrainMappingAlpha[TERRAIN_SIZE * TERRAIN_SIZE];
@@ -72,27 +73,27 @@ void    CSWaterTerrain::Render(void)
 
     EnableAlphaTest();
     BindTexture(BITMAP_MAPTILE);
-    glBegin(GL_TRIANGLES);
-    glColor3f(0.2f, 0.5f, 0.65f);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLES);
+    g_ImmediateModeEmulator.Color3f(0.2f, 0.5f, 0.65f);
     for (j = 0; j < m_iTriangleListNum; j++)
     {
         offset = m_iTriangleList[j];
-        glTexCoord2f(g_chrome[offset][1], g_chrome[offset][0]);
-        glVertex3fv(m_Vertices[offset]);
+        g_ImmediateModeEmulator.TexCoord2f(g_chrome[offset][1], g_chrome[offset][0]);
+        g_ImmediateModeEmulator.Vertex3fv(m_Vertices[offset]);
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
     EnableAlphaBlend();
     BindTexture(BITMAP_MAPTILE + 1);
-    glBegin(GL_TRIANGLES);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLES);
     for (j = 0; j < m_iTriangleListNum; j++)
     {
         offset = m_iTriangleList[j];
         alpha = 1.f - DotProduct(m_Normals[offset], m_vLightVector);
-        glColor3f(alpha, alpha * 2.5f, alpha * 3.f);//, alpha );
-        glTexCoord2f(g_chrome[offset][1], g_chrome[offset][0]);
-        glVertex3fv(m_Vertices[offset]);
+        g_ImmediateModeEmulator.Color3f(alpha, alpha * 2.5f, alpha * 3.f);//, alpha );
+        g_ImmediateModeEmulator.TexCoord2f(g_chrome[offset][1], g_chrome[offset][0]);
+        g_ImmediateModeEmulator.Vertex3fv(m_Vertices[offset]);
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void CSWaterTerrain::SpawnAmbientWave(double currentTimeMs)
@@ -423,18 +424,18 @@ void    CSWaterTerrain::RenderWaterBitmapTile(float xf, float yf, float lodf, in
         VectorCopy(PrimaryTerrainLight[TerrainIndex4], Light[3]);
     }
 
-    glBegin(GL_TRIANGLE_FAN);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
     for (int i = 0; i < 4; i++)
     {
         if (LightEnable)
         {
             if (Alpha == 1.f)
-                glColor3fv(Light[i]);
+                g_ImmediateModeEmulator.Color3fv(Light[i]);
             else
-                glColor4f(Light[i][0], Light[i][1], Light[i][2], Alpha);
+                g_ImmediateModeEmulator.Color3f(Light[i][0], Light[i][1], Light[i][2]);
         }
-        glTexCoord2f(c[i][0], c[i][1]);
-        glVertex3fv(TerrainVertex[i]);
+        g_ImmediateModeEmulator.TexCoord2f(c[i][0], c[i][1]);
+        g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[i]);
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }

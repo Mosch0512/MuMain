@@ -12,6 +12,7 @@
 #include "ZzzTexture.h"
 #include "SideHair.h"
 #include "ZzzCharacter.h"
+#include "ModernGL.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -138,14 +139,14 @@ void CSideHair::RenderLine(vec3_t v1, vec3_t v2, vec3_t c1, vec3_t c2)
     CrossProduct(m_vLight, d, vOrtho);
     VectorNormalize(vOrtho);
     VectorScale(vOrtho, 10.f, vOrtho);
-    glBegin(GL_QUADS);
+    g_ImmediateModeEmulator.Begin(GL_QUADS);
     //glColor3fv( c1);
-    glTexCoord2f(0.f, 0.f + fTextureMove + fTextureV); glVertex3f(p1[0] - vOrtho[0], p1[1] - vOrtho[1], p1[2] - vOrtho[2]);
+    g_ImmediateModeEmulator.TexCoord2f(0.f, 0.f + fTextureMove + fTextureV); g_ImmediateModeEmulator.Vertex3f(p1[0] - vOrtho[0], p1[1] - vOrtho[1], p1[2] - vOrtho[2]);
     //glColor3fv( c2);
-    glTexCoord2f(0.f, 1.f - fTextureMove + fTextureV); glVertex3f(p2[0] - vOrtho[0], p2[1] - vOrtho[1], p2[2] - vOrtho[2]);
-    glTexCoord2f(1.f, 1.f - fTextureMove + fTextureV); glVertex3f(p2[0] + vOrtho[0], p2[1] + vOrtho[1], p2[2] + vOrtho[2]);
+    g_ImmediateModeEmulator.TexCoord2f(0.f, 1.f - fTextureMove + fTextureV); g_ImmediateModeEmulator.Vertex3f(p2[0] - vOrtho[0], p2[1] - vOrtho[1], p2[2] - vOrtho[2]);
+    g_ImmediateModeEmulator.TexCoord2f(1.f, 1.f - fTextureMove + fTextureV); g_ImmediateModeEmulator.Vertex3f(p2[0] + vOrtho[0], p2[1] + vOrtho[1], p2[2] + vOrtho[2]);
     //glColor3fv( c1);
-    glTexCoord2f(1.f, 0.f + fTextureMove + fTextureV); glVertex3f(p1[0] + vOrtho[0], p1[1] + vOrtho[1], p1[2] + vOrtho[2]);
-    glEnd();
+    g_ImmediateModeEmulator.TexCoord2f(1.f, 0.f + fTextureMove + fTextureV); g_ImmediateModeEmulator.Vertex3f(p1[0] + vOrtho[0], p1[1] + vOrtho[1], p1[2] + vOrtho[2]);
+    g_ImmediateModeEmulator.End();
     //g_OpenglLib.Enable(GL_CULL_FACE);
 }
