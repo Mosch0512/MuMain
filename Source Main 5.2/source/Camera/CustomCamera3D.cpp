@@ -112,10 +112,10 @@ void CCustomCamera3D::ProcessMouseRotation(int currentMouseX, int currentMouseY)
     m_fRotationAngle += (float)deltaX * rotationSpeed;
 
     // Normalize angle to 0-360 range
-    while (m_fRotationAngle >= 360.0f)
-        m_fRotationAngle -= 360.0f;
-    while (m_fRotationAngle < 0.0f)
+    m_fRotationAngle = fmodf(m_fRotationAngle, 360.0f);
+    if (m_fRotationAngle < 0.0f) {
         m_fRotationAngle += 360.0f;
+    }
 
     // Update vertical pitch angle (inverted Y - moving mouse up looks up)
     m_fPitchAngle -= (float)deltaY * pitchSpeed;
