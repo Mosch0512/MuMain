@@ -274,11 +274,11 @@ void BindTextureStream(int tex)
     {
         CachTexture = tex;
         if (TextureStream)
-            glEnd();
+            g_ImmediateModeEmulator.End();
         BITMAP_t* b = &Bitmaps[tex];
         glBindTexture(GL_TEXTURE_2D, b->TextureNumber);
 
-        glBegin(GL_TRIANGLES);
+        g_ImmediateModeEmulator.Begin(GL_TRIANGLES);
         TextureStream = true;
     }
 }
@@ -286,7 +286,7 @@ void BindTextureStream(int tex)
 void EndTextureStream()
 {
     if (TextureStream)
-        glEnd();
+        g_ImmediateModeEmulator.End();
     TextureStream = false;
 }
 
@@ -1319,14 +1319,14 @@ void RenderBitmapRotate(int Texture, float x, float y, float Width, float Height
     TEXCOORD(c[2], u + uWidth, v + vHeight);
     TEXCOORD(c[1], u, v + vHeight);
 
-    glBegin(GL_TRIANGLE_FAN);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
     for (int i = 0; i < 4; i++)
     {
-        glTexCoord2f(c[i][0], c[i][1]);
+        g_ImmediateModeEmulator.TexCoord2f(c[i][0], c[i][1]);
         VectorRotate(p[i], Matrix, p2[i]);
-        glVertex2f(p2[i][0] + x, p2[i][1] + y);
+        g_ImmediateModeEmulator.Vertex2f(p2[i][0] + x, p2[i][1] + y);
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void RenderBitRotate(int Texture, float x, float y, float Width, float Height, float Rotate)
@@ -1366,14 +1366,14 @@ void RenderBitRotate(int Texture, float x, float y, float Width, float Height, f
     TEXCOORD(c[2], 1.f, 1.f);
     TEXCOORD(c[1], 0.f, 1.f);
 
-    glBegin(GL_TRIANGLE_FAN);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
     for (int i = 0; i < 4; i++)
     {
-        glTexCoord2f(c[i][0], c[i][1]);
+        g_ImmediateModeEmulator.TexCoord2f(c[i][0], c[i][1]);
         VectorRotate(p[i], Matrix, p2[i]);
-        glVertex2f(p2[i][0] + (WindowWidth / 2.f), p2[i][1] + (WindowHeight / 2.f));
+        g_ImmediateModeEmulator.Vertex2f(p2[i][0] + (WindowWidth / 2.f), p2[i][1] + (WindowHeight / 2.f));
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void RenderPointRotate(int Texture, float ix, float iy, float iWidth, float iHeight, float x, float y, float Width, float Height, float Rotate, float Rotate_Loc, float uWidth, float vHeight, int Num)
@@ -1414,18 +1414,18 @@ void RenderPointRotate(int Texture, float ix, float iy, float iWidth, float iHei
     TEXCOORD(c[2], uWidth, vHeight);
     TEXCOORD(c[1], 0.f, vHeight);
 
-    glBegin(GL_TRIANGLE_FAN);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
     for (i = 0; i < 4; i++)
     {
-        glTexCoord2f(c[i][0], c[i][1]);
+        g_ImmediateModeEmulator.TexCoord2f(c[i][0], c[i][1]);
 
         Matrix[0][3] = p3[0] + 25;
         Matrix[1][3] = p3[1];
         VectorTransform(p2[i], Matrix, p4[i]);
 
-        glVertex2f(p4[i][0] + (WindowWidth / 2.f), p4[i][1] + (WindowHeight / 2.f));
+        g_ImmediateModeEmulator.Vertex2f(p4[i][0] + (WindowWidth / 2.f), p4[i][1] + (WindowHeight / 2.f));
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
 
     if (Num > -1)
     {
@@ -1474,13 +1474,13 @@ void RenderBitmapLocalRotate(int Texture, float x, float y, float Width, float H
     TEXCOORD(c[2], u + uWidth, v + vHeight);
     TEXCOORD(c[1], u, v + vHeight);
 
-    glBegin(GL_TRIANGLE_FAN);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
     for (int i = 0; i < 4; i++)
     {
-        glTexCoord2f(c[i][0], c[i][1]);
-        glVertex2f(p[i][0], p[i][1]);
+        g_ImmediateModeEmulator.TexCoord2f(c[i][0], c[i][1]);
+        g_ImmediateModeEmulator.Vertex2f(p[i][0], p[i][1]);
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void RenderBitmapAlpha(int Texture, float sx, float sy, float Width, float Height)
@@ -1515,14 +1515,14 @@ void RenderBitmapAlpha(int Texture, float sx, float sy, float Width, float Heigh
             if(x==3&&y==3) Alpha[2] = 0.f;
             if(x==3&&y==0) Alpha[3] = 0.f;*/
 
-            glBegin(GL_TRIANGLE_FAN);
+            g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
             for (int i = 0; i < 4; i++)
             {
-                glColor4f(1.f, 1.f, 1.f, Alpha[i]);
-                glTexCoord2f(c[i][0], c[i][1]);
-                glVertex2f(p[i][0], p[i][1]);
+                g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
+                g_ImmediateModeEmulator.TexCoord2f(c[i][0], c[i][1]);
+                g_ImmediateModeEmulator.Vertex2f(p[i][0], p[i][1]);
             }
-            glEnd();
+            g_ImmediateModeEmulator.End();
         }
     }
 }
@@ -1548,13 +1548,13 @@ void RenderBitmapUV(int Texture, float x, float y, float Width, float Height, fl
     TEXCOORD(c[2], u + uWidth, v + vHeight);
     TEXCOORD(c[1], u, v + vHeight - vHeight * 0.25f);
 
-    glBegin(GL_TRIANGLE_FAN);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
     for (int i = 0; i < 4; i++)
     {
-        glTexCoord2f(c[i][0], c[i][1]);
-        glVertex2f(p[i][0], p[i][1]);
+        g_ImmediateModeEmulator.TexCoord2f(c[i][0], c[i][1]);
+        g_ImmediateModeEmulator.Vertex2f(p[i][0], p[i][1]);
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
