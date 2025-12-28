@@ -15,6 +15,7 @@
 #include "WSclient.h"
 #include "SkillManager.h"
 #include "Random.h"
+#include "ModernGL.h"
 
 #include <cmath>
 
@@ -61,14 +62,14 @@ void RenderCircle(int Type, vec3_t ObjectPosition, float ScaleBottom, float Scal
         VectorRotate(p, Matrix1, Position[3]);
         VectorAdd(ObjectPosition, Position[3], Position[3]);
 
-        glBegin(GL_QUADS);
+        g_ImmediateModeEmulator.Begin(GL_QUADS);
         for (int i = 0; i < 4; i++)
         {
-            glTexCoord2f(UV[i][0], UV[i][1] + TextureV);
-            glColor3fv(Light[i]);
-            glVertex3fv(Position[i]);
+            g_ImmediateModeEmulator.TexCoord2f(UV[i][0], UV[i][1] + TextureV);
+            g_ImmediateModeEmulator.Color3fv(Light[i]);
+            g_ImmediateModeEmulator.Vertex3fv(Position[i]);
         }
-        glEnd();
+        g_ImmediateModeEmulator.End();
     }
 }
 
@@ -117,15 +118,15 @@ void RenderCircle2D(int Type, vec3_t ScreenPosition, float ScaleBottom, float Sc
         Vector(0.f, ScaleTop, Height, p);
         VectorRotate(p, Matrix1, Position[3]);
 
-        glBegin(GL_QUADS);
+        g_ImmediateModeEmulator.Begin(GL_QUADS);
         for (int i = 0; i < 4; i++)
         {
-            glTexCoord2f(UV[i][0], UV[i][1] + TextureV);
-            glColor3fv(Light[i]);
+            g_ImmediateModeEmulator.TexCoord2f(UV[i][0], UV[i][1] + TextureV);
+            g_ImmediateModeEmulator.Color3fv(Light[i]);
             VectorAdd(ObjectPosition, Position[i], Position[i]);
-            glVertex2f(Position[i][0], Position[i][1]);
+            g_ImmediateModeEmulator.Vertex2f(Position[i][0], Position[i][1]);
         }
-        glEnd();
+        g_ImmediateModeEmulator.End();
     }
 }
 
