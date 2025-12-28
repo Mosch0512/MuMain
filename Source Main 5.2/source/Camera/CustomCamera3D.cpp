@@ -14,6 +14,7 @@ bool CCustomCamera3D::m_bEnabled = false;
 float CCustomCamera3D::m_fZoomDistance = 100.0f;     // Default zoom (100 = 1.0x scale)
 float CCustomCamera3D::m_fRotationAngle = 0.0f;      // Default rotation (0 degrees)
 float CCustomCamera3D::m_fPitchAngle = 0.0f;         // Default pitch (0 degrees)
+float CCustomCamera3D::m_fRollAngle = 0.0f;          // Default roll (0 degrees)
 float CCustomCamera3D::m_fMinZoom = 50.0f;           // Minimum zoom (0.5x - closest)
 float CCustomCamera3D::m_fMaxZoom = 200.0f;          // Maximum zoom (2.0x - farthest)
 float CCustomCamera3D::m_fMinPitch = -25.0f;         // Minimum pitch (-45 degrees, looking down)
@@ -23,6 +24,7 @@ int CCustomCamera3D::m_iLastMouseX = 0;
 int CCustomCamera3D::m_iLastMouseY = 0;
 float CCustomCamera3D::m_fInitialCameraOffset[3] = { 0.0f, 0.0f, 0.0f };
 bool CCustomCamera3D::m_bInitialOffsetSet = false;
+float CCustomCamera3D::m_fRollSpeed = 0.5f;          // Auto-roll speed (0.5 degrees per frame for testing)
 
 void CCustomCamera3D::Initialize()
 {
@@ -53,7 +55,7 @@ void CCustomCamera3D::Toggle()
 
 void CCustomCamera3D::Update()
 {
-    // Currently unused - reserved for future smooth transitions if needed
+    // Reserved for future use - smooth transitions, etc.
 }
 
 void CCustomCamera3D::ProcessMouseWheel(int delta)

@@ -30,13 +30,14 @@
 //-------------------------------------------------------------------------------------------------------------
 // 3D Camera frustum adjustment constants
 // These control how the camera frustum expands when using the 3D camera zoom feature
-constexpr float FRUSTUM_BASE_MULTIPLIER = 2.0f;        // Base zoom multiplier at 1.0x zoom
-constexpr float FRUSTUM_ZOOM_SCALE_FACTOR = 2.5f;      // How aggressively frustum grows with zoom
-constexpr float FRUSTUM_FAR_BOOST = 1.8f;              // Additional boost for far plane (top of screen)
-constexpr float FRUSTUM_WIDTH_FAR_BOOST = 1.5f;        // Additional boost for far width
-constexpr float FRUSTUM_BUFFER_BASE = 2.0f;            // Base terrain buffer multiplier
-constexpr float FRUSTUM_BUFFER_SCALE = 2.0f;           // Terrain buffer scale factor with zoom
-constexpr float FRUSTUM_RANGE_SCALE = 3.0f;            // Range multiplier for frustum test
+constexpr float FRUSTUM_BASE_MULTIPLIER = 1.2f;        // Base zoom multiplier at 1.0x zoom
+constexpr float FRUSTUM_ZOOM_SCALE_FACTOR = 0.6f;      // How aggressively frustum grows with zoom
+constexpr float FRUSTUM_FAR_BOOST = 1.3f;              // Additional boost for far plane (top of screen)
+constexpr float FRUSTUM_NEAR_BOOST = 1.5f;             // Additional boost for near plane (bottom of screen - must be higher)
+constexpr float FRUSTUM_WIDTH_FAR_BOOST = 1.2f;        // Additional boost for far width
+constexpr float FRUSTUM_BUFFER_BASE = 2.0f;            // Base terrain buffer multiplier (needs to be higher)
+constexpr float FRUSTUM_BUFFER_SCALE = 1.5f;           // Terrain buffer scale factor with zoom
+constexpr float FRUSTUM_RANGE_SCALE = 2.0f;            // Range multiplier for frustum test (needs to match buffer)
 //-------------------------------------------------------------------------------------------------------------
 
 int  TerrainFlag;
@@ -2191,16 +2192,23 @@ void CreateFrustrum2D(vec3_t Position)
     }
 
     // Adjust for custom 3D camera zoom
+    // The 3D camera changes position and rotation, so we need to ensure the frustum
+    // covers enough terrain in all directions
     if (CCustomCamera3D::IsEnabled())
     {
         float zoomScale = CCustomCamera3D::GetZoomDistance() / 100.0f;
-        float zoomMultiplier = (FRUSTUM_BASE_MULTIPLIER + zoomScale * FRUSTUM_ZOOM_SCALE_FACTOR);
-        // Scale CameraViewFar more aggressively for top of screen
-        CameraViewFar *= zoomMultiplier * FRUSTUM_FAR_BOOST;
-        CameraViewNear *= zoomMultiplier;
-        CameraViewTarget *= zoomMultiplier;
-        WidthFar *= zoomMultiplier * FRUSTUM_WIDTH_FAR_BOOST;
-        WidthNear *= zoomMultiplier;
+
+        // Add extra coverage based on zoom
+        // The frustum is a trapezoid - wider at far (top/distance) than near (bottom/close)
+        float extraFar = 6000.0f * zoomScale;      // Extended far for top of screen
+        float extraNear = 2100.0f * zoomScale;      // Extended near for bottom of screen
+        float extraWidthFar = 3250.0f * zoomScale;  // Width at far plane (top of view into distance)
+        float extraWidthNear = 130.0f * zoomScale;  // Minimal width at near plane (bottom of view)
+
+        CameraViewFar += extraFar;
+        CameraViewNear -= extraNear;  // SUBTRACT to bring near plane CLOSER (render more ground at bottom)
+        WidthFar += extraWidthFar;    // Wide trapezoid at far plane
+        WidthNear += extraWidthNear;  // Narrow trapezoid at near plane
     }
 
     vec3_t p[4];
@@ -2298,7 +2306,10 @@ void CreateFrustrum(float xAspect, float yAspect, vec3_t position)
     if (CCustomCamera3D::IsEnabled())
     {
         float zoomScale = CCustomCamera3D::GetZoomDistance() / 100.0f;
-        extraBuffer = tileWidth * (int)(FRUSTUM_BUFFER_BASE + zoomScale * FRUSTUM_BUFFER_SCALE);
+        float pitchAngle = CCustomCamera3D::GetPitchAngle();
+        // When looking down, need MUCH more buffer in all directions
+        float pitchBufferFactor = 1.0f + (pitchAngle < 0.0f ? -pitchAngle * 0.05f : 0.0f);
+        extraBuffer = tileWidth * (int)((FRUSTUM_BUFFER_BASE + zoomScale * FRUSTUM_BUFFER_SCALE) * pitchBufferFactor);
     }
 
     FrustrumBoundMinX = (int)(FrustrumMinX / TERRAIN_SCALE) / tileWidth * tileWidth - extraBuffer;
@@ -2626,7 +2637,10 @@ void RenderTerrainFrustrum(bool EditFlag)
     if (CCustomCamera3D::IsEnabled())
     {
         float zoomScale = CCustomCamera3D::GetZoomDistance() / 100.0f;
-        frustumRange = g_fFrustumRange * (1.0f + zoomScale * FRUSTUM_RANGE_SCALE);
+        float pitchAngle = CCustomCamera3D::GetPitchAngle();
+        // When looking down, need bigger range test to include ground tiles
+        float pitchRangeFactor = 1.0f + (pitchAngle < 0.0f ? -pitchAngle * 0.03f : 0.0f);
+        frustumRange = g_fFrustumRange * (1.0f + zoomScale * FRUSTUM_RANGE_SCALE) * pitchRangeFactor;
     }
 
     for (; yi <= FrustrumBoundMaxY; yi += 4, yf += 4.f)

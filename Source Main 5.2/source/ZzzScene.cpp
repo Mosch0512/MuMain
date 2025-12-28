@@ -82,7 +82,7 @@ short   g_shCameraLevel = 0;
 int g_iLengthAuthorityCode = 20;
 
 wchar_t* szServerIpAddress = L"127.127.127.127";
-WORD g_ServerPort = 44406;
+WORD g_ServerPort = 55902;
 
 EGameScene  SceneFlag = WEBZEN_SCENE;
 
@@ -1652,6 +1652,9 @@ void MoveMainScene()
 
     if (CCustomCamera3D::IsEnabled())
     {
+        // Update camera (for auto-roll and other animations)
+        CCustomCamera3D::Update();
+
         // Mouse Wheel Zoom - Capture before UI system
         if (MouseWheel != 0)
         {
@@ -1801,7 +1804,13 @@ bool RenderMainScene()
     }
 
     Width = GetScreenWidth();
-    if (gMapManager.WorldActive == WD_0LORENCIA)
+
+    // Override clear color for 3D camera to match fog/sky color
+    if (CCustomCamera3D::IsEnabled())
+    {
+        glClearColor(0.7f, 0.8f, 0.9f, 1.0f);  // White-bluish sky tone matching fog
+    }
+    else if (gMapManager.WorldActive == WD_0LORENCIA)
     {
         glClearColor(10 / 256.f, 20 / 256.f, 14 / 256.f, 1.f);
     }
@@ -2122,43 +2131,10 @@ void MainScene(HDC hDC)
 
     Set3DSoundPosition();
 
-    if (gMapManager.WorldActive == WD_10HEAVEN)
-    {
-        glClearColor(3.f / 256.f, 25.f / 256.f, 44.f / 256.f, 1.f);
-    }
-    else if (gMapManager.WorldActive == WD_73NEW_LOGIN_SCENE || gMapManager.WorldActive == WD_74NEW_CHARACTER_SCENE)
-    {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    }
-    else if (gMapManager.InHellas(gMapManager.WorldActive))
-    {
-        glClearColor(30.f / 256.f, 40.f / 256.f, 40.f / 256.f, 1.f);
-    }
-    else if (gMapManager.InChaosCastle() == true)
-    {
-        glClearColor(0.f, 0.f, 0.f, 1.f);
-    }
-    else if (gMapManager.InBattleCastle() && battleCastle::InBattleCastle2(Hero->Object.Position))
-    {
-        glClearColor(0.f, 0.f, 0.f, 1.f);
-    }
-    else if (gMapManager.WorldActive >= WD_45CURSEDTEMPLE_LV1 && gMapManager.WorldActive <= WD_45CURSEDTEMPLE_LV6)
-    {
-        glClearColor(9.f / 256.f, 8.f / 256.f, 33.f / 256.f, 1.f);
-    }
-    else if (gMapManager.WorldActive == WD_51HOME_6TH_CHAR
-        )
-    {
-        glClearColor(178.f / 256.f, 178.f / 256.f, 178.f / 256.f, 1.f);
-    }
-    else if (gMapManager.WorldActive == WD_65DOPPLEGANGER1)
-    {
-        glClearColor(148.f / 256.f, 179.f / 256.f, 223.f / 256.f, 1.f);
-    }
-    else
-    {
-        glClearColor(0 / 256.f, 0 / 256.f, 0 / 256.f, 1.f);
-    }
+
+    glClearColor(3.f / 256.f, 25.f / 256.f, 44.f / 256.f, 1.f);
+
+    
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

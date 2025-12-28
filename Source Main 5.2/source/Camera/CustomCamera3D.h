@@ -18,6 +18,7 @@ private:
     static float m_fZoomDistance;        // Current zoom distance from character
     static float m_fRotationAngle;       // Camera rotation angle around character (in degrees, horizontal)
     static float m_fPitchAngle;          // Camera pitch angle (in degrees, vertical)
+    static float m_fRollAngle;           // Camera roll angle (in degrees, rotation around view axis)
     static float m_fMinZoom;             // Minimum zoom distance (closest)
     static float m_fMaxZoom;             // Maximum zoom distance (farthest)
     static float m_fMinPitch;            // Minimum pitch angle (looking down)
@@ -27,6 +28,7 @@ private:
     static int m_iLastMouseY;            // Last mouse Y position for pitch calculation
     static float m_fInitialCameraOffset[3]; // Initial camera offset from character (saved on first frame)
     static bool m_bInitialOffsetSet;     // Has the initial offset been captured?
+    static float m_fRollSpeed;           // Auto-roll speed for testing (degrees per frame)
 
 public:
     // Initialize default values
@@ -64,4 +66,7 @@ public:
 
     // Get current rotation angle
     static float GetRotationAngle() { return m_fRotationAngle; }
+
+    // Get current pitch angle
+    static float GetPitchAngle() { return m_fPitchAngle; }
 };
