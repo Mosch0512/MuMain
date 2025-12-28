@@ -14,7 +14,7 @@
 #include "DSPlaySound.h"
 #include "WSclient.h"
 #include "Random.h"
-#include "CustomCamera3D.h"
+#include "Camera/CustomCamera3D.h"
 
 PARTICLE  Pointers[MAX_POINTERS];
 

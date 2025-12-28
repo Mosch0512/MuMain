@@ -48,7 +48,7 @@
 #include "w_CursedTemple.h"
 #include "CameraMove.h"
 #include "w_MapHeaders.h"
-#include "CustomCamera3D.h"
+#include "Camera/CustomCamera3D.h"
 #include "w_PetProcess.h"
 #include "PortalMgr.h"
 #include "ServerListManager.h"

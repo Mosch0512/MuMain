@@ -20,7 +20,7 @@
 #include "SkillManager.h"
 #include <NewUISystem.h>
 #include "ZzzInterface.h"
-#include "CustomCamera3D.h"
+#include "Camera/CustomCamera3D.h"
 
 PARTICLE  Particles[MAX_PARTICLES];
 #ifdef DEVIAS_XMAS_EVENT

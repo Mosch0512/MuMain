@@ -11,7 +11,7 @@
 #include "ZzzInfomation.h"
 #include "NewUISystem.h"
 #include "wglext.h"
-#include "CustomCamera3D.h"
+#include "Camera/CustomCamera3D.h"
 
 extern CHARACTER* Hero;
 

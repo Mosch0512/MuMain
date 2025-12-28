@@ -25,7 +25,7 @@
 
 #include "w_MapHeaders.h"
 #include "CameraMove.h"
-#include "CustomCamera3D.h"
+#include "Camera/CustomCamera3D.h"
 
 //-------------------------------------------------------------------------------------------------------------
 
