@@ -1650,13 +1650,6 @@ void MoveMainScene()
     // Handle middle mouse button for rotation
     bool buttonHeld = (MouseMButton || MouseMButtonPush);
 
-    // Debug: Log button state changes
-    static bool lastButtonHeld = false;
-    if (buttonHeld != lastButtonHeld)
-    {
-        lastButtonHeld = buttonHeld;
-    }
-
     if (CCustomCamera3D::IsEnabled())
     {
         // Mouse Wheel Zoom - Capture before UI system
