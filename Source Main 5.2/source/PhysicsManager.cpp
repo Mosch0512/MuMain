@@ -8,6 +8,7 @@
 #include "ZzzCharacter.h"
 #include "ZzzEffect.h"
 #include "MapManager.h"
+#include "ModernGL.h"
 
 #define RENDER_CLOTH
 #define ADD_COLLISION
@@ -833,7 +834,7 @@ void CPhysicsCloth::RenderFace(BOOL bFront, int iTexture, vec3_t* pvRenderPos)
 {
     BindTexture(iTexture);	//BITMAP_ROBE
 
-    glBegin(GL_QUADS);
+    g_ImmediateModeEmulator.Begin(GL_QUADS);
 
     if (bFront)
     {
@@ -862,7 +863,7 @@ void CPhysicsCloth::RenderFace(BOOL bFront, int iTexture, vec3_t* pvRenderPos)
         }
     }
 
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void CPhysicsCloth::RenderVertex(vec3_t* pvRenderPos, int xVertex, int yVertex)

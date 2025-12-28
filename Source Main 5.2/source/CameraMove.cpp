@@ -14,6 +14,7 @@
 #include "CameraMove.h"
 #include "ZzzLodTerrain.h"
 #include "ZzzAI.h"
+#include "ModernGL.h"
 
 CCameraMove::CCameraMove()
 {
@@ -486,8 +487,8 @@ void CCameraMove::RenderWayPoint()
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_TEXTURE_2D);
 
-    glBegin(GL_QUADS);
-    glColor4f(1.0f, 0.0f, 0.0f, 0.8f);
+    g_ImmediateModeEmulator.Begin(GL_QUADS);
+    g_ImmediateModeEmulator.Color3f(1.0f, 0.0f, 0.0f);
     for (const auto& waypoint : m_listWayPoint)
     {
         glNormal3f(0.0f, 0.0f, 1.0f);
@@ -496,22 +497,22 @@ void CCameraMove::RenderWayPoint()
         const float minY = waypoint->fCameraY + kWaypointRenderOffset - kWaypointRenderHalfSize;
         const float maxY = waypoint->fCameraY + kWaypointRenderOffset + kWaypointRenderHalfSize;
 
-        glVertex3f(minX, minY, waypoint->fCameraZ);
-        glVertex3f(maxX, minY, waypoint->fCameraZ);
-        glVertex3f(maxX, maxY, waypoint->fCameraZ);
-        glVertex3f(minX, maxY, waypoint->fCameraZ);
+        g_ImmediateModeEmulator.Vertex3f(minX, minY, waypoint->fCameraZ);
+        g_ImmediateModeEmulator.Vertex3f(maxX, minY, waypoint->fCameraZ);
+        g_ImmediateModeEmulator.Vertex3f(maxX, maxY, waypoint->fCameraZ);
+        g_ImmediateModeEmulator.Vertex3f(minX, maxY, waypoint->fCameraZ);
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
 
-    glBegin(GL_LINE_STRIP);
+    g_ImmediateModeEmulator.Begin(GL_LINE_STRIP);
 
-    glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
+    g_ImmediateModeEmulator.Color3f(1.0f, 1.0f, 1.0f);
     for (const auto& waypoint : m_listWayPoint)
     {
-        glVertex3f(waypoint->fCameraX + 50.0f, waypoint->fCameraY + 50.0f, waypoint->fCameraZ);
+        g_ImmediateModeEmulator.Vertex3f(waypoint->fCameraX + 50.0f, waypoint->fCameraY + 50.0f, waypoint->fCameraZ);
     }
 
-    glEnd();
+    g_ImmediateModeEmulator.End();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_ALPHA_TEST);

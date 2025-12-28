@@ -8,6 +8,7 @@
 #include "Input.h"
 
 #include "ZzzOpenglUtil.h"
+#include "ModernGL.h"
 
 #include <crtdbg.h>
 
@@ -296,18 +297,18 @@ void CSprite::Render()
 
         BindTexture(m_nTexID);
 
-        ::glBegin(GL_TRIANGLE_FAN);
+        g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
 
-        ::glColor4ub(m_byRed, m_byGreen, m_byBlue, m_byAlpha);
+        g_ImmediateModeEmulator.Color3f(m_byRed / 255.0f, m_byGreen / 255.0f, m_byBlue / 255.0f);
 
         for (int i = LT; i < POS_MAX; ++i)
         {
-            ::glTexCoord2f(m_aTexCoord[i].fTU, m_aTexCoord[i].fTV);
-            ::glVertex2f(m_aScrCoord[i].fX * m_fScaleX,
+            g_ImmediateModeEmulator.TexCoord2f(m_aTexCoord[i].fTU, m_aTexCoord[i].fTV);
+            g_ImmediateModeEmulator.Vertex2f(m_aScrCoord[i].fX * m_fScaleX,
                 m_aScrCoord[i].fY * m_fScaleY);
         }
 
-        ::glEnd();
+        g_ImmediateModeEmulator.End();
     }
     else
     {
@@ -317,13 +318,13 @@ void CSprite::Render()
             ::glDisable(GL_TEXTURE_2D);
         }
 
-        ::glBegin(GL_TRIANGLE_FAN);
+        g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
 
-        ::glColor4ub(m_byRed, m_byGreen, m_byBlue, m_byAlpha);
+        g_ImmediateModeEmulator.Color3f(m_byRed / 255.0f, m_byGreen / 255.0f, m_byBlue / 255.0f);
         for (int i = LT; i < POS_MAX; ++i)
-            ::glVertex2f(m_aScrCoord[i].fX * m_fScaleX,
+            g_ImmediateModeEmulator.Vertex2f(m_aScrCoord[i].fX * m_fScaleX,
                 m_aScrCoord[i].fY * m_fScaleY);
 
-        ::glEnd();
+        g_ImmediateModeEmulator.End();
     }
 }

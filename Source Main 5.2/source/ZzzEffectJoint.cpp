@@ -14,6 +14,7 @@
 #include "DSPlaySound.h"
 #include "WSclient.h"
 #include "CSPetSystem.h"
+#include "ModernGL.h"
 
 extern float g_fBoneSave[10][3][4];
 
@@ -7066,14 +7067,14 @@ void RenderJoints(BYTE bRenderOneMore)
                 {
                     float Luminosity = ((float)((o->MaxTails - j) / (float)(o->MaxTails)) * 2);
                     Luminosity *= powf(o->Light[0], FPS_ANIMATION_FACTOR);
-                    glColor3f(Luminosity, Luminosity, Luminosity);
+                    g_ImmediateModeEmulator.Color3f(Luminosity, Luminosity, Luminosity);
 
-                    glBegin(GL_QUADS);
-                    glTexCoord2f(Light1, 0.f); glVertex3fv(currentTail[0]);
-                    glTexCoord2f(Light1, 1.f); glVertex3fv(currentTail[1]);
-                    glTexCoord2f(Light2, 1.f); glVertex3fv(nextTail[1]);
-                    glTexCoord2f(Light2, 0.f); glVertex3fv(nextTail[0]);
-                    glEnd();
+                    g_ImmediateModeEmulator.Begin(GL_QUADS);
+                    g_ImmediateModeEmulator.TexCoord2f(Light1, 0.f); g_ImmediateModeEmulator.Vertex3fv(currentTail[0]);
+                    g_ImmediateModeEmulator.TexCoord2f(Light1, 1.f); g_ImmediateModeEmulator.Vertex3fv(currentTail[1]);
+                    g_ImmediateModeEmulator.TexCoord2f(Light2, 1.f); g_ImmediateModeEmulator.Vertex3fv(nextTail[1]);
+                    g_ImmediateModeEmulator.TexCoord2f(Light2, 0.f); g_ImmediateModeEmulator.Vertex3fv(nextTail[0]);
+                    g_ImmediateModeEmulator.End();
                 }
                 else
                 {
@@ -7218,16 +7219,16 @@ void RenderJoints(BYTE bRenderOneMore)
                         glPushMatrix();
                         glTranslatef(t_bias[0], t_bias[1], t_bias[2]);
 
-                        glBegin(GL_QUADS);
-                        glTexCoord2f(Light1, 1.f); glVertex3fv(currentTail[2]);
-                        glTexCoord2f(Light1, 0.f); glVertex3fv(currentTail[3]);
-                        glTexCoord2f(Light2, 0.f); glVertex3fv(o->Tails[j + 1][3]);
-                        glTexCoord2f(Light2, 1.f); glVertex3fv(o->Tails[j + 1][2]);
-                        glTexCoord2f(Light1, 0.f); glVertex3fv(currentTail[0]);
-                        glTexCoord2f(Light1, 1.f); glVertex3fv(currentTail[1]);
-                        glTexCoord2f(Light2, 1.f); glVertex3fv(o->Tails[j + 1][1]);
-                        glTexCoord2f(Light2, 0.f); glVertex3fv(o->Tails[j + 1][0]);
-                        glEnd();
+                        g_ImmediateModeEmulator.Begin(GL_QUADS);
+                        g_ImmediateModeEmulator.TexCoord2f(Light1, 1.f); g_ImmediateModeEmulator.Vertex3fv(currentTail[2]);
+                        g_ImmediateModeEmulator.TexCoord2f(Light1, 0.f); g_ImmediateModeEmulator.Vertex3fv(currentTail[3]);
+                        g_ImmediateModeEmulator.TexCoord2f(Light2, 0.f); g_ImmediateModeEmulator.Vertex3fv(o->Tails[j + 1][3]);
+                        g_ImmediateModeEmulator.TexCoord2f(Light2, 1.f); g_ImmediateModeEmulator.Vertex3fv(o->Tails[j + 1][2]);
+                        g_ImmediateModeEmulator.TexCoord2f(Light1, 0.f); g_ImmediateModeEmulator.Vertex3fv(currentTail[0]);
+                        g_ImmediateModeEmulator.TexCoord2f(Light1, 1.f); g_ImmediateModeEmulator.Vertex3fv(currentTail[1]);
+                        g_ImmediateModeEmulator.TexCoord2f(Light2, 1.f); g_ImmediateModeEmulator.Vertex3fv(o->Tails[j + 1][1]);
+                        g_ImmediateModeEmulator.TexCoord2f(Light2, 0.f); g_ImmediateModeEmulator.Vertex3fv(o->Tails[j + 1][0]);
+                        g_ImmediateModeEmulator.End();
 
                         glPopMatrix();
                         continue;
@@ -7251,12 +7252,12 @@ void RenderJoints(BYTE bRenderOneMore)
 
                     if ((o->RenderFace & RENDER_FACE_ONE) == RENDER_FACE_ONE)
                     {
-                        glBegin(GL_QUADS);
-                        glTexCoord2f(L1, V2); glVertex3fv(currentTail[2]);
-                        glTexCoord2f(L1, V1); glVertex3fv(currentTail[3]);
-                        glTexCoord2f(L2, V1); glVertex3fv(nextTail[3]);
-                        glTexCoord2f(L2, V2); glVertex3fv(nextTail[2]);
-                        glEnd();
+                        g_ImmediateModeEmulator.Begin(GL_QUADS);
+                        g_ImmediateModeEmulator.TexCoord2f(L1, V2); g_ImmediateModeEmulator.Vertex3fv(currentTail[2]);
+                        g_ImmediateModeEmulator.TexCoord2f(L1, V1); g_ImmediateModeEmulator.Vertex3fv(currentTail[3]);
+                        g_ImmediateModeEmulator.TexCoord2f(L2, V1); g_ImmediateModeEmulator.Vertex3fv(nextTail[3]);
+                        g_ImmediateModeEmulator.TexCoord2f(L2, V2); g_ImmediateModeEmulator.Vertex3fv(nextTail[2]);
+                        g_ImmediateModeEmulator.End();
                     }
 
                     if ((o->RenderFace & RENDER_FACE_TWO) == RENDER_FACE_TWO)
@@ -7266,12 +7267,12 @@ void RenderJoints(BYTE bRenderOneMore)
                             L1 += Scroll * 2.f;
                             L2 += Scroll * 2.f;
                         }
-                        glBegin(GL_QUADS);
-                        glTexCoord2f(L1, V1); glVertex3fv(currentTail[0]);
-                        glTexCoord2f(L1, V2); glVertex3fv(currentTail[1]);
-                        glTexCoord2f(L2, V2); glVertex3fv(nextTail[1]);
-                        glTexCoord2f(L2, V1); glVertex3fv(nextTail[0]);
-                        glEnd();
+                        g_ImmediateModeEmulator.Begin(GL_QUADS);
+                        g_ImmediateModeEmulator.TexCoord2f(L1, V1); g_ImmediateModeEmulator.Vertex3fv(currentTail[0]);
+                        g_ImmediateModeEmulator.TexCoord2f(L1, V2); g_ImmediateModeEmulator.Vertex3fv(currentTail[1]);
+                        g_ImmediateModeEmulator.TexCoord2f(L2, V2); g_ImmediateModeEmulator.Vertex3fv(nextTail[1]);
+                        g_ImmediateModeEmulator.TexCoord2f(L2, V1); g_ImmediateModeEmulator.Vertex3fv(nextTail[0]);
+                        g_ImmediateModeEmulator.End();
                     }
                 }
             }

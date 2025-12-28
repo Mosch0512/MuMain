@@ -25,6 +25,7 @@
 
 #include "w_MapHeaders.h"
 #include "CameraMove.h"
+#include "ModernGL.h"
 
 //-------------------------------------------------------------------------------------------------------------
 
@@ -1437,12 +1438,12 @@ void RenderFace(int Texture, int mx, int my)
         DisableAlphaBlend();
     BindTexture(BITMAP_MAPTILE + Texture);
 
-    glBegin(GL_TRIANGLE_FAN);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
     Vertex0();
     Vertex1();
     Vertex2();
     Vertex3();
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void RenderFace_After(int Texture, int mx, int my)
@@ -1456,36 +1457,36 @@ void RenderFace_After(int Texture, int mx, int my)
 
     BindTexture(BITMAP_MAPTILE + Texture);
 
-    glBegin(GL_TRIANGLE_FAN);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
     Vertex0();
     Vertex1();
     Vertex2();
     Vertex3();
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void RenderFaceAlpha(int Texture, int mx, int my)
 {
     EnableAlphaTest();
     BindTexture(BITMAP_MAPTILE + Texture);
-    glBegin(GL_TRIANGLE_FAN);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
     VertexAlpha0();
     VertexAlpha1();
     VertexAlpha2();
     VertexAlpha3();
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void RenderFaceBlend(int Texture, int mx, int my)
 {
     EnableAlphaBlend();
     BindTexture(BITMAP_MAPTILE + Texture);
-    glBegin(GL_TRIANGLE_FAN);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
     VertexBlend0();
     VertexBlend1();
     VertexBlend2();
     VertexBlend3();
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void FaceTexture(int Texture, float xf, float yf, bool Water, bool Scale)
@@ -1655,20 +1656,20 @@ void RenderTerrainFace(float xf, float yf, int xi, int yi, float lodf)
 #ifdef ASG_ADD_MAP_KARUTAN
                 }
 #endif	// ASG_ADD_MAP_KARUTAN
-                glBegin(GL_QUADS);
-                glTexCoord2f(TerrainTextureCoord[0][0], TerrainTextureCoord[0][1]);
-                glColor3fv(PrimaryTerrainLight[TerrainIndex1]);
-                glVertex3fv(TerrainVertex[0]);
-                glTexCoord2f(TerrainTextureCoord[1][0], TerrainTextureCoord[1][1]);
-                glColor3fv(PrimaryTerrainLight[TerrainIndex2]);
-                glVertex3fv(TerrainVertex[1]);
-                glTexCoord2f(TerrainTextureCoord[2][0], TerrainTextureCoord[2][1]);
-                glColor3fv(PrimaryTerrainLight[TerrainIndex3]);
-                glVertex3fv(TerrainVertex[2]);
-                glTexCoord2f(TerrainTextureCoord[3][0], TerrainTextureCoord[3][1]);
-                glColor3fv(PrimaryTerrainLight[TerrainIndex4]);
-                glVertex3fv(TerrainVertex[3]);
-                glEnd();
+                g_ImmediateModeEmulator.Begin(GL_QUADS);
+                g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[0][0], TerrainTextureCoord[0][1]);
+                g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[TerrainIndex1]);
+                g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[0]);
+                g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[1][0], TerrainTextureCoord[1][1]);
+                g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[TerrainIndex2]);
+                g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[1]);
+                g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[2][0], TerrainTextureCoord[2][1]);
+                g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[TerrainIndex3]);
+                g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[2]);
+                g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[3][0], TerrainTextureCoord[3][1]);
+                g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[TerrainIndex4]);
+                g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[3]);
+                g_ImmediateModeEmulator.End();
 
                 if (gMapManager.IsPKField() || IsDoppelGanger2())
                     DisableAlphaBlend();
@@ -1737,20 +1738,20 @@ bool RenderTerrainTile(float xf, float yf, int xi, int yi, float lodf, int lodi,
             {
                 EnableAlphaTest();
                 DisableTexture();
-                glBegin(GL_TRIANGLE_FAN);
+                g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
                 if (4 <= path->GetClosedStatus(TerrainIndex1))
                 {
-                    glColor4f(0.3f, 0.3f, 1.0f, 0.5f);
+                    g_ImmediateModeEmulator.Color3f(0.3f, 0.3f, 1.0f);
                 }
                 else
                 {
-                    glColor4f(1.0f, 1.0f, 1.0f, 0.3f);
+                    g_ImmediateModeEmulator.Color3f(1.0f, 1.0f, 1.0f);
                 }
                 for (int i = 0; i < 4; i++)
                 {
-                    glVertex3fv(TerrainVertex[i]);
+                    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[i]);
                 }
-                glEnd();
+                g_ImmediateModeEmulator.End();
                 DisableAlphaBlend();
             }
         }
@@ -1762,13 +1763,13 @@ bool RenderTerrainTile(float xf, float yf, int xi, int yi, float lodf, int lodi,
         if (EditFlag != EDIT_LIGHT)
         {
             DisableTexture();
-            glColor3f(0.5f, 0.5f, 0.5f);
-            glBegin(GL_LINE_STRIP);
+            g_ImmediateModeEmulator.Color3f(0.5f, 0.5f, 0.5f);
+            g_ImmediateModeEmulator.Begin(GL_LINE_STRIP);
             for (int i = 0; i < 4; i++)
             {
-                glVertex3fv(TerrainVertex[i]);
+                g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[i]);
             }
-            glEnd();
+            g_ImmediateModeEmulator.End();
             DisableAlphaBlend();
         }
 #endif// _DEBUG
@@ -1806,13 +1807,13 @@ bool RenderTerrainTile(float xf, float yf, int xi, int yi, float lodf, int lodi,
             EnableAlphaTest();
             DisableTexture();
 
-            glBegin(GL_TRIANGLE_FAN);
-            glColor4f(1.f, 0.5f, 0.5f, 0.3f);
+            g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.5f, 0.5f);
             for (int i = 0; i < 4; i++)
             {
-                glVertex3fv(TerrainVertex[i]);
+                g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[i]);
             }
-            glEnd();
+            g_ImmediateModeEmulator.End();
 
             DisableAlphaBlend();
         }
@@ -1876,20 +1877,20 @@ void RenderTerrainBitmapTile(float xf, float yf, float lodf, int lodi, vec3_t c[
         VectorCopy(PrimaryTerrainLight[TerrainIndex4], Light[3]);
     }
 
-    glBegin(GL_TRIANGLE_FAN);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
     for (int i = 0; i < 4; i++)
     {
         if (LightEnable)
         {
             if (Alpha == 1.f)
-                glColor3fv(Light[i]);
+                g_ImmediateModeEmulator.Color3fv(Light[i]);
             else
-                glColor4f(Light[i][0], Light[i][1], Light[i][2], Alpha);
+                g_ImmediateModeEmulator.Color3f(Light[i][0], Light[i][1], Light[i][2]);
         }
-        glTexCoord2f(c[i][0], c[i][1]);
-        glVertex3fv(TerrainVertex[i]);
+        g_ImmediateModeEmulator.TexCoord2f(c[i][0], c[i][1]);
+        g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[i]);
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void RenderTerrainBitmap(int Texture, int mxi, int myi, float Rotation)

@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "ZzzOpenglUtil.h"
-#include "ZzzInfomation.h" 
+#include "ZzzInfomation.h"
 #include "ZzzBMD.h"
 #include "ZzzObject.h"
 #include "ZzzCharacter.h"
@@ -17,6 +17,7 @@
 #include "CameraMove.h"
 #include "PhysicsManager.h"
 #include "NewUISystem.h"
+#include "ModernGL.h"
 
 BMD* Models;
 BMD* ModelsDump;
@@ -1643,7 +1644,7 @@ void BMD::RenderMeshAlternative(int iRndExtFlag, int iParam, int i, int RenderFl
     }
 
     // ver 1.0 (triangle)
-    glBegin(GL_TRIANGLES);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLES);
     for (int j = 0; j < m->NumTriangles; j++)
     {
         Triangle_t* tp = &m->Triangles[j];
@@ -1656,20 +1657,20 @@ void BMD::RenderMeshAlternative(int iRndExtFlag, int iParam, int i, int RenderFl
             {
                 TexCoord_t* texp = &m->TexCoords[tp->TexCoordIndex[k]];
                 if (EnableWave)
-                    glTexCoord2f(texp->TexCoordU + BlendMeshTexCoordU, texp->TexCoordV + BlendMeshTexCoordV);
+                    g_ImmediateModeEmulator.TexCoord2f(texp->TexCoordU + BlendMeshTexCoordU, texp->TexCoordV + BlendMeshTexCoordV);
                 else
-                    glTexCoord2f(texp->TexCoordU, texp->TexCoordV);
+                    g_ImmediateModeEmulator.TexCoord2f(texp->TexCoordU, texp->TexCoordV);
                 if (EnableLight)
                 {
                     int ni = tp->NormalIndex[k];
                     if (Alpha >= 0.99f)
                     {
-                        glColor3fv(LightTransform[i][ni]);
+                        g_ImmediateModeEmulator.Color3fv(LightTransform[i][ni]);
                     }
                     else
                     {
                         float* Light = LightTransform[i][ni];
-                        glColor4f(Light[0], Light[1], Light[2], Alpha);
+                        g_ImmediateModeEmulator.Color3f(Light[0], Light[1], Light[2]);
                     }
                 }
                 break;
@@ -1696,15 +1697,15 @@ void BMD::RenderMeshAlternative(int iRndExtFlag, int iParam, int i, int RenderFl
                 {
                     vPos[iCoord] = VertexTransform[i][vi][iCoord] + Normal[iCoord] * fSin * 28.0f;
                 }
-                glVertex3fv(vPos);
+                g_ImmediateModeEmulator.Vertex3fv(vPos);
             }
             else
             {
-                glVertex3fv(VertexTransform[i][vi]);
+                g_ImmediateModeEmulator.Vertex3fv(VertexTransform[i][vi]);
             }
         }
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void BMD::RenderMeshEffect(int i, int iType, int iSubType, vec3_t Angle, VOID* obj)
@@ -2131,7 +2132,7 @@ void BMD::RenderMeshTranslate(int i, int RenderFlag, float Alpha, int BlendMesh,
         Render = RENDER_TEXTURE;
     }
 
-    glBegin(GL_TRIANGLES);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLES);
     for (int j = 0; j < m->NumTriangles; j++)
     {
         vec3_t  pos;
@@ -2145,20 +2146,20 @@ void BMD::RenderMeshTranslate(int i, int RenderFlag, float Alpha, int BlendMesh,
             {
                 TexCoord_t* texp = &m->TexCoords[tp->TexCoordIndex[k]];
                 if (EnableWave)
-                    glTexCoord2f(texp->TexCoordU + BlendMeshTexCoordU, texp->TexCoordV + BlendMeshTexCoordV);
+                    g_ImmediateModeEmulator.TexCoord2f(texp->TexCoordU + BlendMeshTexCoordU, texp->TexCoordV + BlendMeshTexCoordV);
                 else
-                    glTexCoord2f(texp->TexCoordU, texp->TexCoordV);
+                    g_ImmediateModeEmulator.TexCoord2f(texp->TexCoordU, texp->TexCoordV);
                 if (EnableLight)
                 {
                     int ni = tp->NormalIndex[k];
                     if (Alpha >= 0.99f)
                     {
-                        glColor3fv(LightTransform[i][ni]);
+                        g_ImmediateModeEmulator.Color3fv(LightTransform[i][ni]);
                     }
                     else
                     {
                         float* Light = LightTransform[i][ni];
-                        glColor4f(Light[0], Light[1], Light[2], Alpha);
+                        g_ImmediateModeEmulator.Color3f(Light[0], Light[1], Light[2]);
                     }
                 }
                 break;
@@ -2166,21 +2167,21 @@ void BMD::RenderMeshTranslate(int i, int RenderFlag, float Alpha, int BlendMesh,
             case RENDER_CHROME:
             {
                 if (Alpha >= 0.99f)
-                    glColor3fv(BodyLight);
+                    g_ImmediateModeEmulator.Color3fv(BodyLight);
                 else
-                    glColor4f(BodyLight[0], BodyLight[1], BodyLight[2], Alpha);
+                    g_ImmediateModeEmulator.Color3f(BodyLight[0], BodyLight[1], BodyLight[2]);
                 int ni = tp->NormalIndex[k];
-                glTexCoord2f(g_chrome[ni][0], g_chrome[ni][1]);
+                g_ImmediateModeEmulator.TexCoord2f(g_chrome[ni][0], g_chrome[ni][1]);
                 break;
             }
             }
             {
                 VectorAdd(VertexTransform[i][vi], BodyOrigin, pos);
-                glVertex3fv(pos);
+                g_ImmediateModeEmulator.Vertex3fv(pos);
             }
         }
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void BMD::RenderBodyTranslate(int Flag, float Alpha, int BlendMesh, float BlendMeshLight, float BlendMeshTexCoordU, float BlendMeshTexCoordV, int HiddenMesh, int Texture)
@@ -2408,43 +2409,43 @@ void BMD::RenderObjectBoundingBox()
                 VectorTransform(b->BoundingVertices[j], BoneTransform[i], BoundingVertices[j]);
             }
 
-            glBegin(GL_QUADS);
-            glColor3f(0.2f, 0.2f, 0.2f);
-            glTexCoord2f(1.0F, 1.0F); glVertex3fv(BoundingVertices[7]);
-            glTexCoord2f(1.0F, 0.0F); glVertex3fv(BoundingVertices[6]);
-            glTexCoord2f(0.0F, 0.0F); glVertex3fv(BoundingVertices[4]);
-            glTexCoord2f(0.0F, 1.0F); glVertex3fv(BoundingVertices[5]);
+            g_ImmediateModeEmulator.Begin(GL_QUADS);
+            g_ImmediateModeEmulator.Color3f(0.2f, 0.2f, 0.2f);
+            g_ImmediateModeEmulator.TexCoord2f(1.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[7]);
+            g_ImmediateModeEmulator.TexCoord2f(1.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[6]);
+            g_ImmediateModeEmulator.TexCoord2f(0.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[4]);
+            g_ImmediateModeEmulator.TexCoord2f(0.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[5]);
 
-            glColor3f(0.2f, 0.2f, 0.2f);
-            glTexCoord2f(0.0F, 1.0F); glVertex3fv(BoundingVertices[0]);
-            glTexCoord2f(1.0F, 1.0F); glVertex3fv(BoundingVertices[2]);
-            glTexCoord2f(1.0F, 0.0F); glVertex3fv(BoundingVertices[3]);
-            glTexCoord2f(0.0F, 0.0F); glVertex3fv(BoundingVertices[1]);
+            g_ImmediateModeEmulator.Color3f(0.2f, 0.2f, 0.2f);
+            g_ImmediateModeEmulator.TexCoord2f(0.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[0]);
+            g_ImmediateModeEmulator.TexCoord2f(1.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[2]);
+            g_ImmediateModeEmulator.TexCoord2f(1.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[3]);
+            g_ImmediateModeEmulator.TexCoord2f(0.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[1]);
 
-            glColor3f(0.6f, 0.6f, 0.6f);
-            glTexCoord2f(1.0F, 1.0F); glVertex3fv(BoundingVertices[7]);
-            glTexCoord2f(1.0F, 0.0F); glVertex3fv(BoundingVertices[3]);
-            glTexCoord2f(0.0F, 0.0F); glVertex3fv(BoundingVertices[2]);
-            glTexCoord2f(0.0F, 1.0F); glVertex3fv(BoundingVertices[6]);
+            g_ImmediateModeEmulator.Color3f(0.6f, 0.6f, 0.6f);
+            g_ImmediateModeEmulator.TexCoord2f(1.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[7]);
+            g_ImmediateModeEmulator.TexCoord2f(1.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[3]);
+            g_ImmediateModeEmulator.TexCoord2f(0.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[2]);
+            g_ImmediateModeEmulator.TexCoord2f(0.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[6]);
 
-            glColor3f(0.6f, 0.6f, 0.6f);
-            glTexCoord2f(0.0F, 1.0F); glVertex3fv(BoundingVertices[0]);
-            glTexCoord2f(1.0F, 1.0F); glVertex3fv(BoundingVertices[1]);
-            glTexCoord2f(1.0F, 0.0F); glVertex3fv(BoundingVertices[5]);
-            glTexCoord2f(0.0F, 0.0F); glVertex3fv(BoundingVertices[4]);
+            g_ImmediateModeEmulator.Color3f(0.6f, 0.6f, 0.6f);
+            g_ImmediateModeEmulator.TexCoord2f(0.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[0]);
+            g_ImmediateModeEmulator.TexCoord2f(1.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[1]);
+            g_ImmediateModeEmulator.TexCoord2f(1.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[5]);
+            g_ImmediateModeEmulator.TexCoord2f(0.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[4]);
 
-            glColor3f(0.4f, 0.4f, 0.4f);
-            glTexCoord2f(1.0F, 1.0F); glVertex3fv(BoundingVertices[7]);
-            glTexCoord2f(1.0F, 0.0F); glVertex3fv(BoundingVertices[5]);
-            glTexCoord2f(0.0F, 0.0F); glVertex3fv(BoundingVertices[1]);
-            glTexCoord2f(0.0F, 1.0F); glVertex3fv(BoundingVertices[3]);
+            g_ImmediateModeEmulator.Color3f(0.4f, 0.4f, 0.4f);
+            g_ImmediateModeEmulator.TexCoord2f(1.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[7]);
+            g_ImmediateModeEmulator.TexCoord2f(1.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[5]);
+            g_ImmediateModeEmulator.TexCoord2f(0.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[1]);
+            g_ImmediateModeEmulator.TexCoord2f(0.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[3]);
 
-            glColor3f(0.4f, 0.4f, 0.4f);
-            glTexCoord2f(0.0F, 1.0F); glVertex3fv(BoundingVertices[0]);
-            glTexCoord2f(1.0F, 1.0F); glVertex3fv(BoundingVertices[4]);
-            glTexCoord2f(1.0F, 0.0F); glVertex3fv(BoundingVertices[6]);
-            glTexCoord2f(0.0F, 0.0F); glVertex3fv(BoundingVertices[2]);
-            glEnd();
+            g_ImmediateModeEmulator.Color3f(0.4f, 0.4f, 0.4f);
+            g_ImmediateModeEmulator.TexCoord2f(0.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[0]);
+            g_ImmediateModeEmulator.TexCoord2f(1.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[4]);
+            g_ImmediateModeEmulator.TexCoord2f(1.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[6]);
+            g_ImmediateModeEmulator.TexCoord2f(0.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(BoundingVertices[2]);
+            g_ImmediateModeEmulator.End();
         }
     }
     glPopMatrix();
@@ -2482,14 +2483,14 @@ void BMD::RenderBone(float(*BoneMatrix)[3][4])
                 {
                     VectorMA(BodyOrigin, BodyScale, BoneVertice, BoneVertice);
                 }
-                glBegin(GL_LINES);
-                glVertex3fv(BoneVertices[0]);
-                glVertex3fv(BoneVertices[1]); 
-                glVertex3fv(BoneVertices[1]);
-                glVertex3fv(BoneVertices[2]);
-                glVertex3fv(BoneVertices[2]);
-                glVertex3fv(BoneVertices[0]);
-                glEnd();
+                g_ImmediateModeEmulator.Begin(GL_LINES);
+                g_ImmediateModeEmulator.Vertex3fv(BoneVertices[0]);
+                g_ImmediateModeEmulator.Vertex3fv(BoneVertices[1]); 
+                g_ImmediateModeEmulator.Vertex3fv(BoneVertices[1]);
+                g_ImmediateModeEmulator.Vertex3fv(BoneVertices[2]);
+                g_ImmediateModeEmulator.Vertex3fv(BoneVertices[2]);
+                g_ImmediateModeEmulator.Vertex3fv(BoneVertices[0]);
+                g_ImmediateModeEmulator.End();
             }
         }
     }

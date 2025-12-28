@@ -32,6 +32,7 @@
 #include "w_MapHeaders.h"
 #include "MonkSystem.h"
 #include "NewUISystem.h"
+#include "ModernGL.h"
 
 extern vec3_t VertexTransform[MAX_MESH][MAX_VERTICES];
 extern vec3_t LightTransform[MAX_MESH][MAX_VERTICES];
@@ -10809,43 +10810,43 @@ void RenderBoundingBox(OBJECT* pObj)
     }
 
     //glBegin(GL_QUADS);
-    glBegin(GL_LINES);
-    glColor3f(0.2f, 0.2f, 0.2f);
-    glTexCoord2f(1.0F, 1.0F); glVertex3fv(TransformVertices[7]);
-    glTexCoord2f(1.0F, 0.0F); glVertex3fv(TransformVertices[6]);
-    glTexCoord2f(0.0F, 0.0F); glVertex3fv(TransformVertices[4]);
-    glTexCoord2f(0.0F, 1.0F); glVertex3fv(TransformVertices[5]);
+    g_ImmediateModeEmulator.Begin(GL_LINES);
+    g_ImmediateModeEmulator.Color3f(0.2f, 0.2f, 0.2f);
+    g_ImmediateModeEmulator.TexCoord2f(1.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[7]);
+    g_ImmediateModeEmulator.TexCoord2f(1.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[6]);
+    g_ImmediateModeEmulator.TexCoord2f(0.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[4]);
+    g_ImmediateModeEmulator.TexCoord2f(0.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[5]);
 
-    glColor3f(0.2f, 0.2f, 0.2f);
-    glTexCoord2f(0.0F, 1.0F); glVertex3fv(TransformVertices[0]);
-    glTexCoord2f(1.0F, 1.0F); glVertex3fv(TransformVertices[2]);
-    glTexCoord2f(1.0F, 0.0F); glVertex3fv(TransformVertices[3]);
-    glTexCoord2f(0.0F, 0.0F); glVertex3fv(TransformVertices[1]);
+    g_ImmediateModeEmulator.Color3f(0.2f, 0.2f, 0.2f);
+    g_ImmediateModeEmulator.TexCoord2f(0.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[0]);
+    g_ImmediateModeEmulator.TexCoord2f(1.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[2]);
+    g_ImmediateModeEmulator.TexCoord2f(1.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[3]);
+    g_ImmediateModeEmulator.TexCoord2f(0.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[1]);
 
-    glColor3f(0.6f, 0.6f, 0.6f);
-    glTexCoord2f(1.0F, 1.0F); glVertex3fv(TransformVertices[7]);
-    glTexCoord2f(1.0F, 0.0F); glVertex3fv(TransformVertices[3]);
-    glTexCoord2f(0.0F, 0.0F); glVertex3fv(TransformVertices[2]);
-    glTexCoord2f(0.0F, 1.0F); glVertex3fv(TransformVertices[6]);
+    g_ImmediateModeEmulator.Color3f(0.6f, 0.6f, 0.6f);
+    g_ImmediateModeEmulator.TexCoord2f(1.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[7]);
+    g_ImmediateModeEmulator.TexCoord2f(1.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[3]);
+    g_ImmediateModeEmulator.TexCoord2f(0.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[2]);
+    g_ImmediateModeEmulator.TexCoord2f(0.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[6]);
 
-    glColor3f(0.6f, 0.6f, 0.6f);
-    glTexCoord2f(0.0F, 1.0F); glVertex3fv(TransformVertices[0]);
-    glTexCoord2f(1.0F, 1.0F); glVertex3fv(TransformVertices[1]);
-    glTexCoord2f(1.0F, 0.0F); glVertex3fv(TransformVertices[5]);
-    glTexCoord2f(0.0F, 0.0F); glVertex3fv(TransformVertices[4]);
+    g_ImmediateModeEmulator.Color3f(0.6f, 0.6f, 0.6f);
+    g_ImmediateModeEmulator.TexCoord2f(0.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[0]);
+    g_ImmediateModeEmulator.TexCoord2f(1.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[1]);
+    g_ImmediateModeEmulator.TexCoord2f(1.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[5]);
+    g_ImmediateModeEmulator.TexCoord2f(0.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[4]);
 
-    glColor3f(0.4f, 0.4f, 0.4f);
-    glTexCoord2f(1.0F, 1.0F); glVertex3fv(TransformVertices[7]);
-    glTexCoord2f(1.0F, 0.0F); glVertex3fv(TransformVertices[5]);
-    glTexCoord2f(0.0F, 0.0F); glVertex3fv(TransformVertices[1]);
-    glTexCoord2f(0.0F, 1.0F); glVertex3fv(TransformVertices[3]);
+    g_ImmediateModeEmulator.Color3f(0.4f, 0.4f, 0.4f);
+    g_ImmediateModeEmulator.TexCoord2f(1.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[7]);
+    g_ImmediateModeEmulator.TexCoord2f(1.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[5]);
+    g_ImmediateModeEmulator.TexCoord2f(0.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[1]);
+    g_ImmediateModeEmulator.TexCoord2f(0.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[3]);
 
-    glColor3f(0.4f, 0.4f, 0.4f);
-    glTexCoord2f(0.0F, 1.0F); glVertex3fv(TransformVertices[0]);
-    glTexCoord2f(1.0F, 1.0F); glVertex3fv(TransformVertices[4]);
-    glTexCoord2f(1.0F, 0.0F); glVertex3fv(TransformVertices[6]);
-    glTexCoord2f(0.0F, 0.0F); glVertex3fv(TransformVertices[2]);
-    glEnd();
+    g_ImmediateModeEmulator.Color3f(0.4f, 0.4f, 0.4f);
+    g_ImmediateModeEmulator.TexCoord2f(0.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[0]);
+    g_ImmediateModeEmulator.TexCoord2f(1.0F, 1.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[4]);
+    g_ImmediateModeEmulator.TexCoord2f(1.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[6]);
+    g_ImmediateModeEmulator.TexCoord2f(0.0F, 0.0F); g_ImmediateModeEmulator.Vertex3fv(TransformVertices[2]);
+    g_ImmediateModeEmulator.End();
 
     glPopMatrix();
 }
