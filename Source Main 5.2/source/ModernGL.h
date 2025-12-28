@@ -114,6 +114,43 @@ private:
     void ConvertQuadsToTriangles(std::vector<VertexPCT>& outVertices);
 };
 
+// Matrix stack for replacing glPushMatrix/glPopMatrix in core profile
+// Note: Currently using compatibility profile, so legacy matrix stack still works
+// This class is prepared for future migration to core profile
+class CMatrixStack {
+private:
+    struct Matrix4x4 {
+        float m[16];
+        Matrix4x4();
+        void LoadIdentity();
+        void Multiply(const Matrix4x4& other);
+    };
+
+    std::vector<Matrix4x4> m_Stack;
+    Matrix4x4 m_Current;
+
+public:
+    CMatrixStack();
+
+    void Push();
+    void Pop();
+    void LoadIdentity();
+    void Translate(float x, float y, float z);
+    void Rotate(float angle, float x, float y, float z);
+    void Scale(float x, float y, float z);
+    void MultMatrix(const float* m);
+    void LoadMatrix(const float* m);
+    const float* GetMatrix() const { return m_Current.m; }
+
+    // Helper to sync with legacy OpenGL matrix (for compatibility mode)
+    void SyncFromGL();
+    void SyncToGL();
+};
+
+// Global matrix stacks (for future core profile migration)
+extern CMatrixStack g_ModelViewStack;
+extern CMatrixStack g_ProjectionStack;
+
 // Global immediate mode emulator instance
 extern CImmediateModeEmulator g_ImmediateModeEmulator;
 

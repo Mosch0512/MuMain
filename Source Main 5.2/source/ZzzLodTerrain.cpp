@@ -1213,169 +1213,169 @@ inline void Interpolation(int mx, int my)
 
 inline void Vertex0()
 {
-    glTexCoord2f(TerrainTextureCoord[0][0], TerrainTextureCoord[0][1]);
-    glColor3fv(PrimaryTerrainLight[TerrainIndex1]);
-    glVertex3fv(TerrainVertex[0]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[0][0], TerrainTextureCoord[0][1]);
+    g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[TerrainIndex1]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[0]);
 }
 
 inline void Vertex1()
 {
-    glTexCoord2f(TerrainTextureCoord[1][0], TerrainTextureCoord[1][1]);
-    glColor3fv(PrimaryTerrainLight[TerrainIndex2]);
-    glVertex3fv(TerrainVertex[1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[1][0], TerrainTextureCoord[1][1]);
+    g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[TerrainIndex2]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[1]);
 }
 
 inline void Vertex2()
 {
-    glTexCoord2f(TerrainTextureCoord[2][0], TerrainTextureCoord[2][1]);
-    glColor3fv(PrimaryTerrainLight[TerrainIndex3]);
-    glVertex3fv(TerrainVertex[2]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[2][0], TerrainTextureCoord[2][1]);
+    g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[TerrainIndex3]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[2]);
 }
 
 inline void Vertex3()
 {
-    glTexCoord2f(TerrainTextureCoord[3][0], TerrainTextureCoord[3][1]);
-    glColor3fv(PrimaryTerrainLight[TerrainIndex4]);
-    glVertex3fv(TerrainVertex[3]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[3][0], TerrainTextureCoord[3][1]);
+    g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[TerrainIndex4]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[3]);
 }
 
 inline void Vertex01()
 {
-    glTexCoord2f(TerrainTextureCoord01[0], TerrainTextureCoord01[1]);
-    glColor3fv(PrimaryTerrainLight[Index01]);
-    glVertex3fv(TerrainVertex01);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord01[0], TerrainTextureCoord01[1]);
+    g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[Index01]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex01);
 }
 
 inline void Vertex12()
 {
-    glTexCoord2f(TerrainTextureCoord12[0], TerrainTextureCoord12[1]);
-    glColor3fv(PrimaryTerrainLight[Index12]);
-    glVertex3fv(TerrainVertex12);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord12[0], TerrainTextureCoord12[1]);
+    g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[Index12]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex12);
 }
 
 inline void Vertex23()
 {
-    glTexCoord2f(TerrainTextureCoord23[0], TerrainTextureCoord23[1]);
-    glColor3fv(PrimaryTerrainLight[Index23]);
-    glVertex3fv(TerrainVertex23);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord23[0], TerrainTextureCoord23[1]);
+    g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[Index23]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex23);
 }
 
 inline void Vertex30()
 {
-    glTexCoord2f(TerrainTextureCoord30[0], TerrainTextureCoord30[1]);
-    glColor3fv(PrimaryTerrainLight[Index30]);
-    glVertex3fv(TerrainVertex30);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord30[0], TerrainTextureCoord30[1]);
+    g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[Index30]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex30);
 }
 
 inline void Vertex02()
 {
-    glTexCoord2f(TerrainTextureCoord02[0], TerrainTextureCoord02[1]);
-    glColor3fv(PrimaryTerrainLight[Index02]);
-    glVertex3fv(TerrainVertex02);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord02[0], TerrainTextureCoord02[1]);
+    g_ImmediateModeEmulator.Color3fv(PrimaryTerrainLight[Index02]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex02);
 }
 
 inline void VertexAlpha0()
 {
-    glTexCoord2f(TerrainTextureCoord[0][0], TerrainTextureCoord[0][1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[0][0], TerrainTextureCoord[0][1]);
     float* Light = &PrimaryTerrainLight[TerrainIndex1][0];
-    glColor4f(Light[0], Light[1], Light[2], TerrainMappingAlpha[TerrainIndex1]);
-    glVertex3fv(TerrainVertex[0]);
+    g_ImmediateModeEmulator.Color3f(Light[0], Light[1], Light[2]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[0]);
 }
 
 inline void VertexAlpha1()
 {
-    glTexCoord2f(TerrainTextureCoord[1][0], TerrainTextureCoord[1][1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[1][0], TerrainTextureCoord[1][1]);
     float* Light = &PrimaryTerrainLight[TerrainIndex2][0];
-    glColor4f(Light[0], Light[1], Light[2], TerrainMappingAlpha[TerrainIndex2]);
-    glVertex3fv(TerrainVertex[1]);
+    g_ImmediateModeEmulator.Color3f(Light[0], Light[1], Light[2]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[1]);
 }
 
 inline void VertexAlpha2()
 {
-    glTexCoord2f(TerrainTextureCoord[2][0], TerrainTextureCoord[2][1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[2][0], TerrainTextureCoord[2][1]);
     float* Light = &PrimaryTerrainLight[TerrainIndex3][0];
-    glColor4f(Light[0], Light[1], Light[2], TerrainMappingAlpha[TerrainIndex3]);
-    glVertex3fv(TerrainVertex[2]);
+    g_ImmediateModeEmulator.Color3f(Light[0], Light[1], Light[2]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[2]);
 }
 
 inline void VertexAlpha3()
 {
-    glTexCoord2f(TerrainTextureCoord[3][0], TerrainTextureCoord[3][1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[3][0], TerrainTextureCoord[3][1]);
     float* Light = &PrimaryTerrainLight[TerrainIndex4][0];
-    glColor4f(Light[0], Light[1], Light[2], TerrainMappingAlpha[TerrainIndex4]);
-    glVertex3fv(TerrainVertex[3]);
+    g_ImmediateModeEmulator.Color3f(Light[0], Light[1], Light[2]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[3]);
 }
 
 inline void VertexAlpha01()
 {
-    glTexCoord2f(TerrainTextureCoord01[0], TerrainTextureCoord01[1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord01[0], TerrainTextureCoord01[1]);
     float* Light = &PrimaryTerrainLight[Index01][0];
-    glColor4f(Light[0], Light[1], Light[2], TerrainMappingAlpha01);
-    glVertex3fv(TerrainVertex01);
+    g_ImmediateModeEmulator.Color3f(Light[0], Light[1], Light[2]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex01);
 }
 
 inline void VertexAlpha12()
 {
-    glTexCoord2f(TerrainTextureCoord12[0], TerrainTextureCoord12[1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord12[0], TerrainTextureCoord12[1]);
     float* Light = &PrimaryTerrainLight[Index12][0];
-    glColor4f(Light[0], Light[1], Light[2], TerrainMappingAlpha12);
-    glVertex3fv(TerrainVertex12);
+    g_ImmediateModeEmulator.Color3f(Light[0], Light[1], Light[2]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex12);
 }
 
 inline void VertexAlpha23()
 {
-    glTexCoord2f(TerrainTextureCoord23[0], TerrainTextureCoord23[1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord23[0], TerrainTextureCoord23[1]);
     float* Light = &PrimaryTerrainLight[Index23][0];
-    glColor4f(Light[0], Light[1], Light[2], TerrainMappingAlpha23);
-    glVertex3fv(TerrainVertex23);
+    g_ImmediateModeEmulator.Color3f(Light[0], Light[1], Light[2]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex23);
 }
 
 inline void VertexAlpha30()
 {
-    glTexCoord2f(TerrainTextureCoord30[0], TerrainTextureCoord30[1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord30[0], TerrainTextureCoord30[1]);
     float* Light = &PrimaryTerrainLight[Index30][0];
-    glColor4f(Light[0], Light[1], Light[2], TerrainMappingAlpha30);
-    glVertex3fv(TerrainVertex30);
+    g_ImmediateModeEmulator.Color3f(Light[0], Light[1], Light[2]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex30);
 }
 
 inline void VertexAlpha02()
 {
-    glTexCoord2f(TerrainTextureCoord02[0], TerrainTextureCoord02[1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord02[0], TerrainTextureCoord02[1]);
     float* Light = &PrimaryTerrainLight[Index02][0];
-    glColor4f(Light[0], Light[1], Light[2], TerrainMappingAlpha02);
-    glVertex3fv(TerrainVertex02);
+    g_ImmediateModeEmulator.Color3f(Light[0], Light[1], Light[2]);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex02);
 }
 
 inline void VertexBlend0()
 {
-    glTexCoord2f(TerrainTextureCoord[0][0], TerrainTextureCoord[0][1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[0][0], TerrainTextureCoord[0][1]);
     float Light = TerrainMappingAlpha[TerrainIndex1];
-    glColor3f(Light, Light, Light);
-    glVertex3fv(TerrainVertex[0]);
+    g_ImmediateModeEmulator.Color3f(Light, Light, Light);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[0]);
 }
 
 inline void VertexBlend1()
 {
-    glTexCoord2f(TerrainTextureCoord[1][0], TerrainTextureCoord[1][1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[1][0], TerrainTextureCoord[1][1]);
     float Light = TerrainMappingAlpha[TerrainIndex2];
-    glColor3f(Light, Light, Light);
-    glVertex3fv(TerrainVertex[1]);
+    g_ImmediateModeEmulator.Color3f(Light, Light, Light);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[1]);
 }
 
 inline void VertexBlend2()
 {
-    glTexCoord2f(TerrainTextureCoord[2][0], TerrainTextureCoord[2][1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[2][0], TerrainTextureCoord[2][1]);
     float Light = TerrainMappingAlpha[TerrainIndex3];
-    glColor3f(Light, Light, Light);
-    glVertex3fv(TerrainVertex[2]);
+    g_ImmediateModeEmulator.Color3f(Light, Light, Light);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[2]);
 }
 
 inline void VertexBlend3()
 {
-    glTexCoord2f(TerrainTextureCoord[3][0], TerrainTextureCoord[3][1]);
+    g_ImmediateModeEmulator.TexCoord2f(TerrainTextureCoord[3][0], TerrainTextureCoord[3][1]);
     float Light = TerrainMappingAlpha[TerrainIndex4];
-    glColor3f(Light, Light, Light);
-    glVertex3fv(TerrainVertex[3]);
+    g_ImmediateModeEmulator.Color3f(Light, Light, Light);
+    g_ImmediateModeEmulator.Vertex3fv(TerrainVertex[3]);
 }
 
 void RenderFace(int Texture, int mx, int my)

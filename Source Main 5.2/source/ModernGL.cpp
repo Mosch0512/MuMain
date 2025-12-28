@@ -17,6 +17,8 @@ static PFNGLENABLEVERTEXATTRIBARRAYPROC pglEnableVertexAttribArray = nullptr;
 // Global instances
 CImmediateModeEmulator g_ImmediateModeEmulator;
 CDynamicBatchRenderer g_EffectBatchRenderer;
+CMatrixStack g_ModelViewStack;
+CMatrixStack g_ProjectionStack;
 
 // Load OpenGL extension functions
 static bool LoadGLExtensions()
@@ -407,4 +409,138 @@ void InitModernGL()
 void CleanupModernGL()
 {
     g_EffectBatchRenderer.Cleanup();
+}
+
+// ============================================================================
+// CMatrixStack Implementation
+// ============================================================================
+
+#include <cmath>
+#include <cstring>
+
+CMatrixStack::Matrix4x4::Matrix4x4()
+{
+    LoadIdentity();
+}
+
+void CMatrixStack::Matrix4x4::LoadIdentity()
+{
+    memset(m, 0, sizeof(m));
+    m[0] = m[5] = m[10] = m[15] = 1.0f;
+}
+
+void CMatrixStack::Matrix4x4::Multiply(const Matrix4x4& other)
+{
+    Matrix4x4 result;
+    for (int row = 0; row < 4; ++row) {
+        for (int col = 0; col < 4; ++col) {
+            result.m[row * 4 + col] = 0.0f;
+            for (int i = 0; i < 4; ++i) {
+                result.m[row * 4 + col] += m[row * 4 + i] * other.m[i * 4 + col];
+            }
+        }
+    }
+    memcpy(m, result.m, sizeof(m));
+}
+
+CMatrixStack::CMatrixStack()
+{
+    m_Current.LoadIdentity();
+}
+
+void CMatrixStack::Push()
+{
+    m_Stack.push_back(m_Current);
+}
+
+void CMatrixStack::Pop()
+{
+    if (!m_Stack.empty()) {
+        m_Current = m_Stack.back();
+        m_Stack.pop_back();
+    }
+}
+
+void CMatrixStack::LoadIdentity()
+{
+    m_Current.LoadIdentity();
+}
+
+void CMatrixStack::Translate(float x, float y, float z)
+{
+    Matrix4x4 translation;
+    translation.m[12] = x;
+    translation.m[13] = y;
+    translation.m[14] = z;
+    m_Current.Multiply(translation);
+}
+
+void CMatrixStack::Rotate(float angle, float x, float y, float z)
+{
+    float rad = angle * 3.14159265f / 180.0f;
+    float c = cosf(rad);
+    float s = sinf(rad);
+    float t = 1.0f - c;
+
+    // Normalize axis
+    float len = sqrtf(x * x + y * y + z * z);
+    if (len > 0.0f) {
+        x /= len;
+        y /= len;
+        z /= len;
+    }
+
+    Matrix4x4 rotation;
+    rotation.m[0] = t * x * x + c;
+    rotation.m[1] = t * x * y + s * z;
+    rotation.m[2] = t * x * z - s * y;
+    rotation.m[3] = 0.0f;
+
+    rotation.m[4] = t * x * y - s * z;
+    rotation.m[5] = t * y * y + c;
+    rotation.m[6] = t * y * z + s * x;
+    rotation.m[7] = 0.0f;
+
+    rotation.m[8] = t * x * z + s * y;
+    rotation.m[9] = t * y * z - s * x;
+    rotation.m[10] = t * z * z + c;
+    rotation.m[11] = 0.0f;
+
+    rotation.m[12] = 0.0f;
+    rotation.m[13] = 0.0f;
+    rotation.m[14] = 0.0f;
+    rotation.m[15] = 1.0f;
+
+    m_Current.Multiply(rotation);
+}
+
+void CMatrixStack::Scale(float x, float y, float z)
+{
+    Matrix4x4 scale;
+    scale.m[0] = x;
+    scale.m[5] = y;
+    scale.m[10] = z;
+    m_Current.Multiply(scale);
+}
+
+void CMatrixStack::MultMatrix(const float* mat)
+{
+    Matrix4x4 other;
+    memcpy(other.m, mat, sizeof(other.m));
+    m_Current.Multiply(other);
+}
+
+void CMatrixStack::LoadMatrix(const float* mat)
+{
+    memcpy(m_Current.m, mat, sizeof(m_Current.m));
+}
+
+void CMatrixStack::SyncFromGL()
+{
+    glGetFloatv(GL_MODELVIEW_MATRIX, m_Current.m);
+}
+
+void CMatrixStack::SyncToGL()
+{
+    glLoadMatrixf(m_Current.m);
 }

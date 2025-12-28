@@ -870,8 +870,8 @@ void CPhysicsCloth::RenderVertex(vec3_t* pvRenderPos, int xVertex, int yVertex)
 {
     int iVertex = m_iNumHor * yVertex + xVertex;
     vec3_t* pvPos = &pvRenderPos[iVertex];
-    glTexCoord2f((float)xVertex / (float)(m_iNumHor - 1), std::min<float>(0.99f, (float)yVertex / (float)(m_iNumVer - 1)));
-    glVertex3f((*pvPos)[0], (*pvPos)[1], (*pvPos)[2]);
+    g_ImmediateModeEmulator.TexCoord2f((float)xVertex / (float)(m_iNumHor - 1), std::min<float>(0.99f, (float)yVertex / (float)(m_iNumVer - 1)));
+    g_ImmediateModeEmulator.Vertex3f((*pvPos)[0], (*pvPos)[1], (*pvPos)[2]);
 }
 
 void CPhysicsCloth::RenderCollisions(void)
