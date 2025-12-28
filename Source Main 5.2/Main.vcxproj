@@ -120,8 +120,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)source\;$(SolutionDir)dependencies\include;$(SolutionDir)dependencies\netcore\includes</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_FOREIGN_DEBUG;_LANGUAGE_FOREIGN;_LANGUAGE_ENG;UNICODE;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)source\;$(SolutionDir)ThirdParty\imgui;$(SolutionDir)ThirdParty\imgui\backends;$(SolutionDir)dependencies\include;$(SolutionDir)dependencies\netcore\includes</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_EDITOR;WIN32;_DEBUG;_WINDOWS;_FOREIGN_DEBUG;_LANGUAGE_FOREIGN;_LANGUAGE_ENG;UNICODE;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -143,6 +143,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -182,8 +183,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)source\;$(SolutionDir)dependencies\include;$(SolutionDir)dependencies\include\asio</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_FOREIGN_DEBUG;_LANGUAGE_FOREIGN;_LANGUAGE_ENG;UNICODE;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)source\;$(SolutionDir)ThirdParty\imgui;$(SolutionDir)ThirdParty\imgui\backends;$(SolutionDir)dependencies\include;$(SolutionDir)dependencies\include\asio</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_EDITOR;WIN32;_DEBUG;_WINDOWS;_FOREIGN_DEBUG;_LANGUAGE_FOREIGN;_LANGUAGE_ENG;UNICODE;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -205,6 +206,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -728,6 +730,49 @@
     <ClCompile Include="source\_GlobalFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <!-- ImGui Files -->
+    <ClCompile Include="ThirdParty\imgui\imgui.cpp" Condition="'$(Configuration)'=='Global Debug'">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp" Condition="'$(Configuration)'=='Global Debug'">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp" Condition="'$(Configuration)'=='Global Debug'">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" Condition="'$(Configuration)'=='Global Debug'">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_win32.cpp" Condition="'$(Configuration)'=='Global Debug'">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_opengl2.cpp" Condition="'$(Configuration)'=='Global Debug'">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClInclude Include="ThirdParty\imgui\imconfig.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="ThirdParty\imgui\imgui.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="ThirdParty\imgui\imgui_internal.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="ThirdParty\imgui\imstb_rectpack.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="ThirdParty\imgui\imstb_textedit.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="ThirdParty\imgui\imstb_truetype.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_opengl2.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_win32.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <!-- End ImGui Files -->
+    <!-- MU Editor (Debug only) -->
+    <ClInclude Include="source\MuEditor\MuEditor.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClCompile Include="source\MuEditor\MuEditor.cpp" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="source\MuEditor\MuEditorConsoleRedirect.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="source\MuEditor\MuEditorConsole.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClCompile Include="source\MuEditor\MuEditorConsole.cpp" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="source\MuEditor\MuEditorUI.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClCompile Include="source\MuEditor\MuEditorUI.cpp" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="source\MuEditor\MuInputBlocker.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClCompile Include="source\MuEditor\MuInputBlocker.cpp" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="source\MuEditor\MuEditorCenterPane.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClCompile Include="source\MuEditor\MuEditorCenterPane.cpp" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClInclude Include="source\MuEditor\MuItemEditor\MuItemEditor.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClCompile Include="source\MuEditor\MuItemEditor\MuItemEditor.cpp" Condition="'$(Configuration)'=='Global Debug'" />
+    <!-- End MU Editor (Debug only) -->
     <ClInclude Include="afxres.h" />
     <ClInclude Include="dependencies\include\span.hpp" />
     <ClInclude Include="source\CharInfoBalloonMng.h" />
@@ -1072,6 +1117,9 @@
     <None Include="script\Mu_Tai.py" />
     <None Include="script\Mu_Tha.py" />
     <None Include="script\Mu_Vie.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="source\MuEditor\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

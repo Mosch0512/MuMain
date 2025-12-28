@@ -5,6 +5,7 @@
 #include "ZzzInfomation.h"
 
 #include <codecvt>
+#include <sstream>
 
 #include "ZzzBMD.h"
 #include "ZzzObject.h"
@@ -371,6 +372,115 @@ void OpenDialogFile(wchar_t* FileName)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// BMD to CSV converters
+///////////////////////////////////////////////////////////////////////////////
+
+void ConvertItemBmdToCsv(const wchar_t* bmdFile, const wchar_t* csvFile)
+{
+    fwprintf(stderr, L"[BMD Converter] Converting %ls to %ls...\n", bmdFile, csvFile);
+    fflush(stderr);
+
+    FILE* fp = _wfopen(bmdFile, L"rb");
+    if (!fp)
+    {
+        fwprintf(stderr, L"[BMD Converter] Failed to open %ls\n", bmdFile);
+        fflush(stderr);
+        return; // Silently fail if BMD doesn't exist
+    }
+
+    const int Size = sizeof(ITEM_ATTRIBUTE_FILE);
+    BYTE* Buffer = new BYTE[Size * MAX_ITEM];
+    fread(Buffer, Size * MAX_ITEM, 1, fp);
+
+    DWORD dwCheckSum;
+    fread(&dwCheckSum, sizeof(DWORD), 1, fp);
+    fclose(fp);
+
+    if (dwCheckSum != GenerateCheckSum2(Buffer, Size * MAX_ITEM, 0xE2F1))
+    {
+        fwprintf(stderr, L"[BMD Converter] Checksum mismatch for %ls\n", bmdFile);
+        std::fflush(stderr);
+        delete[] Buffer;
+        return; // Invalid checksum, skip conversion
+    }
+
+    FILE* csvFp = _wfopen(csvFile, L"w, ccs=UTF-8");
+    if (!csvFp)
+    {
+        fwprintf(stderr, L"[BMD Converter] Failed to create %ls\n", csvFile);
+        std::fflush(stderr);
+        delete[] Buffer;
+        return;
+    }
+
+    // Write CSV header
+    fwprintf(csvFp, L"Index,Name,TwoHand,Level,ItemSlot,SkillIndex,Width,Height,DamageMin,DamageMax,SuccessfulBlocking,Defense,MagicDefense,WeaponSpeed,WalkSpeed,Durability,MagicDur,MagicPower,RequireStrength,RequireDexterity,RequireEnergy,RequireVitality,RequireCharisma,RequireLevel,Value,Zen,AttType,RequireClass0,RequireClass1,RequireClass2,RequireClass3,RequireClass4,RequireClass5,RequireClass6,Resistance0,Resistance1,Resistance2,Resistance3,Resistance4,Resistance5,Resistance6,Resistance7\n");
+
+    BYTE* pSeek = Buffer;
+    int itemCount = 0;
+    for (int i = 0; i < MAX_ITEM; i++)
+    {
+        BuxConvert(pSeek, Size);
+        ITEM_ATTRIBUTE_FILE* item = (ITEM_ATTRIBUTE_FILE*)pSeek;
+
+        // Convert name from UTF-8 to wide char
+        wchar_t wName[MAX_ITEM_NAME] = {0};
+        MultiByteToWideChar(CP_UTF8, 0, item->Name, -1, wName, MAX_ITEM_NAME);
+
+        // Only export items with names
+        if (wName[0] != 0)
+        {
+            // Escape quotes in name
+            wchar_t escapedName[MAX_ITEM_NAME * 2] = {0};
+            int idx = 0;
+            for (int j = 0; j < MAX_ITEM_NAME && wName[j] != 0 && idx < (MAX_ITEM_NAME * 2 - 2); j++)
+            {
+                if (wName[j] == L'"')
+                {
+                    escapedName[idx++] = L'"';
+                    escapedName[idx++] = L'"';
+                }
+                else
+                {
+                    escapedName[idx++] = wName[j];
+                }
+            }
+            escapedName[idx] = L'\0';
+
+            fwprintf(csvFp, L"%d,\"%ls\",%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+                i, escapedName, item->TwoHand ? 1 : 0, item->Level, item->m_byItemSlot, item->m_wSkillIndex,
+                item->Width, item->Height, item->DamageMin, item->DamageMax, item->SuccessfulBlocking,
+                item->Defense, item->MagicDefense, item->WeaponSpeed, item->WalkSpeed,
+                item->Durability, item->MagicDur, item->MagicPower,
+                item->RequireStrength, item->RequireDexterity, item->RequireEnergy,
+                item->RequireVitality, item->RequireCharisma, item->RequireLevel,
+                item->Value, item->iZen, item->AttType);
+
+            for (int c = 0; c < MAX_CLASS; c++)
+            {
+                fwprintf(csvFp, L",%d", item->RequireClass[c]);
+            }
+
+            for (int r = 0; r < MAX_RESISTANCE + 1; r++)
+            {
+                fwprintf(csvFp, L",%d", item->Resistance[r]);
+            }
+
+            fwprintf(csvFp, L"\n");
+            itemCount++;
+        }
+
+        pSeek += Size;
+    }
+
+    fclose(csvFp);
+    delete[] Buffer;
+
+    fwprintf(stderr, L"[BMD Converter] Successfully converted %d items to %ls\n", itemCount, csvFile);
+    std::fflush(stderr);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // item
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -456,12 +566,218 @@ void OpenItemScript(wchar_t* FileName)
     }
 }
 
+bool SaveItemScript(wchar_t* FileName, std::string* outChangeLog)
+{
+    const int Size = sizeof(ITEM_ATTRIBUTE_FILE);
+
+    // Load original file for comparison if change log is requested
+    ITEM_ATTRIBUTE* originalItems = nullptr;
+    if (outChangeLog)
+    {
+        originalItems = new ITEM_ATTRIBUTE[MAX_ITEM];
+        memcpy(originalItems, ItemAttribute, sizeof(ITEM_ATTRIBUTE) * MAX_ITEM);
+
+        // Read original file
+        FILE* fpOrig = _wfopen(FileName, L"rb");
+        if (fpOrig)
+        {
+            BYTE* OrigBuffer = new BYTE[Size * MAX_ITEM];
+            fread(OrigBuffer, Size * MAX_ITEM, 1, fpOrig);
+            fclose(fpOrig);
+
+            BYTE* pSeek = OrigBuffer;
+            for (int i = 0; i < MAX_ITEM; i++)
+            {
+                BuxConvert(pSeek, Size);
+                ITEM_ATTRIBUTE_FILE* orig = (ITEM_ATTRIBUTE_FILE*)pSeek;
+
+                // Store original values
+                originalItems[i].RequireStrength = orig->RequireStrength;
+                originalItems[i].RequireDexterity = orig->RequireDexterity;
+                originalItems[i].RequireEnergy = orig->RequireEnergy;
+                originalItems[i].RequireVitality = orig->RequireVitality;
+                originalItems[i].RequireCharisma = orig->RequireCharisma;
+                originalItems[i].RequireLevel = orig->RequireLevel;
+                originalItems[i].DamageMin = orig->DamageMin;
+                originalItems[i].DamageMax = orig->DamageMax;
+                originalItems[i].WeaponSpeed = orig->WeaponSpeed;
+                originalItems[i].Defense = orig->Defense;
+                originalItems[i].Durability = orig->Durability;
+
+                pSeek += Size;
+            }
+            delete[] OrigBuffer;
+        }
+    }
+
+    // Prepare new buffer
+    FILE* fp = _wfopen(FileName, L"wb");
+    if (fp == NULL)
+    {
+        if (originalItems) delete[] originalItems;
+        return false;
+    }
+
+    BYTE* Buffer = new BYTE[Size * MAX_ITEM];
+    BYTE* pSeek = Buffer;
+
+    // Track changes
+    std::stringstream changeLog;
+    int changeCount = 0;
+
+    // Convert ItemAttribute back to ITEM_ATTRIBUTE_FILE format
+    for (int i = 0; i < MAX_ITEM; i++)
+    {
+        ITEM_ATTRIBUTE_FILE dest;
+        memset(&dest, 0, Size);
+
+        CMultiLanguage::ConvertToUtf8(dest.Name, ItemAttribute[i].Name, MAX_ITEM_NAME);
+        dest.TwoHand = ItemAttribute[i].TwoHand;
+        dest.Level = ItemAttribute[i].Level;
+        dest.m_byItemSlot = ItemAttribute[i].m_byItemSlot;
+        dest.m_wSkillIndex = ItemAttribute[i].m_wSkillIndex;
+        dest.Width = ItemAttribute[i].Width;
+        dest.Height = ItemAttribute[i].Height;
+        dest.DamageMin = ItemAttribute[i].DamageMin;
+        dest.DamageMax = ItemAttribute[i].DamageMax;
+        dest.SuccessfulBlocking = ItemAttribute[i].SuccessfulBlocking;
+        dest.Defense = ItemAttribute[i].Defense;
+        dest.MagicDefense = ItemAttribute[i].MagicDefense;
+        dest.WeaponSpeed = ItemAttribute[i].WeaponSpeed;
+        dest.WalkSpeed = ItemAttribute[i].WalkSpeed;
+        dest.Durability = ItemAttribute[i].Durability;
+        dest.MagicDur = ItemAttribute[i].MagicDur;
+        dest.MagicPower = ItemAttribute[i].MagicPower;
+        dest.RequireStrength = ItemAttribute[i].RequireStrength;
+        dest.RequireDexterity = ItemAttribute[i].RequireDexterity;
+        dest.RequireEnergy = ItemAttribute[i].RequireEnergy;
+        dest.RequireVitality = ItemAttribute[i].RequireVitality;
+        dest.RequireCharisma = ItemAttribute[i].RequireCharisma;
+        dest.RequireLevel = ItemAttribute[i].RequireLevel;
+        dest.Value = ItemAttribute[i].Value;
+        dest.iZen = ItemAttribute[i].iZen;
+        dest.AttType = ItemAttribute[i].AttType;
+
+        for (int c = 0; c < MAX_CLASS; ++c)
+        {
+            dest.RequireClass[c] = ItemAttribute[i].RequireClass[c];
+        }
+
+        for (int r = 0; r < MAX_RESISTANCE; ++r)
+        {
+            dest.Resistance[r] = ItemAttribute[i].Resistance[r];
+        }
+
+        // Track changes
+        if (originalItems && ItemAttribute[i].Name[0] != 0)
+        {
+            bool changed = false;
+            std::stringstream itemChanges;
+
+            if (originalItems[i].RequireStrength != ItemAttribute[i].RequireStrength)
+            {
+                itemChanges << "  Str: " << originalItems[i].RequireStrength << " -> " << ItemAttribute[i].RequireStrength << "\n";
+                changed = true;
+            }
+            if (originalItems[i].RequireDexterity != ItemAttribute[i].RequireDexterity)
+            {
+                itemChanges << "  Dex: " << originalItems[i].RequireDexterity << " -> " << ItemAttribute[i].RequireDexterity << "\n";
+                changed = true;
+            }
+            if (originalItems[i].RequireEnergy != ItemAttribute[i].RequireEnergy)
+            {
+                itemChanges << "  Ene: " << originalItems[i].RequireEnergy << " -> " << ItemAttribute[i].RequireEnergy << "\n";
+                changed = true;
+            }
+            if (originalItems[i].RequireVitality != ItemAttribute[i].RequireVitality)
+            {
+                itemChanges << "  Vit: " << originalItems[i].RequireVitality << " -> " << ItemAttribute[i].RequireVitality << "\n";
+                changed = true;
+            }
+            if (originalItems[i].RequireCharisma != ItemAttribute[i].RequireCharisma)
+            {
+                itemChanges << "  Cha: " << originalItems[i].RequireCharisma << " -> " << ItemAttribute[i].RequireCharisma << "\n";
+                changed = true;
+            }
+            if (originalItems[i].RequireLevel != ItemAttribute[i].RequireLevel)
+            {
+                itemChanges << "  Lvl: " << originalItems[i].RequireLevel << " -> " << ItemAttribute[i].RequireLevel << "\n";
+                changed = true;
+            }
+            if (originalItems[i].DamageMin != ItemAttribute[i].DamageMin)
+            {
+                itemChanges << "  DmgMin: " << (int)originalItems[i].DamageMin << " -> " << (int)ItemAttribute[i].DamageMin << "\n";
+                changed = true;
+            }
+            if (originalItems[i].DamageMax != ItemAttribute[i].DamageMax)
+            {
+                itemChanges << "  DmgMax: " << (int)originalItems[i].DamageMax << " -> " << (int)ItemAttribute[i].DamageMax << "\n";
+                changed = true;
+            }
+            if (originalItems[i].WeaponSpeed != ItemAttribute[i].WeaponSpeed)
+            {
+                itemChanges << "  AtkSpd: " << (int)originalItems[i].WeaponSpeed << " -> " << (int)ItemAttribute[i].WeaponSpeed << "\n";
+                changed = true;
+            }
+            if (originalItems[i].Defense != ItemAttribute[i].Defense)
+            {
+                itemChanges << "  Def: " << (int)originalItems[i].Defense << " -> " << (int)ItemAttribute[i].Defense << "\n";
+                changed = true;
+            }
+            if (originalItems[i].Durability != ItemAttribute[i].Durability)
+            {
+                itemChanges << "  Dur: " << (int)originalItems[i].Durability << " -> " << (int)ItemAttribute[i].Durability << "\n";
+                changed = true;
+            }
+
+            if (changed)
+            {
+                char itemName[MAX_ITEM_NAME];
+                CMultiLanguage::ConvertToUtf8(itemName, ItemAttribute[i].Name, MAX_ITEM_NAME);
+                changeLog << "[" << i << "] " << itemName << "\n" << itemChanges.str();
+                changeCount++;
+            }
+        }
+
+        memcpy(pSeek, &dest, Size);
+        BuxConvert(pSeek, Size);
+        pSeek += Size;
+    }
+
+    // Write buffer
+    fwrite(Buffer, Size * MAX_ITEM, 1, fp);
+
+    // Write checksum
+    DWORD dwCheckSum = GenerateCheckSum2(Buffer, Size * MAX_ITEM, 0xE2F1);
+    fwrite(&dwCheckSum, sizeof(DWORD), 1, fp);
+
+    fclose(fp);
+    delete[] Buffer;
+
+    if (originalItems)
+    {
+        delete[] originalItems;
+        if (outChangeLog)
+        {
+            if (changeCount > 0)
+            {
+                *outChangeLog = "=== Item Changes (" + std::to_string(changeCount) + " items modified) ===\n" + changeLog.str();
+            }
+            else
+            {
+                *outChangeLog = "No changes detected.\n";
+            }
+        }
+    }
+
+    return true;
+}
+
 void PrintItem(wchar_t* FileName)
 {
     FILE* fp = _wfopen(FileName, L"wt");
     fwprintf(fp, L"                이름  최소공격력 최대공격력 방어력 방어율 필요힘 필요민첩 필요에너지\n");
     //fwprintf(fp,"                이름    카오스성공확률\n");
-    bool Excellent = true;
     for (int i = 0; i < 16 * MAX_ITEM_INDEX; i++)
     {
         if ((i & 0x1FF) == 0)
@@ -478,8 +794,9 @@ void PrintItem(wchar_t* FileName)
                 Plus = 10;
             for (int j = 0; j < Plus; j++)
             {
+                bool isExcelent = true;
                 int Level = j;
-                int RequireStrength = 0;
+                int RequireStrength = p->RequireStrength;
                 int RequireDexterity = 0;
                 int RequireEnergy = 0;
                 int DamageMin = p->DamageMin;
@@ -488,7 +805,7 @@ void PrintItem(wchar_t* FileName)
                 int SuccessfulBlocking = p->SuccessfulBlocking;
                 if (DamageMin > 0)
                 {
-                    if (Excellent)
+                    if (isExcelent)
                     {
                         if (p->Level)
                             DamageMin += p->DamageMin * 25 / p->Level + 5;
@@ -497,7 +814,7 @@ void PrintItem(wchar_t* FileName)
                 }
                 if (DamageMax > 0)
                 {
-                    if (Excellent)
+                    if (isExcelent)
                     {
                         if (p->Level)
                             DamageMax += p->DamageMin * 25 / p->Level + 5;
@@ -512,7 +829,7 @@ void PrintItem(wchar_t* FileName)
                     }
                     else
                     {
-                        if (Excellent)
+                        if (isExcelent)
                         {
                             if (p->Level)
                                 Defense += p->Defense * 12 / p->Level + 4 + p->Level / 5;
@@ -522,32 +839,16 @@ void PrintItem(wchar_t* FileName)
                 }
                 if (SuccessfulBlocking > 0)
                 {
-                    if (Excellent)
+                    if (isExcelent)
                     {
                         if (p->Level)
                             SuccessfulBlocking += p->SuccessfulBlocking * 25 / p->Level + 5;
                     }
                     SuccessfulBlocking += Level * 3;
                 }
-                int ItemLevel = p->Level;
-                if (Excellent)
-                    ItemLevel = p->Level + 25;
-                if (p->RequireStrength)
-                    RequireStrength = 20 + p->RequireStrength * (ItemLevel + Level * 3) * 3 / 100;
-                else
-                    RequireStrength = 0;
-                if (p->RequireDexterity)
-                    RequireDexterity = 20 + p->RequireDexterity * (ItemLevel + Level * 3) * 3 / 100;
-                else
-                    RequireDexterity = 0;
-                if (p->RequireEnergy)
-                {
-                    RequireEnergy = 20 + p->RequireEnergy * (ItemLevel + Level * 3) * 4 / 10;
-                }
-                else
-                {
-                    RequireEnergy = 0;
-                }
+                RequireStrength = CalcStatRequirement(STAT_STRENGTH, p->RequireStrength, p->Level, Level, isExcelent);
+                RequireDexterity = CalcStatRequirement(STAT_DEXTERITY, p->RequireDexterity, p->Level, Level, isExcelent);
+                RequireEnergy = CalcStatRequirement(STAT_ENERGY, p->RequireEnergy, p->Level, Level, isExcelent, i, p->RequireLevel);
                 if (i >= ITEM_STAFF && i < ITEM_STAFF * MAX_ITEM_INDEX)
                 {
                     DamageMin = DamageMin / 2 + Level * 2;
@@ -555,7 +856,7 @@ void PrintItem(wchar_t* FileName)
                 }
                 ITEM ip;
                 ip.Type = i;
-                ip.ExcellentFlags = Excellent;
+                ip.ExcellentFlags = isExcelent;
                 ip.Level = Level;
                 SetItemAttributes(&ip);
 
@@ -765,8 +1066,113 @@ void CalcSuccessfulBlocking(ITEM* ip, ITEM_ATTRIBUTE* p)
     }
 }
 
+// Unified defense calculation function used by both CalcDefense and RenderItemInfo
+int CalculateDefenseValue(int baseDefense, int itemType, int enhancementLevel, int excellentFlags, int ancientDiscriminator, int itemLevel)
+{
+    if (baseDefense == 0)
+    {
+        return 0;
+    }
+
+    int calculatedDefense = baseDefense;
+    auto isAncientItem = ancientDiscriminator > 0;
+    auto isExcellent = excellentFlags > 0;
+    auto setItemDropLevel = itemLevel + 30; // GetDropLevel inline
+
+    // Shields get +enhancement level bonus
+    if (itemType >= ITEM_SHIELD && itemType < ITEM_SHIELD + MAX_ITEM_INDEX)
+    {
+        calculatedDefense += enhancementLevel;
+        if (isAncientItem)
+        {
+            calculatedDefense = calculatedDefense + (calculatedDefense * 20 / setItemDropLevel + 2);
+        }
+        return calculatedDefense;
+    }
+
+    // Excellent items get a bonus based on item level (not shields/wings)
+    if (isExcellent && itemLevel > 0 && !(itemType >= ITEM_SHIELD && itemType < ITEM_SHIELD + MAX_ITEM_INDEX) && !(itemType >= ITEM_WINGS_OF_SPIRITS))
+    {
+        calculatedDefense += baseDefense * 12 / itemLevel + 4 + itemLevel / 5;
+    }
+
+    // Ancient item bonus
+    if (isAncientItem)
+    {
+        calculatedDefense += baseDefense + (calculatedDefense * 3 / setItemDropLevel + 2 + setItemDropLevel / 30);
+    }
+
+    // Wings/capes defense bonus based on enhancement level
+    // Check if this is a wing/cape item (starts from ITEM_WING)
+    bool isWingOrCape = (itemType >= ITEM_WING && itemType < ITEM_WING + MAX_ITEM_INDEX) ||
+                        (itemType >= ITEM_HELPER + 30); // Capes start at ITEM_HELPER + 30
+
+    if (isWingOrCape)
+    {
+        // Different wing tiers get different bonuses
+        if ((itemType >= ITEM_WING_OF_STORM && itemType <= ITEM_CAPE_OF_EMPEROR) ||
+            itemType == ITEM_WING_OF_DIMENSION || itemType == ITEM_CAPE_OF_OVERRULE)
+        {
+            // Higher tier wings: *4 multiplier
+            calculatedDefense += (std::min<int>(9, enhancementLevel) * 4);
+        }
+        else if (itemType >= ITEM_WINGS_OF_SPIRITS && itemType <= ITEM_WINGS_OF_DARKNESS)
+        {
+            // Mid-tier wings (Spirits, Soul, Dragon, Darkness): *2 multiplier
+            calculatedDefense += (std::min<int>(9, enhancementLevel) * 2);
+        }
+        else if (itemType == ITEM_CAPE_OF_LORD || itemType == ITEM_CAPE_OF_FIGHTER)
+        {
+            // Basic capes: *2 multiplier
+            calculatedDefense += (std::min<int>(9, enhancementLevel) * 2);
+        }
+        else
+        {
+            // Early wings (Elf, Heaven, Satan, etc.): *3 multiplier for levels 0-9
+            calculatedDefense += (std::min<int>(9, enhancementLevel) * 3);
+        }
+    }
+
+    // Additional progressive bonus for levels above +9 for wings/capes only
+    if (isWingOrCape && enhancementLevel > 9)
+    {
+        int levelsAbove9 = enhancementLevel - 9;
+        if ((itemType >= ITEM_WING_OF_STORM && itemType <= ITEM_CAPE_OF_EMPEROR) || itemType == ITEM_WING_OF_DIMENSION || itemType == ITEM_CAPE_OF_OVERRULE)
+        {
+            // Higher tier wings: sum from 4 to (levelsAbove9 + 3)
+            int first = 4;
+            int last = levelsAbove9 + 3;
+            calculatedDefense += levelsAbove9 * (first + last) / 2;
+        }
+        else if (itemType >= ITEM_WINGS_OF_SPIRITS && itemType <= ITEM_WINGS_OF_DARKNESS)
+        {
+            // Mid-tier wings (Spirits, Soul, Dragon, Darkness): sum from 3 to (levelsAbove9 + 2)
+            int first = 3;
+            int last = levelsAbove9 + 2;
+            calculatedDefense += levelsAbove9 * (first + last) / 2;
+        }
+        else if (itemType == ITEM_CAPE_OF_LORD || itemType == ITEM_CAPE_OF_FIGHTER)
+        {
+            // Basic capes: sum from 3 to (levelsAbove9 + 2)
+            int first = 3;
+            int last = levelsAbove9 + 2;
+            calculatedDefense += levelsAbove9 * (first + last) / 2;
+        }
+        else
+        {
+            // Early wings (Elf, Heaven, Satan): sum from 4 to (levelsAbove9 + 3)
+            int first = 4;
+            int last = levelsAbove9 + 3;
+            calculatedDefense += levelsAbove9 * (first + last) / 2;
+        }
+    }
+
+    return calculatedDefense;
+}
+
 void CalcDefense(ITEM* ip, ITEM_ATTRIBUTE* p)
 {
+    // Calculate magic defense
     if (p->MagicDefense > 0)
     {
         ip->MagicDefense += (std::min<int>(9, p->Level) * 3);	// ~ +9
@@ -776,75 +1182,8 @@ void CalcDefense(ITEM* ip, ITEM_ATTRIBUTE* p)
         }
     }
 
-    if (ip->Type == ITEM_CAPE_OF_LORD)
-    {
-        p->Defense = 15;
-        ip->Defense = 15;
-    }
-
-    if (p->Defense == 0)
-    {
-        return;
-    }
-
-    auto isAncientItem = ip->AncientDiscriminator > 0;
-    auto isExcellent = ip->ExcellentFlags > 0;
-    auto setItemDropLevel = GetDropLevel(p);
-
-    if (ip->Type >= ITEM_SHIELD && ip->Type < ITEM_SHIELD + MAX_ITEM_INDEX)
-    {
-        ip->Defense += ip->Level;
-        if (isAncientItem)
-        {
-            ip->Defense = ip->Defense + (ip->Defense * 20 / setItemDropLevel + 2);
-        }
-
-        return;
-    }
-
-    if (isExcellent && p->Level > 0)
-    {
-        ip->Defense += p->Defense * 12 / p->Level + 4 + p->Level / 5;
-    }
-
-    if (isAncientItem)
-    {
-        ip->Defense += p->Defense + (ip->Defense * 3 / setItemDropLevel + 2 + setItemDropLevel / 30);
-    }
-
-    if ((ip->Type >= ITEM_WINGS_OF_SPIRITS && ip->Type <= ITEM_WINGS_OF_DARKNESS) || ip->Type == ITEM_WINGS_OF_DESPAIR)
-    {
-        ip->Defense += (std::min<int>(9, ip->Level) * 2);	// ~ +9
-    }
-    else if (ip->Type == ITEM_CAPE_OF_LORD
-        || ip->Type == ITEM_CAPE_OF_FIGHTER)
-    {
-        ip->Defense += (std::min<int>(9, ip->Level) * 2);	// ~ +9
-    }
-    else if ((ip->Type >= ITEM_WING_OF_STORM && ip->Type <= ITEM_CAPE_OF_EMPEROR) || ip->Type == ITEM_WING_OF_DIMENSION
-        || (ip->Type == ITEM_CAPE_OF_OVERRULE))
-    {
-        ip->Defense += (std::min<int>(9, ip->Level) * 4);	// ~ +9
-    }
-    else
-    {
-        ip->Defense += (std::min<int>(9, ip->Level) * 3);	// ~ +9
-    }
-    if ((ip->Type >= ITEM_WING_OF_STORM && ip->Type <= ITEM_CAPE_OF_EMPEROR) || ip->Type == ITEM_WING_OF_DIMENSION
-        || ip->Type == ITEM_CAPE_OF_OVERRULE)
-    {
-        if (ip->Level - 9 > 0)
-        {
-            ip->Defense += ip->Level - 5;
-        }
-    }
-    else
-    {
-        if (ip->Level - 9 > 0)
-        {
-            ip->Defense += ip->Level - 6;
-        }
-    }
+    // Use the unified CalculateDefenseValue function
+    ip->Defense = CalculateDefenseValue(p->Defense, ip->Type, ip->Level, ip->ExcellentFlags, ip->AncientDiscriminator, p->Level);
 }
 
 void CalcRequirements(ITEM* ip, ITEM_ATTRIBUTE* p)
@@ -888,78 +1227,14 @@ void CalcRequirements(ITEM* ip, ITEM_ATTRIBUTE* p)
     else
         ip->RequireLevel = 0;
 
-    if (p->RequireStrength)
-        ip->RequireStrength = 20 + (p->RequireStrength) * (ItemLevel + ip->Level * 3) * 3 / 100;
-    else	ip->RequireStrength = 0;
+    ip->RequireStrength = CalcStatRequirement(STAT_STRENGTH, p->RequireStrength, ItemLevel, ip->Level, isExcellent);
+    ip->RequireDexterity = CalcStatRequirement(STAT_DEXTERITY, p->RequireDexterity, ItemLevel, ip->Level, isExcellent);
+    ip->RequireVitality = CalcStatRequirement(STAT_VITALITY, p->RequireVitality, ItemLevel, ip->Level, isExcellent);
+    ip->RequireEnergy = CalcStatRequirement(STAT_ENERGY, p->RequireEnergy, ItemLevel, ip->Level, isExcellent, ip->Type, p->RequireLevel);
+    ip->RequireCharisma = CalcStatRequirement(STAT_CHARISMA, p->RequireCharisma, ItemLevel, ip->Level, isExcellent);
 
-    if (p->RequireDexterity)
-        ip->RequireDexterity = 20 + (p->RequireDexterity) * (ItemLevel + ip->Level * 3) * 3 / 100;
-    else	ip->RequireDexterity = 0;
-
-    if (p->RequireVitality)
-        ip->RequireVitality = 20 + (p->RequireVitality) * (ItemLevel + ip->Level * 3) * 3 / 100;
-    else	ip->RequireVitality = 0;
-
-    if (p->RequireEnergy)
-    {
-        if (ip->Type >= ITEM_BOOK_OF_SAHAMUTT && ip->Type <= ITEM_STAFF + 29)
-        {
-            ip->RequireEnergy = 20 + (p->RequireEnergy) * (ItemLevel + ip->Level * 1) * 3 / 100;
-        }
-        else
-
-            if ((p->RequireLevel > 0) && (ip->Type >= ITEM_ETC && ip->Type < ITEM_ETC + MAX_ITEM_INDEX))
-            {
-                ip->RequireEnergy = 20 + (p->RequireEnergy) * (p->RequireLevel) * 4 / 100;
-            }
-            else
-
-            {
-                ip->RequireEnergy = 20 + (p->RequireEnergy) * (ItemLevel + ip->Level * 3) * 4 / 100;
-            }
-    }
-    else
-    {
-        ip->RequireEnergy = 0;
-    }
-
-    if (p->RequireCharisma)
-        ip->RequireCharisma = 20 + (p->RequireCharisma) * (ItemLevel + ip->Level * 3) * 3 / 100;
-    else	ip->RequireCharisma = 0;
-
-    if (ip->Type == ITEM_ORB_OF_SUMMONING)
-    {
-        WORD Energy = 0;
-
-        switch (ip->Level)
-        {
-        case 0:Energy = 30; break;
-        case 1:Energy = 60; break;
-        case 2:Energy = 90; break;
-        case 3:Energy = 130; break;
-        case 4:Energy = 170; break;
-        case 5:Energy = 210; break;
-        case 6:Energy = 300; break;
-        case 7:Energy = 500; break;
-        }
-        ip->RequireEnergy = Energy;
-    }
-
-    if (p->RequireCharisma)
-    {
-        if (ip->Type == MODEL_DARK_RAVEN_ITEM)
-            ip->RequireCharisma = (185 + (p->RequireCharisma * 15));
-        else
-            ip->RequireCharisma = p->RequireCharisma;
-    }
-
-    if (ip->Type == ITEM_TRANSFORMATION_RING)
-    {
-        if (ip->Level <= 2)
-            ip->RequireLevel = 20;
-        else
-            ip->RequireLevel = 50;
-    }
+    // Apply special item-specific requirement overrides
+    ApplyItemSpecificRequirementOverrides(ip, p);
 
     if ((ip->Type >= ITEM_DRAGON_KNIGHT_HELM && ip->Type <= ITEM_SUNLIGHT_MASK) ||
         (ip->Type >= ITEM_DRAGON_KNIGHT_ARMOR && ip->Type <= ITEM_SUNLIGHT_ARMOR) ||
@@ -2401,7 +2676,7 @@ bool IsRequireEquipItem(ITEM* pItem)
     if (pItem->Type == ITEM_DARK_RAVEN_ITEM)
     {
         PET_INFO* pPetInfo = giPetManager::GetPetInfo(pItem);
-        WORD wRequireCharisma = static_cast<WORD>((185 + pPetInfo->m_wLevel * 15) & 0xFFFF);
+        WORD wRequireCharisma = CalcDarkRavenCharismaRequirement(pPetInfo->m_wLevel);
         if (wRequireCharisma > wCharisma) {
             return false;
         }

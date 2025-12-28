@@ -53,7 +53,7 @@ enum SKILL_TOOLTIP_RENDER_POINT
     STRP_BOOTOMRIGHT
 };
 
-// ¼¼À²Á¤º¸
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 extern int		g_nTaxRate;
 extern int		g_nChaosTaxRate;
@@ -77,7 +77,7 @@ extern int			GuildTotalScore;
 extern int AllRepairGold;
 
 //////////////////////////////////////////////////////////////////////////
-// text °ü·Ã
+// text ï¿½ï¿½ï¿½ï¿½
 //////////////////////////////////////////////////////////////////////////
 extern wchar_t TextList[50][100];
 extern int TextListColor[50];
@@ -153,7 +153,19 @@ void ConvertChaosTaxGold(DWORD Gold, wchar_t* Text);
 int64_t CalcSelfRepairCost(int64_t ItemValue, int Durability, int MaxDurability, short Type);
 int64_t ConvertRepairGold(int64_t Gold, int Durability, int MaxDurability, short Type, wchar_t* Text);
 void RepairAllGold(void);
+enum STAT_TYPE
+{
+    STAT_STRENGTH,
+    STAT_DEXTERITY,
+    STAT_VITALITY,
+    STAT_ENERGY,
+    STAT_CHARISMA
+};
+
 WORD CalcMaxDurability(const ITEM* ip, ITEM_ATTRIBUTE* p, int Level);
+WORD CalcStatRequirement(STAT_TYPE statType, WORD baseRequirement, int itemLevel, int enhancementLevel, bool isExcellent, int itemType = 0, int requireLevel = 0);
+void ApplyItemSpecificRequirementOverrides(ITEM* ip, ITEM_ATTRIBUTE* p);
+WORD CalcDarkRavenCharismaRequirement(int petLevel);
 void RenderTipTextList(const int sx, const int sy, int TextNum, int Tab, int iSort = RT3_SORT_CENTER, int iRenderPoint = STRP_NONE, BOOL bUseBG = TRUE);
 
 void SendRequestUse(int Index, int Target);
@@ -176,7 +188,7 @@ void CreateCastleMark(int Type, BYTE* buffer = NULL, bool blend = true);
 void RenderItem3D(float sx, float sy, float Width, float Height, int Type, int Level, int excellentFlags, int ancientDiscriminator, bool PickUp = false);
 void RenderObjectScreen(int Type, int ItemLevel, int excellentFlags, int ancientDiscriminator, vec3_t Target, int Select, bool PickUp);
 bool GetAttackDamage(int* iMinDamage, int* iMaxDamage);
-void GetItemName(int iType, int iLevel, wchar_t* Text);
+void get_item_name(int iType, int iLevel, wchar_t* Text);
 std::wstring GetItemDisplayName(ITEM* pItem);
 void GetSpecialOptionText(int Type, wchar_t* Text, WORD Option, BYTE Value, int iMana);
 void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype = 0, bool bItemTextListBoxUse = false);

@@ -19,6 +19,12 @@
 #include "ZzzAI.h"
 #include "DSPlaySound.h"
 
+#ifdef _EDITOR
+#include "MuEditor/MuEditor.h"
+#include "MuEditor/MuEditorConsole.h"
+#include "imgui.h"
+#endif
+
 #include "SMD.h"
 #include "Local.h"
 #include "MatchEvent.h"
@@ -81,7 +87,7 @@ short   g_shCameraLevel = 0;
 int g_iLengthAuthorityCode = 20;
 
 wchar_t* szServerIpAddress = L"127.127.127.127";
-WORD g_ServerPort = 44406;
+WORD g_ServerPort = 55902;
 
 EGameScene  SceneFlag = WEBZEN_SCENE;
 
@@ -1233,6 +1239,19 @@ void LoadingScene(HDC hDC)
     ::EndBitmap();
     ::EndOpengl();
     ::glFlush();
+#ifdef _EDITOR
+    // Always render ImGui (shows "Open Editor" button when closed, or full UI when open)
+    g_MuEditor.Render();
+
+    // Render game cursor on top of ImGui if not hovering UI
+    extern bool g_bRenderGameCursor;
+    if (g_bRenderGameCursor)
+    {
+        BeginBitmap();
+        RenderCursor();
+        EndBitmap();
+    }
+#endif
     ::SwapBuffers(hDC);
 
     SAFE_DELETE(rUIMng.m_pLoadingScene);
@@ -2154,6 +2173,19 @@ void MainScene(HDC hDC)
 
         if (Success)
         {
+#ifdef _EDITOR
+            // Always render ImGui (shows "Open Editor" button when closed, or full UI when open)
+            g_MuEditor.Render();
+
+            // Render game cursor on top of ImGui if not hovering UI
+            extern bool g_bRenderGameCursor;
+            if (g_bRenderGameCursor)
+            {
+                BeginBitmap();
+                RenderCursor();
+                EndBitmap();
+            }
+#endif
             SwapBuffers(hDC);
         }
 

@@ -997,46 +997,11 @@ void ComputeItemInfo(int iHelpItem)
             RequireLevel = 0;
         }
 
-        if (p->RequireStrength)
-        {
-            RequireStrength = 20 + p->RequireStrength * (p->Level + Level * 3) * 3 / 100;
-        }
-        else
-        {
-            RequireStrength = 0;
-        }
-
-        if (p->RequireDexterity)	RequireDexterity = 20 + p->RequireDexterity * (p->Level + Level * 3) * 3 / 100;
-        else RequireDexterity = 0;
-
-        if (p->RequireVitality)	RequireVitality = 20 + p->RequireVitality * (p->Level + Level * 3) * 3 / 100;
-        else RequireVitality = 0;
-
-        if (p->RequireEnergy)
-        {
-            if (ItemHelp >= ITEM_BOOK_OF_SAHAMUTT && ItemHelp <= ITEM_STAFF + 29)
-            {
-                RequireEnergy = 20 + p->RequireEnergy * (p->Level + Level * 1) * 3 / 100;
-            }
-            else
-            {
-                if ((p->RequireLevel > 0) && (ItemHelp >= ITEM_ETC && ItemHelp < ITEM_ETC + MAX_ITEM_INDEX))
-                {
-                    RequireEnergy = 20 + (p->RequireEnergy) * (p->RequireLevel) * 4 / 100;
-                }
-                else
-                {
-                    RequireEnergy = 20 + p->RequireEnergy * (p->Level + Level * 3) * 4 / 100;
-                }
-            }
-        }
-        else
-        {
-            RequireEnergy = 0;
-        }
-
-        if (p->RequireCharisma)	RequireCharisma = 20 + p->RequireCharisma * (p->Level + Level * 3) * 3 / 100;
-        else RequireCharisma = 0;
+        RequireStrength = CalcStatRequirement(STAT_STRENGTH, p->RequireStrength, p->Level, Level, false);
+        RequireDexterity = CalcStatRequirement(STAT_DEXTERITY, p->RequireDexterity, p->Level, Level, false);
+        RequireVitality = CalcStatRequirement(STAT_VITALITY, p->RequireVitality, p->Level, Level, false);
+        RequireEnergy = CalcStatRequirement(STAT_ENERGY, p->RequireEnergy, p->Level, Level, false, ItemHelp, p->RequireLevel);
+        RequireCharisma = CalcStatRequirement(STAT_CHARISMA, p->RequireCharisma, p->Level, Level, false);
 
         g_iItemInfo[Level][_COLUMN_TYPE_LEVEL] = Level;
         g_iItemInfo[Level][_COLUMN_TYPE_ATTMIN] = DamageMin;
@@ -1626,7 +1591,135 @@ WORD CalcMaxDurability(const ITEM* ip, ITEM_ATTRIBUTE* p, int Level)
     return  maxDurability;
 }
 
-void GetItemName(int iType, int iLevel, wchar_t* Text)
+// Item stat requirement calculation constants
+namespace ItemRequirement
+{
+    // Base requirement offset
+    const int BASE_OFFSET = 20;
+
+    // Level bonuses
+    const int EXCELLENT_LEVEL_BONUS = 25;
+    const int ANCIENT_LEVEL_BONUS = 30;
+
+    // Enhancement multipliers
+    const int NORMAL_ENHANCEMENT_MULTIPLIER = 3;
+    const int BOOK_STAFF_ENHANCEMENT_MULTIPLIER = 1;
+
+    // Stat type multipliers (percentage as numerator/denominator)
+    const int STRENGTH_DEX_VIT_MULTIPLIER_NUM = 3;
+    const int STRENGTH_DEX_VIT_MULTIPLIER_DEN = 100;
+
+    const int ENERGY_DEFAULT_MULTIPLIER_NUM = 4;
+    const int ENERGY_DEFAULT_MULTIPLIER_DEN = 100;
+
+    const int ENERGY_BOOK_STAFF_MULTIPLIER_NUM = 3;
+    const int ENERGY_BOOK_STAFF_MULTIPLIER_DEN = 100;
+
+    const int ENERGY_ETC_MULTIPLIER_NUM = 4;
+    const int ENERGY_ETC_MULTIPLIER_DEN = 100;
+
+    // Dark Raven pet charisma formula constants
+    const int DARK_RAVEN_CHARISMA_BASE = 185;
+    const int DARK_RAVEN_CHARISMA_PER_LEVEL = 15;
+}
+
+// Helper function to calculate effective item level based on flags
+static int CalcEffectiveItemLevel(int itemLevel, bool isExcellent)
+{
+    if (isExcellent)
+    {
+        return itemLevel + ItemRequirement::EXCELLENT_LEVEL_BONUS;
+    }
+    return itemLevel;
+}
+
+WORD CalcStatRequirement(STAT_TYPE statType, WORD baseRequirement, int itemLevel, int enhancementLevel, bool isExcellent, int itemType, int requireLevel)
+{
+    if (baseRequirement == 0)
+    {
+        return 0;
+    }
+
+    int effectiveItemLevel = CalcEffectiveItemLevel(itemLevel, isExcellent);
+
+    // Handle non-Energy stats (Strength, Dexterity, Vitality, Charisma)
+    if (statType != STAT_ENERGY)
+    {
+        int levelComponent = effectiveItemLevel + enhancementLevel * ItemRequirement::NORMAL_ENHANCEMENT_MULTIPLIER;
+        return ItemRequirement::BASE_OFFSET +
+               baseRequirement * levelComponent *
+               ItemRequirement::STRENGTH_DEX_VIT_MULTIPLIER_NUM /
+               ItemRequirement::STRENGTH_DEX_VIT_MULTIPLIER_DEN;
+    }
+
+    // Energy stat - special cases based on item type
+    // Special case: Books and Staves (ITEM_BOOK_OF_SAHAMUTT to ITEM_STAFF + 29)
+    if (itemType >= ITEM_BOOK_OF_SAHAMUTT && itemType <= ITEM_STAFF + 29)
+    {
+        int levelComponent = effectiveItemLevel + enhancementLevel * ItemRequirement::BOOK_STAFF_ENHANCEMENT_MULTIPLIER;
+        return ItemRequirement::BASE_OFFSET +
+               baseRequirement * levelComponent *
+               ItemRequirement::ENERGY_BOOK_STAFF_MULTIPLIER_NUM /
+               ItemRequirement::ENERGY_BOOK_STAFF_MULTIPLIER_DEN;
+    }
+    // Special case: ETC items with RequireLevel
+    if (requireLevel > 0 && itemType >= ITEM_ETC && itemType < ITEM_ETC + MAX_ITEM_INDEX)
+    {
+        return ItemRequirement::BASE_OFFSET +
+               baseRequirement * requireLevel *
+               ItemRequirement::ENERGY_ETC_MULTIPLIER_NUM /
+               ItemRequirement::ENERGY_ETC_MULTIPLIER_DEN;
+    }
+    // Default Energy case
+    int levelComponent = effectiveItemLevel + enhancementLevel * ItemRequirement::NORMAL_ENHANCEMENT_MULTIPLIER;
+    return ItemRequirement::BASE_OFFSET +
+           baseRequirement * levelComponent *
+           ItemRequirement::ENERGY_DEFAULT_MULTIPLIER_NUM /
+           ItemRequirement::ENERGY_DEFAULT_MULTIPLIER_DEN;
+}
+
+WORD CalcDarkRavenCharismaRequirement(int petLevel)
+{
+    return ItemRequirement::DARK_RAVEN_CHARISMA_BASE + (petLevel * ItemRequirement::DARK_RAVEN_CHARISMA_PER_LEVEL);
+}
+
+void ApplyItemSpecificRequirementOverrides(ITEM* ip, ITEM_ATTRIBUTE* p)
+{
+    // Special case: Orb of Summoning - hardcoded energy requirements by level
+    if (ip->Type == ITEM_ORB_OF_SUMMONING)
+    {
+        WORD Energy = 0;
+        switch (ip->Level)
+        {
+        case 0: Energy = 30; break;
+        case 1: Energy = 60; break;
+        case 2: Energy = 90; break;
+        case 3: Energy = 130; break;
+        case 4: Energy = 170; break;
+        case 5: Energy = 210; break;
+        case 6: Energy = 300; break;
+        case 7: Energy = 500; break;
+        }
+        ip->RequireEnergy = Energy;
+    }
+
+    // Special case: Dark Raven - special charisma formula (overrides CalcStatRequirement)
+    if (ip->Type == MODEL_DARK_RAVEN_ITEM && p->RequireCharisma)
+    {
+        ip->RequireCharisma = CalcDarkRavenCharismaRequirement(p->RequireCharisma);
+    }
+
+    // Special case: Transformation Ring - hardcoded level requirements
+    if (ip->Type == ITEM_TRANSFORMATION_RING)
+    {
+        if (ip->Level <= 2)
+            ip->RequireLevel = 20;
+        else
+            ip->RequireLevel = 50;
+    }
+}
+
+void get_item_name(int iType, int iLevel, wchar_t* Text)
 {
     ITEM_ATTRIBUTE* p = &ItemAttribute[iType];
 
@@ -3927,7 +4020,17 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         TextNum++;
     }
 
-    if (ip->DamageMin)
+    // Read damage from ItemAttribute in editor mode for immediate updates
+    ITEM_ATTRIBUTE* pAttr = &ItemAttribute[ip->Type];
+#ifdef _EDITOR
+    int baseDamageMin = pAttr->DamageMin;
+    int baseDamageMax = pAttr->DamageMax;
+#else
+    int baseDamageMin = ip->DamageMin;
+    int baseDamageMax = ip->DamageMax;
+#endif
+
+    if (baseDamageMin || ip->DamageMin)
     {
         int minindex = 0, maxindex = 0, magicalindex = 0;
 
@@ -3943,8 +4046,8 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
                 magicalindex = SC.SI_SP.SI_magicalpower;
             }
         }
-        int DamageMin = ip->DamageMin;
-        int DamageMax = ip->DamageMax;
+        int DamageMin = baseDamageMin;
+        int DamageMax = baseDamageMax;
         if (ip->Type >> 4 == 15)
         {
             swprintf(TextList[TextNum], L"%ls: %d ~ %d", GlobalText[40 + 2], DamageMin, DamageMax);
@@ -3998,7 +4101,28 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
             TextNum--;
         }
     }
-    if (ip->Defense)
+    // For tooltip display, always use ip->Defense which has bonuses from CalcDefense
+    // In editor mode, CalcDefense recalculates from ItemAttribute, so changes are immediate
+    int calculatedDefense = ip->Defense;
+
+    // Apply enhancement level bonus for armor (Helm through Boots) ONLY - not for wings/capes
+    // This bonus is specific to tooltip display and is NOT in CalcDefense
+    if (ip->Type >= ITEM_HELM && ip->Type < ITEM_BOOTS + MAX_ITEM_INDEX)
+    {
+        // Verify this is NOT a wing/cape by checking it's not in the wing range
+        if (!(ip->Type >= ITEM_WINGS_OF_SPIRITS))
+        {
+            // Armor gets +4 defense per enhancement level, with adjustment above +9
+            int armorBonus = ip->Level * 4;
+            if (ip->Level > 9)
+            {
+                armorBonus -= 3;  // Slight reduction for levels above +9
+            }
+            calculatedDefense += armorBonus;
+        }
+    }
+
+    if (calculatedDefense || ip->Defense)
     {
         int maxdefense = 0;
 
@@ -4012,7 +4136,8 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
                 maxdefense = SC.SI_SD.SI_defense;
             }
         }
-        swprintf(TextList[TextNum], GlobalText[65], ip->Defense + maxdefense);
+
+        swprintf(TextList[TextNum], GlobalText[65], calculatedDefense + maxdefense);
 
         if (maxdefense != 0)
             TextListColor[TextNum] = TEXT_COLOR_YELLOW;
@@ -4845,18 +4970,34 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         }
     }
 
-    if (ip->RequireStrength && bRequireStat)
+    // Helper macro to get actual requirement value (fresh from ItemAttribute in editor mode)
+#ifdef _EDITOR
+    #define GET_ACTUAL_REQUIREMENT(statType, attrField) \
+        [&]() -> WORD { \
+            ITEM_ATTRIBUTE* pAttr = &ItemAttribute[ip->Type]; \
+            if (statType == STAT_ENERGY) \
+                return CalcStatRequirement(statType, pAttr->attrField, pAttr->Level, ip->Level, ip->ExcellentFlags > 0, ip->Type, pAttr->RequireLevel); \
+            else \
+                return CalcStatRequirement(statType, pAttr->attrField, pAttr->Level, ip->Level, ip->ExcellentFlags > 0); \
+        }()
+#else
+    #define GET_ACTUAL_REQUIREMENT(statType, attrField) (ip->attrField)
+#endif
+
+    WORD actualReqStr = GET_ACTUAL_REQUIREMENT(STAT_STRENGTH, RequireStrength);
+
+    if (actualReqStr && bRequireStat)
     {
-        swprintf(TextList[TextNum], GlobalText[73], ip->RequireStrength - si_iNeedStrength);
+        swprintf(TextList[TextNum], GlobalText[73], actualReqStr - si_iNeedStrength);
 
         WORD Strength;
         Strength = CharacterAttribute->Strength + CharacterAttribute->AddStrength;
-        if (Strength < ip->RequireStrength - si_iNeedStrength)
+        if (Strength < actualReqStr - si_iNeedStrength)
         {
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
-            swprintf(TextList[TextNum], GlobalText[74], (ip->RequireStrength - Strength) - si_iNeedStrength);
+            swprintf(TextList[TextNum], GlobalText[74], (actualReqStr - Strength) - si_iNeedStrength);
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
@@ -4876,18 +5017,21 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
             TextNum++;
         }
     }
-    if (ip->RequireDexterity && bRequireStat)
+
+    WORD actualReqDex = GET_ACTUAL_REQUIREMENT(STAT_DEXTERITY, RequireDexterity);
+
+    if (actualReqDex && bRequireStat)
     {
-        swprintf(TextList[TextNum], GlobalText[75], ip->RequireDexterity - si_iNeedDex);
+        swprintf(TextList[TextNum], GlobalText[75], actualReqDex - si_iNeedDex);
         WORD Dexterity;
         Dexterity = CharacterAttribute->Dexterity + CharacterAttribute->AddDexterity;
-        if (Dexterity < (ip->RequireDexterity - si_iNeedDex))
+        if (Dexterity < (actualReqDex - si_iNeedDex))
         {
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
 
-            swprintf(TextList[TextNum], GlobalText[74], (ip->RequireDexterity - Dexterity) - si_iNeedDex);
+            swprintf(TextList[TextNum], GlobalText[74], (actualReqDex - Dexterity) - si_iNeedDex);
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
@@ -4907,18 +5051,20 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         }
     }
 
-    if (ip->RequireVitality && bRequireStat) //  요구체력.
+    WORD actualReqVit = GET_ACTUAL_REQUIREMENT(STAT_VITALITY, RequireVitality);
+
+    if (actualReqVit && bRequireStat) //  요구체력.
     {
-        swprintf(TextList[TextNum], GlobalText[1930], ip->RequireVitality);
+        swprintf(TextList[TextNum], GlobalText[1930], actualReqVit);
 
         WORD Vitality;
         Vitality = CharacterAttribute->Vitality + CharacterAttribute->AddVitality;
-        if (Vitality < ip->RequireVitality)
+        if (Vitality < actualReqVit)
         {
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
-            swprintf(TextList[TextNum], GlobalText[74], ip->RequireVitality - Vitality);
+            swprintf(TextList[TextNum], GlobalText[74], actualReqVit - Vitality);
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
@@ -4931,19 +5077,21 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         }
     }
 
-    if (ip->RequireEnergy && bRequireStat)
+    WORD actualReqEne = GET_ACTUAL_REQUIREMENT(STAT_ENERGY, RequireEnergy);
+
+    if (actualReqEne && bRequireStat)
     {
-        swprintf(TextList[TextNum], GlobalText[77], ip->RequireEnergy);
+        swprintf(TextList[TextNum], GlobalText[77], actualReqEne);
 
         WORD Energy;
         Energy = CharacterAttribute->Energy + CharacterAttribute->AddEnergy;
 
-        if (Energy < ip->RequireEnergy)
+        if (Energy < actualReqEne)
         {
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
-            swprintf(TextList[TextNum], GlobalText[74], ip->RequireEnergy - Energy);
+            swprintf(TextList[TextNum], GlobalText[74], actualReqEne - Energy);
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
@@ -4956,18 +5104,20 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         }
     }
 
-    if (ip->RequireCharisma && bRequireStat)
+    WORD actualReqCha = GET_ACTUAL_REQUIREMENT(STAT_CHARISMA, RequireCharisma);
+
+    if (actualReqCha && bRequireStat)
     {
-        swprintf(TextList[TextNum], GlobalText[698], ip->RequireCharisma);
+        swprintf(TextList[TextNum], GlobalText[698], actualReqCha);
 
         WORD Charisma;
         Charisma = CharacterAttribute->Charisma + CharacterAttribute->AddCharisma;
-        if (Charisma < ip->RequireCharisma)
+        if (Charisma < actualReqCha)
         {
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
-            swprintf(TextList[TextNum], GlobalText[74], ip->RequireCharisma - Charisma);
+            swprintf(TextList[TextNum], GlobalText[74], actualReqCha - Charisma);
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
@@ -4979,6 +5129,9 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
             TextNum++;
         }
     }
+
+    // Clean up the helper macro
+#undef GET_ACTUAL_REQUIREMENT
 
     if (IsRequireClassRenderItem(ip->Type))
     {

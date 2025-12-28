@@ -52,6 +52,16 @@
 
 #include "NewUISystem.h"
 
+#ifdef _EDITOR
+#include "MuEditor/MuEditor.h"
+#include "MuEditor/MuEditorConsole.h"
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+
+// Forward declare ImGui WndProc handler
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#endif
+
 CUIMercenaryInputBox* g_pMercenaryInputBox = nullptr;
 CUITextInputBox* g_pSingleTextInputBox = nullptr;
 CUITextInputBox* g_pSinglePasswdInputBox = nullptr;
@@ -451,6 +461,16 @@ extern bool EnableFastInput;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+#ifdef _EDITOR
+    // Only forward messages to ImGui when editor is open
+    // When editor is closed, we handle button clicks manually in RenderToolbarOpen
+    if (g_MuEditor.IsEnabled())
+    {
+        if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+            return true;
+    }
+#endif
+
     switch (msg)
     {
     case WM_SYSKEYDOWN:
@@ -561,7 +581,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     break;
     case WM_SETCURSOR:
-        ShowCursor(false);
+#ifdef _EDITOR
+        // When hovering UI (including Open Editor button), let Windows show cursor
+        // Otherwise hide Windows cursor for game cursor
+        if (g_MuEditor.IsHoveringUI())
+        {
+            // Let Windows cursor show - don't hide it
+            return DefWindowProc(hwnd, msg, wParam, lParam);
+        }
+        else
+#endif
+        {
+            ShowCursor(false);
+        }
         break;
         //-----------------------------
     default:
@@ -859,6 +891,30 @@ MSG MainLoop()
         {
             if (g_bUseWindowMode || g_bWndActive || g_HasInactiveFpsOverride)
             {
+#ifdef _EDITOR
+                // F12 key toggle for editor
+                static bool wasF12Pressed = false;
+                if (GetAsyncKeyState(VK_F12) & 0x8000)
+                {
+                    if (!wasF12Pressed)
+                    {
+                        g_MuEditor.ToggleEditor();
+                        fwprintf(stderr, L"[Editor] Toggled: %s\n",
+                            g_MuEditor.IsEnabled() ? L"ON" : L"OFF");
+                        fflush(stderr);
+                        wasF12Pressed = true;
+                    }
+                }
+                else
+                {
+                    wasF12Pressed = false;
+                }
+
+                // Update editor UI (must be before RenderScene)
+                g_MuEditor.Update();
+#endif
+
+                // Render game scene (ImGui rendering happens inside before SwapBuffers)
                 RenderScene(g_hDC);
             }
         }
@@ -1226,6 +1282,19 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLin
 
     ShowWindow(g_hWnd, nCmdShow);
     UpdateWindow(g_hWnd);
+
+#ifdef _EDITOR
+    // Initialize MU Editor
+    g_MuEditor.Initialize(g_hWnd, g_hDC);
+
+    // Check for --editor command line flag
+    if (szCmdLine && wcsstr(GetCommandLineW(), L"--editor"))
+    {
+        g_MuEditor.SetEnabled(true);
+        fwprintf(stderr, L"[Editor] Starting in editor mode (--editor flag detected)\n");
+        std::fflush(stderr);
+    }
+#endif
 
     g_ErrorReport.WriteImeInfo( g_hWnd);
     g_ErrorReport.AddSeparator();
