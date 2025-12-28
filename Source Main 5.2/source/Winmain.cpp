@@ -22,6 +22,7 @@
 #include "ZzzInventory.h"
 #include "ZzzLodTerrain.h"
 #include "DSPlaySound.h"
+#include "ModernGL.h"
 
 #include "resource.h"
 #include <imm.h>
@@ -198,6 +199,9 @@ GLvoid KillGLWindow(GLvoid)
 {
     if (g_hRC)
     {
+        // Cleanup modern OpenGL systems before destroying context
+        CleanupModernGL();
+
         wglMakeCurrent(nullptr, nullptr);
         if (!wglDeleteContext(g_hRC))
         {
@@ -1225,8 +1229,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLin
     pfd.nVersion = 1;
     pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
     pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cColorBits = 16;
-    pfd.cDepthBits = 16;
+    pfd.cColorBits = 32;
+    pfd.cDepthBits = 24;
+    pfd.cStencilBits = 8;
 
     if (!(g_hDC = GetDC(g_hWnd)))
     {
@@ -1254,11 +1259,60 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLin
         return FALSE;
     }
 
-    if (!(g_hRC = wglCreateContext(g_hDC)))
+    // Create a temporary context to get wglCreateContextAttribsARB
+    HGLRC tempContext = wglCreateContext(g_hDC);
+    if (!tempContext)
     {
-        g_ErrorReport.Write(L"OpenGL Create Context Error - ErrorCode : %d\r\n", GetLastError());
+        g_ErrorReport.Write(L"OpenGL Create Temp Context Error - ErrorCode : %d\r\n", GetLastError());
         KillGLWindow();
-        MessageBox(nullptr, GlobalText[4], L"OpenGL Create Context Error.", MB_OK | MB_ICONEXCLAMATION);
+        MessageBox(nullptr, GlobalText[4], L"OpenGL Create Temp Context Error.", MB_OK | MB_ICONEXCLAMATION);
+        return FALSE;
+    }
+
+    if (!wglMakeCurrent(g_hDC, tempContext))
+    {
+        g_ErrorReport.Write(L"OpenGL Make Current Temp Error - ErrorCode : %d\r\n", GetLastError());
+        wglDeleteContext(tempContext);
+        KillGLWindow();
+        MessageBox(nullptr, GlobalText[4], L"OpenGL Make Current Temp Error.", MB_OK | MB_ICONEXCLAMATION);
+        return FALSE;
+    }
+
+    // Get the wglCreateContextAttribsARB function
+    typedef HGLRC(WINAPI* PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC, HGLRC, const int*);
+    PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB =
+        (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+
+    if (!wglCreateContextAttribsARB)
+    {
+        g_ErrorReport.Write(L"OpenGL wglCreateContextAttribsARB not available - ErrorCode : %d\r\n", GetLastError());
+        wglMakeCurrent(nullptr, nullptr);
+        wglDeleteContext(tempContext);
+        KillGLWindow();
+        MessageBox(nullptr, GlobalText[4], L"OpenGL 4.x not supported.", MB_OK | MB_ICONEXCLAMATION);
+        return FALSE;
+    }
+
+    // Create OpenGL 4.6 compatibility context (for incremental migration)
+    // TODO: Switch to core profile (0x00000001) once all legacy OpenGL is migrated
+    const int contextAttribs[] = {
+        0x2091, 4,  // WGL_CONTEXT_MAJOR_VERSION_ARB
+        0x2092, 6,  // WGL_CONTEXT_MINOR_VERSION_ARB
+        0x9126, 0x00000002,  // WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB
+        0
+    };
+
+    g_hRC = wglCreateContextAttribsARB(g_hDC, nullptr, contextAttribs);
+
+    // Delete temporary context
+    wglMakeCurrent(nullptr, nullptr);
+    wglDeleteContext(tempContext);
+
+    if (!g_hRC)
+    {
+        g_ErrorReport.Write(L"OpenGL 4.6 Context Creation Error - ErrorCode : %d\r\n", GetLastError());
+        KillGLWindow();
+        MessageBox(nullptr, GlobalText[4], L"OpenGL 4.6 Create Context Error.", MB_OK | MB_ICONEXCLAMATION);
         return FALSE;
     }
 
@@ -1279,6 +1333,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLin
     g_ErrorReport.WriteOpenGLInfo();
     g_ErrorReport.AddSeparator();
     g_ErrorReport.WriteSoundCardInfo();
+
+    // Initialize modern OpenGL systems
+    InitModernGL();
 
     ShowWindow(g_hWnd, nCmdShow);
     UpdateWindow(g_hWnd);

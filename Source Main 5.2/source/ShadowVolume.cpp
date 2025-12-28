@@ -12,6 +12,7 @@
 #include "ZzzTexture.h"
 #include "BaseCls.h"
 #include "ZzzCharacter.h"
+#include "ModernGL.h"
 
 CQueue<CShadowVolume*> m_qSV;
 
@@ -88,13 +89,13 @@ void RenderShadowToScreen(void)
     p[2][0] = 0.f + Width; p[2][1] = Height;
     p[3][0] = 0.f + Width; p[3][1] = 0.f;
     //BeginBitmap();
-    glBegin(GL_TRIANGLE_FAN);
-    glColor3fv(vLight);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
+    g_ImmediateModeEmulator.Color3fv(vLight);
     for (int i = 0; i < 4; i++)
     {
-        glVertex2f(p[i][0], p[i][1]);
+        g_ImmediateModeEmulator.Vertex2f(p[i][0], p[i][1]);
     }
-    glEnd();
+    g_ImmediateModeEmulator.End();
     glDepthFunc(GL_LESS);
     glDisable(GL_STENCIL_TEST);
     EnableDepthMask();
@@ -296,14 +297,14 @@ void CShadowVolume::RenderAsFrame(void)
 
 void CShadowVolume::RenderShadowVolume(void)
 {
-    glBegin(GL_TRIANGLES);
+    g_ImmediateModeEmulator.Begin(GL_TRIANGLES);
 
     for (int i = 0; i < m_nNumVertices; ++i)
     {
-        glVertex3fv(m_pVertices[i]);
+        g_ImmediateModeEmulator.Vertex3fv(m_pVertices[i]);
     }
 
-    glEnd();
+    g_ImmediateModeEmulator.End();
 }
 
 void CShadowVolume::Shade(void)

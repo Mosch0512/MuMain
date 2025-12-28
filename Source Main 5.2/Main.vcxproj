@@ -374,6 +374,7 @@
     <ClCompile Include="source\Dotnet\PacketFunctions_ClientToServer.cpp" />
     <ClCompile Include="source\Dotnet\PacketFunctions_ConnectServer.cpp" />
     <ClCompile Include="source\Dotnet\PacketFunctions_Custom.cpp" />
+    <ClCompile Include="source\ModernGL.cpp" />
     <ClCompile Include="source\MUHelper\MuHelper.cpp" />
     <ClCompile Include="source\MUHelper\MuHelperData.cpp" />
     <ClCompile Include="source\NewUIInventoryExtension.cpp" />
@@ -749,6 +750,7 @@
     <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_opengl2.cpp" Condition="'$(Configuration)'=='Global Debug'">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClInclude Include="source\ModernGL.h" />
     <ClInclude Include="ThirdParty\imgui\imconfig.h" Condition="'$(Configuration)'=='Global Debug'" />
     <ClInclude Include="ThirdParty\imgui\imgui.h" Condition="'$(Configuration)'=='Global Debug'" />
     <ClInclude Include="ThirdParty\imgui\imgui_internal.h" Condition="'$(Configuration)'=='Global Debug'" />
