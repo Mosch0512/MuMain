@@ -25,8 +25,8 @@ private:
     static bool m_bRotating;             // Is middle mouse button held for rotation?
     static int m_iLastMouseX;            // Last mouse X position for rotation calculation
     static int m_iLastMouseY;            // Last mouse Y position for pitch calculation
-    static bool m_bF9KeyPressed;         // To prevent toggle spam
     static float m_fInitialCameraOffset[3]; // Initial camera offset from character (saved on first frame)
+    static bool m_bInitialOffsetSet;     // Has the initial offset been captured?
 
 public:
     // Initialize default values

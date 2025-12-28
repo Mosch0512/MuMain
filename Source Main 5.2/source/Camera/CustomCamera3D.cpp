@@ -21,8 +21,8 @@ float CCustomCamera3D::m_fMaxPitch = 45.0f;          // Maximum pitch (20 degree
 bool CCustomCamera3D::m_bRotating = false;
 int CCustomCamera3D::m_iLastMouseX = 0;
 int CCustomCamera3D::m_iLastMouseY = 0;
-bool CCustomCamera3D::m_bF9KeyPressed = false;
 float CCustomCamera3D::m_fInitialCameraOffset[3] = { 0.0f, 0.0f, 0.0f };
+bool CCustomCamera3D::m_bInitialOffsetSet = false;
 
 void CCustomCamera3D::Initialize()
 {
@@ -43,6 +43,7 @@ void CCustomCamera3D::Toggle()
         m_fInitialCameraOffset[0] = 0.0f;
         m_fInitialCameraOffset[1] = 0.0f;
         m_fInitialCameraOffset[2] = 0.0f;
+        m_bInitialOffsetSet = false;
     }
     else
     {
@@ -169,12 +170,13 @@ void CCustomCamera3D::GetModifiedCameraPosition(float inPos[3], float charPos[3]
     float relativeY = inPos[1] - charPos[1];
     float relativeZ = inPos[2] - charPos[2];
 
-    // If initial offset not set yet (first frame or not rotating), save it
-    if (m_fInitialCameraOffset[0] == 0.0f && m_fInitialCameraOffset[1] == 0.0f && m_fInitialCameraOffset[2] == 0.0f)
+    // If initial offset not set yet (first frame after enabling), save it
+    if (!m_bInitialOffsetSet)
     {
         m_fInitialCameraOffset[0] = relativeX;
         m_fInitialCameraOffset[1] = relativeY;
         m_fInitialCameraOffset[2] = relativeZ;
+        m_bInitialOffsetSet = true;
     }
 
     // Calculate zoom scale from reference distance (100 units = 1.0x)
