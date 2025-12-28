@@ -1175,22 +1175,17 @@ void RenderColor(float x, float y, float Width, float Height, float Alpha, int F
     p[2][0] = x + Width; p[2][1] = y - Height;
     p[3][0] = x + Width; p[3][1] = y;
 
+    // Get the current OpenGL color state (set by glColor4f before calling this function)
+    GLfloat currentColor[4];
+    glGetFloatv(GL_CURRENT_COLOR, currentColor);
+
     g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
+    // Set the color once before all vertices
+    g_ImmediateModeEmulator.Color3f(currentColor[0], currentColor[1], currentColor[2]);
+    
     for (int i = 0; i < 4; i++)
     {
-        if (Alpha > 0.f)
-        {
-            if (Flag == 0)
-                g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
-            else
-                if (Flag == 1)
-                    g_ImmediateModeEmulator.Color3f(0.f, 0.f, 0.f);
-        }
         g_ImmediateModeEmulator.Vertex2f(p[i][0], p[i][1]);
-        if (Alpha > 0.f)
-        {
-            g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
-        }
     }
     g_ImmediateModeEmulator.End();
 }
@@ -1225,19 +1220,19 @@ void RenderColorBitmap(int Texture, float x, float y, float Width, float Height,
     TEXCOORD(c[2], u + uWidth, v + vHeight);
     TEXCOORD(c[1], u, v + vHeight);
 
+    // Extract RGB from the color parameter
+    float colorR = static_cast<GLubyte>((color & 0xff)) / 255.f;
+    float colorG = static_cast<GLubyte>((color >> 8) & 0xff) / 255.f;
+    float colorB = static_cast<GLubyte>((color >> 16) & 0xff) / 255.f;
+
     g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
+    // Set the color once before all vertices
+    g_ImmediateModeEmulator.Color3f(colorR, colorG, colorB);
 
     for (int i = 0; i < 4; i++)
     {
-        g_ImmediateModeEmulator.Color3f(
-            static_cast<GLubyte>((color & 0xff)) / 255.f,         //Red
-            static_cast<GLubyte>((color >> 8) & 0xff) / 255.f,    //Green
-            static_cast<GLubyte>((color >> 16) & 0xff) / 255.f);  //Blue
-
         g_ImmediateModeEmulator.TexCoord2f(c[i][0], c[i][1]);
         g_ImmediateModeEmulator.Vertex2f(p[i][0], p[i][1]);
-
-        g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     }
     g_ImmediateModeEmulator.End();
 }
@@ -1272,19 +1267,18 @@ void RenderBitmap(int Texture, float x, float y, float Width, float Height, floa
     TEXCOORD(c[2], u + uWidth, v + vHeight);
     TEXCOORD(c[1], u, v + vHeight);
 
+    // Get the current OpenGL color state (set by glColor4f before calling this function)
+    GLfloat currentColor[4];
+    glGetFloatv(GL_CURRENT_COLOR, currentColor);
+
     g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
+    // Set the color once before all vertices
+    g_ImmediateModeEmulator.Color3f(currentColor[0], currentColor[1], currentColor[2]);
+
     for (int i = 0; i < 4; i++)
     {
-        if (Alpha > 0.f)
-        {
-            g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
-        }
         g_ImmediateModeEmulator.TexCoord2f(c[i][0], c[i][1]);
         g_ImmediateModeEmulator.Vertex2f(p[i][0], p[i][1]);
-        if (Alpha > 0.f)
-        {
-            g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
-        }
     }
     g_ImmediateModeEmulator.End();
 }
@@ -1488,6 +1482,10 @@ void RenderBitmapAlpha(int Texture, float sx, float sy, float Width, float Heigh
     EnableAlphaTest();
     BindTexture(Texture);
 
+    // Get the current OpenGL color state (set by glColor4f before calling this function)
+    GLfloat currentColor[4];
+    glGetFloatv(GL_CURRENT_COLOR, currentColor);
+
     sy = WindowHeight - sy;
     for (int y = 0; y < 4; y++)
     {
@@ -1516,9 +1514,10 @@ void RenderBitmapAlpha(int Texture, float sx, float sy, float Width, float Heigh
             if(x==3&&y==0) Alpha[3] = 0.f;*/
 
             g_ImmediateModeEmulator.Begin(GL_TRIANGLE_FAN);
+            // Set the color once before all vertices
+            g_ImmediateModeEmulator.Color3f(currentColor[0], currentColor[1], currentColor[2]);
             for (int i = 0; i < 4; i++)
             {
-                g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
                 g_ImmediateModeEmulator.TexCoord2f(c[i][0], c[i][1]);
                 g_ImmediateModeEmulator.Vertex2f(p[i][0], p[i][1]);
             }
