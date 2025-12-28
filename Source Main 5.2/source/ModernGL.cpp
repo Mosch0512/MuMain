@@ -13,6 +13,7 @@ static PFNGLBUFFERDATAPROC pglBufferData = nullptr;
 static PFNGLBUFFERSUBDATAPROC pglBufferSubData = nullptr;
 static PFNGLVERTEXATTRIBPOINTERPROC pglVertexAttribPointer = nullptr;
 static PFNGLENABLEVERTEXATTRIBARRAYPROC pglEnableVertexAttribArray = nullptr;
+static PFNGLDISABLEVERTEXATTRIBARRAYPROC pglDisableVertexAttribArray = nullptr;
 
 // Global instances
 CImmediateModeEmulator g_ImmediateModeEmulator;
@@ -33,11 +34,12 @@ static bool LoadGLExtensions()
     pglBufferSubData = (PFNGLBUFFERSUBDATAPROC)wglGetProcAddress("glBufferSubData");
     pglVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
     pglEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
+    pglDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glDisableVertexAttribArray");
 
     return pglGenVertexArrays && pglDeleteVertexArrays && pglBindVertexArray &&
            pglGenBuffers && pglDeleteBuffers && pglBindBuffer &&
            pglBufferData && pglBufferSubData &&
-           pglVertexAttribPointer && pglEnableVertexAttribArray;
+           pglVertexAttribPointer && pglEnableVertexAttribArray && pglDisableVertexAttribArray;
 }
 
 // ============================================================================
@@ -348,28 +350,35 @@ void CImmediateModeEmulator::RenderBatch()
         renderVertices = m_Vertices;
     }
 
-    // Create temporary VBO for this batch
-    GLuint vao, vbo;
-    pglGenVertexArrays(1, &vao);
-    pglGenBuffers(1, &vbo);
+    // CRITICAL: Unbind any VAO that might be active
+    // VAOs override client-side arrays, so we must unbind them first
+    if (pglBindVertexArray) {
+        pglBindVertexArray(0);
+    }
 
-    pglBindVertexArray(vao);
-    pglBindBuffer(GL_ARRAY_BUFFER, vbo);
-    pglBufferData(GL_ARRAY_BUFFER, renderVertices.size() * sizeof(VertexPCT), renderVertices.data(), GL_STREAM_DRAW);
+    // Disable any vertex attribute arrays that might interfere with fixed-function
+    // In compatibility mode, we use fixed-function (glVertexPointer), not attributes (glVertexAttribPointer)
+    if (pglDisableVertexAttribArray) {
+        for (int i = 0; i < 8; i++) {
+            pglDisableVertexAttribArray(i);
+        }
+    }
 
-    pglVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPCT), (void*)0);
-    pglEnableVertexAttribArray(0);
-    pglVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPCT), (void*)(3 * sizeof(float)));
-    pglEnableVertexAttribArray(1);
-    pglVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPCT), (void*)(6 * sizeof(float)));
-    pglEnableVertexAttribArray(2);
+    // Use compatibility mode client-side vertex arrays (no shaders needed)
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+    glVertexPointer(3, GL_FLOAT, sizeof(VertexPCT), &renderVertices[0].x);
+    glColorPointer(3, GL_FLOAT, sizeof(VertexPCT), &renderVertices[0].r);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(VertexPCT), &renderVertices[0].u);
 
     GLenum drawMode = (m_PrimitiveType == GL_QUADS) ? GL_TRIANGLES : m_PrimitiveType;
     glDrawArrays(drawMode, 0, (GLsizei)renderVertices.size());
 
-    pglBindVertexArray(0);
-    pglDeleteBuffers(1, &vbo);
-    pglDeleteVertexArrays(1, &vao);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void CImmediateModeEmulator::ConvertQuadsToTriangles(std::vector<VertexPCT>& outVertices)
@@ -402,8 +411,12 @@ void InitModernGL()
         return;
     }
 
-    // Initialize global batch renderer with reasonable capacity
-    g_EffectBatchRenderer.Initialize(65536); // 64K vertices
+    // NOTE: CDynamicBatchRenderer and CStaticVBO use VAO+VBO with vertex attributes
+    // These require shaders to work properly. For now, we're using compatibility mode
+    // with fixed-function pipeline, so we DON'T initialize them.
+    // They can be enabled later when we add a shader system.
+    
+    // g_EffectBatchRenderer.Initialize(65536); // Disabled - requires shaders
 }
 
 void CleanupModernGL()
