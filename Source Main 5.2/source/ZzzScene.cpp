@@ -908,7 +908,7 @@ bool NewRenderCharacterScene(HDC hDC)
     Height = 480;
     Width = GetScreenWidth();
 
-    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClearColor(0.85f, 0.9f, 0.95f, 1.0f);  // White-bluish sky tone matching fog
     BeginOpengl(0, 25, 640, 430);
 
     CreateFrustrum((float)Width / (float)640, (float)Height / 480.f, pos);
@@ -1123,7 +1123,7 @@ bool NewRenderLogInScene(HDC hDC)
 
     Height = 480;
     Width = GetScreenWidth();
-    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClearColor(00.5f, 0.7f, 1.0f, 1.0f);  // White-bluish sky tone matching fog
 
     BeginOpengl(0, 25, 640, 430);
     CreateFrustrum((float)Width / (float)640, (float)Height / 480.f, pos);
@@ -1805,40 +1805,9 @@ bool RenderMainScene()
 
     Width = GetScreenWidth();
 
-    // Override clear color for 3D camera to match fog/sky color
-    if (CCustomCamera3D::IsEnabled())
-    {
-        glClearColor(0.7f, 0.8f, 0.9f, 1.0f);  // White-bluish sky tone matching fog
-    }
-    else if (gMapManager.WorldActive == WD_0LORENCIA)
-    {
-        glClearColor(10 / 256.f, 20 / 256.f, 14 / 256.f, 1.f);
-    }
-    else if (gMapManager.WorldActive == WD_2DEVIAS)
-    {
-        glClearColor(0.f / 256.f, 0.f / 256.f, 10.f / 256.f, 1.f);
-    }
-    else if (gMapManager.WorldActive == WD_10HEAVEN)
-    {
-        glClearColor(3.f / 256.f, 25.f / 256.f, 44.f / 256.f, 1.f);
-    }
-    else if (gMapManager.InChaosCastle() == true)
-    {
-        glClearColor(0 / 256.f, 0 / 256.f, 0 / 256.f, 1.f);
-    }
-    else if (gMapManager.WorldActive >= WD_45CURSEDTEMPLE_LV1 && gMapManager.WorldActive <= WD_45CURSEDTEMPLE_LV6)
-    {
-        glClearColor(9.f / 256.f, 8.f / 256.f, 33.f / 256.f, 1.f);
-    }
-    else if (gMapManager.InHellas() == true)
-    {
-        byWaterMap = 1;
-        glClearColor(0.f / 256.f, 0.f / 256.f, 0.f / 256.f, 1.f);
-    }
-    else
-    {
-        glClearColor(0 / 256.f, 0 / 256.f, 0 / 256.f, 1.f);
-    }
+
+    glClearColor(0.85f, 0.9f, 0.95f, 1.0f);  // White-bluish sky tone matching fog
+    
 
     BeginOpengl(0, 0, Width, Height);
 
@@ -2132,7 +2101,7 @@ void MainScene(HDC hDC)
     Set3DSoundPosition();
 
 
-    glClearColor(3.f / 256.f, 25.f / 256.f, 44.f / 256.f, 1.f);
+    glClearColor(0.85f, 0.9f, 0.95f, 1.0f);  // White-bluish sky tone matching fog
 
     
 

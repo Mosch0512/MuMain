@@ -2200,7 +2200,7 @@ void CreateFrustrum2D(vec3_t Position)
 
         // Add extra coverage based on zoom
         // The frustum is a trapezoid - wider at far (top/distance) than near (bottom/close)
-        float extraFar = 6000.0f * zoomScale;      // Extended far for top of screen
+        float extraFar = 7000.0f * zoomScale;      // Extended far for top of screen
         float extraNear = 2100.0f * zoomScale;      // Extended near for bottom of screen
         float extraWidthFar = 3250.0f * zoomScale;  // Width at far plane (top of view into distance)
         float extraWidthNear = 130.0f * zoomScale;  // Minimal width at near plane (bottom of view)

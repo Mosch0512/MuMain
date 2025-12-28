@@ -694,10 +694,10 @@ void BeginOpengl(int x, int y, int Width, int Height)
         if (CCustomCamera3D::IsEnabled())
         {
             // Custom fog for 3D camera - VERY CLOSE for testing
-            float fogStart = 5000.0f;   // Start fading very close
-            float fogEnd = 6000.0f;    // Fully fogged very close
+            float fogStart = 4000.0f;   // Start fading very close
+            float fogEnd = 7000.0f;    // Fully fogged very close
 
-            GLfloat customFogColor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };  // BRIGHT RED for testing visibility
+            GLfloat customFogColor[4] = { 0.85f, 0.9f, 0.95f, 0.9f };  // White-bluish sky tone at 90% opacity
             glFogf(GL_FOG_START, fogStart);
             glFogf(GL_FOG_END, fogEnd);
             glFogfv(GL_FOG_COLOR, customFogColor);
