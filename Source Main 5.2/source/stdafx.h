@@ -79,6 +79,9 @@
 #include <gl/glew.h>
 #include <gl/GL.h>
 
+// Disable OpenGL 2 immediate mode functions - forces OpenGL 4.6 usage
+#include "OpenGL2Deprecated.h"
+
 //patch
 //winmain
 #include "Winmain.h"

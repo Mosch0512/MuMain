@@ -115,26 +115,7 @@ void CSideHair::RenderLine(vec3_t v1, vec3_t v2, vec3_t c1, vec3_t c2)
     BindTexture(BITMAP_ROBE + 4);
     EnableAlphaBlendMinus();
     //EnableAlphaTest();
-    //g_OpenglLib.DisableTexture();
-    //g_OpenglLib.Disable(GL_CULL_FACE);
-    /*glBegin(GL_QUADS);
-    glTexCoord2f(0.f,0.f+fTextureMove);glVertex3f(p1[0]-Scale,p1[1],p1[2]);
-    glTexCoord2f(0.f,1.f-fTextureMove);glVertex3f(p2[0]-Scale,p2[1],p2[2]);
-    glTexCoord2f(1.f,1.f-fTextureMove);glVertex3f(p2[0]+Scale,p2[1],p2[2]);
-    glTexCoord2f(1.f,0.f+fTextureMove);glVertex3f(p1[0]+Scale,p1[1],p1[2]);
-    glEnd();
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.f,0.f+fTextureMove);glVertex3f(p1[0],p1[1]-Scale,p1[2]);
-    glTexCoord2f(0.f,1.f-fTextureMove);glVertex3f(p2[0],p2[1]-Scale,p2[2]);
-    glTexCoord2f(1.f,1.f-fTextureMove);glVertex3f(p2[0],p2[1]+Scale,p2[2]);
-    glTexCoord2f(1.f,0.f+fTextureMove);glVertex3f(p1[0],p1[1]+Scale,p1[2]);
-    glEnd();
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.f,0.f+fTextureMove);glVertex3f(p1[0],p1[1],p1[2]-Scale);
-    glTexCoord2f(0.f,1.f-fTextureMove);glVertex3f(p2[0],p2[1],p2[2]-Scale);
-    glTexCoord2f(1.f,1.f-fTextureMove);glVertex3f(p2[0],p2[1],p2[2]+Scale);
-    glTexCoord2f(1.f,0.f+fTextureMove);glVertex3f(p1[0],p1[1],p1[2]+Scale);
-    glEnd();*/
+    // Old OpenGL 2 immediate mode code removed - replaced with g_ImmediateModeEmulator below
     vec3_t vOrtho;
     CrossProduct(m_vLight, d, vOrtho);
     VectorNormalize(vOrtho);

@@ -751,6 +751,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClInclude Include="source\ModernGL.h" />
+    <ClInclude Include="source\OpenGL2Deprecated.h" />
     <ClInclude Include="ThirdParty\imgui\imconfig.h" Condition="'$(Configuration)'=='Global Debug'" />
     <ClInclude Include="ThirdParty\imgui\imgui.h" Condition="'$(Configuration)'=='Global Debug'" />
     <ClInclude Include="ThirdParty\imgui\imgui_internal.h" Condition="'$(Configuration)'=='Global Debug'" />
