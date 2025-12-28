@@ -1124,7 +1124,7 @@ float RenderNumber2D(float x, float y, int Num, float Width, float Height)
     for (int i = 0; i < Length; i++)
     {
         float u = (float)(Text[i] - 48) * 16.f / 256.f;
-        //glColor3fv(Color);
+        //g_ImmediateModeEmulator.Color3fv(Color);
         RenderBitmap(BITMAP_FONT + 1, x, y, Width, Height, u, 0.f, 16.f / 256.f, 16.f / 32.f);
         x += Width * 0.7f;
     }

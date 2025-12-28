@@ -701,13 +701,13 @@ void CNewUIGuardWindow::RenderScrollBar(int iPos_x, int iPos_y, BOOL bIsClicked)
 {
     if (bIsClicked)
     {
-        glColor3ub(200, 200, 200);
+        glColor4f(200/255.0f, 200/255.0f, 200/255.0f, 1.0f);
         RenderImage(IMAGE_GUARDWINDOW_SCROLLBAR_ON, iPos_x, iPos_y, 15, 30);
     }
     else
     {
-        glColor3ub(255, 255, 255);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         RenderImage(IMAGE_GUARDWINDOW_SCROLLBAR_ON, iPos_x, iPos_y, 15, 30);
     }
-    glColor3ub(255, 255, 255);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 }

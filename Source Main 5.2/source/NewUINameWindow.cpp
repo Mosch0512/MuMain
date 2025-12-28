@@ -14,6 +14,7 @@
 #include "PersonalShopTitleImp.h"
 #include "MatchEvent.h"
 #include "MapManager.h"
+#include "ModernGL.h"
 
 using namespace SEASON3B;
 
@@ -159,15 +160,15 @@ void SEASON3B::CNewUINameWindow::RenderName()
                     RenderColor((float)(ScreenX + 1), (float)(ScreenY + 1), totalWidth, 5.f);
 
                     EnableAlphaBlend();
-                    glColor3f(0.2f, 0.0f, 0.0f);
+                    g_ImmediateModeEmulator.Color3f(0.2f, 0.0f, 0.0f);
                     RenderColor((float)ScreenX, (float)ScreenY, totalWidth, 5.f);
 
-                    glColor3f(50.f / 255.f, 10 / 255.f, 0.f);
+                    g_ImmediateModeEmulator.Color3f(50.f / 255.f, 10 / 255.f, 0.f);
                     RenderColor((float)(ScreenX + borderWidth), (float)(ScreenY + borderWidth), stepsWidth, 1.f);
 
                     int stepHP = (int)(c->HealthStatus * steps);
 
-                    glColor3f(250.f / 255.f, 10 / 255.f, 0.f);
+                    g_ImmediateModeEmulator.Color3f(250.f / 255.f, 10 / 255.f, 0.f);
                     for (int k = 0; k < stepHP; ++k)
                     {
                         RenderColor(

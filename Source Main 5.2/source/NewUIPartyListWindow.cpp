@@ -8,6 +8,7 @@
 
 #include "ZzzInventory.h"
 #include "CharacterManager.h"
+#include "ModernGL.h"
 #include "SkillManager.h"
 #include "ZzzInterface.h"
 
@@ -327,15 +328,15 @@ void SEASON3B::CNewUIPartyListWindow::RenderPartyHPOnHead()
         RenderColor((float)(ScreenX + 1), (float)(ScreenY + 1), Width + 4.f, 5.f);
 
         EnableAlphaBlend();
-        glColor3f(0.2f, 0.0f, 0.0f);
+        g_ImmediateModeEmulator.Color3f(0.2f, 0.0f, 0.0f);
         RenderColor((float)ScreenX, (float)ScreenY, Width + 4.f, 5.f);
 
-        glColor3f(50.f / 255.f, 10 / 255.f, 0.f);
+        g_ImmediateModeEmulator.Color3f(50.f / 255.f, 10 / 255.f, 0.f);
         RenderColor((float)(ScreenX + 2), (float)(ScreenY + 2), Width, 1.f);
 
         int stepHP = std::min<int>(10, p->stepHP);
 
-        glColor3f(250.f / 255.f, 10 / 255.f, 0.f);
+        g_ImmediateModeEmulator.Color3f(250.f / 255.f, 10 / 255.f, 0.f);
         for (int k = 0; k < stepHP; ++k)
         {
             RenderColor((float)(ScreenX + 2 + (k * 4)), (float)(ScreenY + 2), 3.f, 2.f);
@@ -343,7 +344,7 @@ void SEASON3B::CNewUIPartyListWindow::RenderPartyHPOnHead()
         DisableAlphaBlend();
     }
     DisableAlphaBlend();
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
 }
 
 float CNewUIPartyListWindow::GetLayerDepth()

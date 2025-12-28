@@ -15,6 +15,7 @@
 #include "ZzzCharacter.h"
 
 #include "DSPlaySound.h"
+#include "ModernGL.h"
 #include "UIGateKeeper.h"
 
 extern CUIGateKeeper* g_pUIGateKeeper;
@@ -314,7 +315,7 @@ void CNewUIGatemanWindow::RenderGuildMasterMode()
 
     glColor4f(0.f, 0.f, 0.f, 0.3f);
     RenderColor(ptOrigin.x + 20, ptOrigin.y + 52, 90.f, 30.f);
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
 
     EnableAlphaTest();
     ptOrigin.y += 30;

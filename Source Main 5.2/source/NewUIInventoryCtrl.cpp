@@ -13,6 +13,7 @@
 #include "SocketSystem.h"
 #include "MapManager.h"
 #include "MixMgr.h"
+#include "ModernGL.h"
 using namespace SEASON3B;
 
 SEASON3B::CNewUIPickedItem::CNewUIPickedItem()
@@ -1360,7 +1361,7 @@ bool SEASON3B::CNewUIInventoryCtrl::IsRepairMode()
 void SEASON3B::CNewUIInventoryCtrl::RenderNumberOfItem()
 {
     EnableAlphaTest();
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     auto li = m_vecItem.begin();
     for (; li != m_vecItem.end(); ++li)
     {
@@ -1373,52 +1374,52 @@ void SEASON3B::CNewUIInventoryCtrl::RenderNumberOfItem()
 
         if (pItem->Type >= ITEM_POTION && pItem->Type <= ITEM_ANTIDOTE && pItem->Durability > 1)
         {
-            glColor3f(1.f, 0.9f, 0.7f);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.9f, 0.7f);
             SEASON3B::RenderNumber(x + width - 6, y + 1, pItem->Durability);
         }
         else if (pItem->Type >= ITEM_JACK_OLANTERN_BLESSINGS && pItem->Type <= ITEM_JACK_OLANTERN_DRINK && pItem->Durability > 1)
         {
-            glColor3f(1.f, 0.9f, 0.7f);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.9f, 0.7f);
             SEASON3B::RenderNumber(x + width - 6, y + 1, pItem->Durability);
         }
         else if (pItem->Type >= ITEM_SMALL_SHIELD_POTION && pItem->Type <= ITEM_LARGE_COMPLEX_POTION && pItem->Durability > 1)
         {
-            glColor3f(1.f, 0.9f, 0.7f);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.9f, 0.7f);
             SEASON3B::RenderNumber(x + width - 6, y + 1, pItem->Durability);
         }
         else if (pItem->Type >= ITEM_POTION + 70 && pItem->Type <= ITEM_POTION + 71 && pItem->Durability > 1)
         {
-            glColor3f(1.f, 0.9f, 0.7f);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.9f, 0.7f);
             SEASON3B::RenderNumber(x + width - 6, y + 1, pItem->Durability);
         }
         else if (pItem->Type == ITEM_POTION + 94 && pItem->Durability > 1)
         {
-            glColor3f(1.f, 0.9f, 0.7f);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.9f, 0.7f);
             SEASON3B::RenderNumber(x + width - 6, y + 1, pItem->Durability);
         }
         else if (pItem->Type >= ITEM_POTION + 78 && pItem->Type <= ITEM_POTION + 82 && pItem->Durability > 1)
         {
-            glColor3f(1.f, 0.9f, 0.7f);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.9f, 0.7f);
             SEASON3B::RenderNumber(x + width - 6, y + 1, pItem->Durability);
         }
         else if (pItem->Type >= ITEM_CHERRY_BLOSSOM_WINE && pItem->Type <= ITEM_GOLDEN_CHERRY_BLOSSOM_BRANCH && pItem->Durability > 1)
         {
-            glColor3f(1.f, 0.9f, 0.7f);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.9f, 0.7f);
             SEASON3B::RenderNumber(x + width - 6, y + 1, pItem->Durability);
         }
         else if (pItem->Type == ITEM_POTION + 133 && pItem->Durability > 1)
         {
-            glColor3f(1.f, 0.9f, 0.7f);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.9f, 0.7f);
             SEASON3B::RenderNumber(x + width - 6, y + 1, pItem->Durability);
         }
         else if (COMGEM::isCompiledGem(pItem))
         {
             const int Level = pItem->Level;
-            glColor3f(1.f, 0.9f, 0.7f);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.9f, 0.7f);
             SEASON3B::RenderNumber(x + width - 6, y + 1, (Level + 1) * COMGEM::FIRST);
         }
     }
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     DisableAlphaBlend();
 }
 

@@ -26,6 +26,7 @@
 #include "ZzzScene.h"
 #include "ZzzTexture.h"
 #include "DSPlaySound.h"
+#include "ModernGL.h"
 
 namespace
 {
@@ -705,7 +706,7 @@ void    CSPetDarkSpirit::RenderCmdType(void)
 
     RenderBar(x, y + 12, Width, Height, (float)Life);
 
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
 
     Width = 20.f; Height = 28.f; x = GetScreenWidth() - Width - PartyWidth - 65.f; y = 5.f;
     RenderBitmap(BITMAP_SKILL_INTERFACE + 2, (float)x, (float)y, (float)Width - 4, (float)Height - 8, (((m_byCommand) % 8) * 32 + 6.f) / 256.f, (((m_byCommand) / 8) * Height + 3.f) / 256.f, Width / 256.f, (Height - 1.f) / 256.f);

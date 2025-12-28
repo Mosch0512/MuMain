@@ -13,6 +13,7 @@
 
 #include "NewUICommonMessageBox.h"
 #include "Local.h"
+#include "ModernGL.h"
 #include "NewUISystem.h"
 #include "ZzzInterface.h"
 
@@ -514,7 +515,7 @@ void CUIGuildMaster::RenderGuildMasterMain()
     m_EditGuildMarkButton.SetPosition(ptOrigin.x, ptOrigin.y);
     m_EditGuildMarkButton.Render();
 
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     float Width = 24.f; float Height = 24.f; float x = (float)GetPosition_x() + 25; float y = (float)GetPosition_y() + 395;
     RenderBitmap(BITMAP_INVENTORY_BUTTON, x, y, Width, Height, 0.f, 0.f, Width / 32.f, Height / 32.f);
     if (CheckMouseIn(x, y, Width, Height))
@@ -613,7 +614,7 @@ BOOL CUIGuildMaster::DoMouseAction()
 
 void CUIGuildMaster::Render()
 {
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
 
     POINT ptOrigin = { GetPosition_x(), GetPosition_y() };
 

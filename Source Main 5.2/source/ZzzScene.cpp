@@ -1,4 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -62,6 +62,7 @@
 #include <thread>
 
 #include "CharacterManager.h"
+#include "ModernGL.h"
 
 extern CUITextInputBox* g_pSingleTextInputBox;
 extern CUITextInputBox* g_pSinglePasswdInputBox;
@@ -180,8 +181,8 @@ bool CheckAbuseNameFilter(wchar_t* Text)
 bool CheckName()
 {
     if (CheckAbuseNameFilter(InputText[0]) || CheckAbuseFilter(InputText[0]) ||
-        FindText(InputText[0], L" ") || FindText(InputText[0], L"　") ||
-        FindText(InputText[0], L".") || FindText(InputText[0], L"·") || FindText(InputText[0], L"∼") ||
+        FindText(InputText[0], L" ") || FindText(InputText[0], L" ") ||
+        FindText(InputText[0], L".") || FindText(InputText[0], L"�") || FindText(InputText[0], L"~") ||
         FindText(InputText[0], L"Webzen") || FindText(InputText[0], L"WebZen") || FindText(InputText[0], L"webzen") || FindText(InputText[0], L"WEBZEN") ||
         FindText(InputText[0], GlobalText[457]) || FindText(InputText[0], GlobalText[458]))
         return true;
@@ -909,7 +910,7 @@ bool NewRenderCharacterScene(HDC hDC)
 
     int Width, Height;
 
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     Height = 480;
     Width = GetScreenWidth();
 
@@ -1124,7 +1125,7 @@ bool NewRenderLogInScene(HDC hDC)
 
     int Width, Height;
 
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
 
     Height = 480;
     Width = GetScreenWidth();
@@ -1176,7 +1177,7 @@ bool NewRenderLogInScene(HDC hDC)
     g_pRenderText->SetFont(g_hFont);
 
     InputTextWidth = 256;
-    glColor3f(0.8f, 0.7f, 0.6f);
+    g_ImmediateModeEmulator.Color3f(0.8f, 0.7f, 0.6f);
     g_pRenderText->SetTextColor(255, 255, 255, 255);
     g_pRenderText->SetBgColor(0, 0, 0, 128);
 

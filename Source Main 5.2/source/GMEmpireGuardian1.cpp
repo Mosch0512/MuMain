@@ -14,7 +14,7 @@
 #include "PhysicsManager.h"
 #include "MapManager.h"
 #include "GOBoid.h"
-
+#include "ModernGL.h"
 
 
 GMEmpireGuardian1Ptr GMEmpireGuardian1::Make()
@@ -2229,7 +2229,7 @@ void GMEmpireGuardian1::RenderFrontSideVisual()
     case WEATHER_FOG:
     {
         EnableAlphaBlend();
-        glColor3f(0.6f, 0.6f, 0.9f);
+        g_ImmediateModeEmulator.Color3f(0.6f, 0.6f, 0.9f);
         float WindX2 = (float)((int)WorldTime % 100000) * 0.00005f;
         float WindY2 = (float)((int)WorldTime % 100000) * 0.00008f;
         RenderBitmapUV(BITMAP_CHROME + 2, 0.f, 0.f, 640.f, 480.f - 45.f, WindX2, WindY2, 2.0f, 2.0f);
@@ -2242,7 +2242,7 @@ void GMEmpireGuardian1::RenderFrontSideVisual()
         if (rand_fps_check(20))
         {
             EnableAlphaBlend();
-            glColor3f(0.7f, 0.7f, 0.9f);
+            g_ImmediateModeEmulator.Color3f(0.7f, 0.7f, 0.9f);
             float WindX2 = (float)((int)WorldTime % 100000) * 0.0006f;
             float WindY2 = -(float)((int)WorldTime % 100000) * 0.0006f;
             RenderBitmapUV(BITMAP_CHROME + 2, 0.f, 0.f, 640.f, 480.f - 45.f, WindX2, WindY2, 3.0f, 2.0f);

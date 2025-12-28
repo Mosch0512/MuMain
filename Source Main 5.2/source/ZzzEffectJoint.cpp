@@ -1,4 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -3936,7 +3936,7 @@ void MoveJoint(JOINT* o, int iIndex)
             vec3_t Position;
             VectorCopy(o->Position, Position);
 
-            o->Angle[0] = (float)o->LifeTime;	// 임시로 -_-
+            o->Angle[0] = (float)o->LifeTime;	// ??? -_-
             CreateParticleFpsChecked(BITMAP_FIRE + 1, Position, o->Angle, Light, 5, 0.9f);
             if (rand_fps_check(200))
             {
@@ -4196,7 +4196,7 @@ void MoveJoint(JOINT* o, int iIndex)
         VectorRotate(Position, Matrix, p);
         VectorAddScaled(o->Position, p, o->Position, FPS_ANIMATION_FACTOR);
         break;
-    case MODEL_SPEARSKILL:	// 방어막
+    case MODEL_SPEARSKILL:	// ???
         CHARACTER* c;
         if (o->m_iChaIndex != -1)
         {
@@ -4504,11 +4504,11 @@ void MoveJoint(JOINT* o, int iIndex)
 
                 Vector(0.2f, 0.2f, 0.4f + 0.2f * fSinAdd, o->Light);
                 break;
-            case 14:	// 소환 손목링
+            case 14:	// ?? ???
                 if (o->Target != NULL)
                 {
                     if (o->Target->Live)
-                        o->LifeTime = 100.f; //무한
+                        o->LifeTime = 100.f; //??
                     else
                     {
                         DeleteJoint(MODEL_SPEARSKILL, o->Target, 14);
@@ -4837,7 +4837,7 @@ void MoveJoint(JOINT* o, int iIndex)
                 }
                 else
                 {
-                    assert(!"디버깅");
+                    assert(!"???");
                 }
             }
             break;
@@ -5047,7 +5047,7 @@ void MoveJoint(JOINT* o, int iIndex)
                 o->Light[2] -= (10.12f) * FPS_ANIMATION_FACTOR;
             }
         }
-        else if (o->SubType == 1 || o->SubType == 2 || o->SubType == 3 || o->SubType == 5 || o->SubType == 6 || o->SubType == 7) //  위에서 아래로 내려오는 번개.
+        else if (o->SubType == 1 || o->SubType == 2 || o->SubType == 3 || o->SubType == 5 || o->SubType == 6 || o->SubType == 7) //  ??? ??? ???? ??.
 
         {
             VectorCopy(o->StartPosition, o->Position);
@@ -5615,7 +5615,7 @@ void MoveJoint(JOINT* o, int iIndex)
             else
             {
                 if (fLife < 10.f)
-                {	// 끝
+                {	// ?
                     fPos = fLife * 7.0f;
                 }
                 else
@@ -5830,7 +5830,7 @@ void MoveJoint(JOINT* o, int iIndex)
         {
             if (o->Target->Live)
             {
-                o->LifeTime = 100.f; //무한
+                o->LifeTime = 100.f; //??
 
                 if (rand_fps_check(3))
                 {
@@ -5984,10 +5984,10 @@ void MoveJoint(JOINT* o, int iIndex)
                 Position[2] += (150.f) * FPS_ANIMATION_FACTOR;
                 Distance = MoveHumming(o->Position, o->Angle, Position, o->Velocity);
 
-                //박종훈테스트
+                //??????
                 //					CreateParticle(BITMAP_SMOKE, o->Position, o->Angle, o->Light, 34, 1.0f);
                 //					CreateParticle(BITMAP_SMOKE, o->Position, o->Angle, o->Light, 35, 1.0f);
-                //박종훈테스트
+                //??????
                 if (Distance <= 70.0f && fabs(fOldAngle - o->Angle[2]) > 20.0f)
                 {
                     if (o->Velocity >= 20.f)
@@ -6291,8 +6291,8 @@ void MoveJoint(JOINT* o, int iIndex)
                                 CreateParticle(BITMAP_FIRE, o->Position, o->Angle, o->Light, 0);
                             }
 
-                            CreateJointFpsChecked(BITMAP_JOINT_THUNDER, Light, o->Position, o->Angle, 3, NULL, rand() % 10 + 5.f, 5, 10); //  전기
-                            CreateJointFpsChecked(BITMAP_JOINT_THUNDER, Light, o->Position, o->Angle, 3, NULL, rand() % 8 + 4.f, 5, 10); //  전기
+                            CreateJointFpsChecked(BITMAP_JOINT_THUNDER, Light, o->Position, o->Angle, 3, NULL, rand() % 10 + 5.f, 5, 10); //  ??
+                            CreateJointFpsChecked(BITMAP_JOINT_THUNDER, Light, o->Position, o->Angle, 3, NULL, rand() % 8 + 4.f, 5, 10); //  ??
                         }
                     }
                     if (o->SubType == 0)
@@ -6966,7 +6966,7 @@ void RenderJoints(BYTE bRenderOneMore)
                 case 9:
                 case 10:
                     fAlpha = (float)std::min<int>(o->LifeTime, 20) * 0.05f;
-                    glColor3f(fAlpha * o->Light[0], fAlpha * o->Light[1], fAlpha * o->Light[2]);
+                    g_ImmediateModeEmulator.Color3f(fAlpha * o->Light[0], fAlpha * o->Light[1], fAlpha * o->Light[2]);
                     break;
                 case 3:
                 case 5:
@@ -6976,10 +6976,10 @@ void RenderJoints(BYTE bRenderOneMore)
                 case 16:
                 case 14:
                 case 17:
-                    glColor3f(o->Light[0], o->Light[1], o->Light[2]);
+                    g_ImmediateModeEmulator.Color3f(o->Light[0], o->Light[1], o->Light[2]);
                     break;
                 case 15:
-                    glColor3f(o->Light[0], o->Light[1], o->Light[2]);
+                    g_ImmediateModeEmulator.Color3f(o->Light[0], o->Light[1], o->Light[2]);
                     EnableAlphaBlendMinus();
                     break;
                 }
@@ -6987,12 +6987,12 @@ void RenderJoints(BYTE bRenderOneMore)
             else if (o->Type == BITMAP_FLARE_BLUE && o->SubType == 20)
             {
                 EnableAlphaBlend2();
-                glColor3fv(o->Light);
+                g_ImmediateModeEmulator.Color3fv(o->Light);
             }
             else if (o->Type == BITMAP_SMOKE && o->SubType == 0)
             {
                 float fAlpha = (float)std::min<int>(o->LifeTime, 20) * 0.1f;
-                glColor3f(fAlpha * o->Light[0], fAlpha * o->Light[1], fAlpha * o->Light[2]);
+                g_ImmediateModeEmulator.Color3f(fAlpha * o->Light[0], fAlpha * o->Light[1], fAlpha * o->Light[2]);
             }
             else if (o->Type == BITMAP_JOINT_SPARK)
             {
@@ -7001,7 +7001,7 @@ void RenderJoints(BYTE bRenderOneMore)
             }
             else
             {
-                glColor3fv(o->Light);
+                g_ImmediateModeEmulator.Color3fv(o->Light);
             }
 
             BindTexture(o->TexType);
@@ -7047,7 +7047,7 @@ void RenderJoints(BYTE bRenderOneMore)
                     Light2 -= Scroll;
                 }
                 if (o->Type == BITMAP_FLARE_FORCE && o->SubType >= 0 && o->SubType <= 4
-                    || (o->SubType >= 11 && o->SubType <= 13)	//^ 펜릴 스킬 관련
+                    || (o->SubType >= 11 && o->SubType <= 13)	//^ ?? ?? ??
                     )
                 {
                     Light1 = ((int)o->NumTails - (j)) / (float)((o->MaxTails - 1) / 2);
@@ -7096,17 +7096,17 @@ void RenderJoints(BYTE bRenderOneMore)
                             if (fJointHeight > 0)
                             {
                                 Vector(o->Light[0] - fJointHeight, o->Light[1] - fJointHeight, o->Light[2] - fJointHeight, Light);
-                                glColor3fv(Light);
+                                g_ImmediateModeEmulator.Color3fv(Light);
                             }
                             else
                             {
                                 VectorCopy(o->Light, Light);
-                                glColor3fv(o->Light);//1.f,1.f,1.f);
+                                g_ImmediateModeEmulator.Color3fv(o->Light);//1.f,1.f,1.f);
                             }
                         }
                         else
                         {
-                            glColor3f(1.f, 1.f, 1.f);
+                            g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
                         }
 
                         if (j == ((int)o->NumTails / 2))
@@ -7132,7 +7132,7 @@ void RenderJoints(BYTE bRenderOneMore)
                             float  fJointHeight = (j) * 0.01f;
                             VectorScale(o->Light, powf(0.9978f, FPS_ANIMATION_FACTOR), o->Light);
                             Vector(o->Light[0] - fJointHeight, o->Light[1] - fJointHeight, o->Light[2] - fJointHeight, Light);
-                            glColor3fv(Light);
+                            g_ImmediateModeEmulator.Color3fv(Light);
 
                             vec3_t  Position;
 
@@ -7153,15 +7153,15 @@ void RenderJoints(BYTE bRenderOneMore)
                         if (tail == j)
                         {
                             float l = o->Light[2] - j;
-                            glColor3f(l, l, l);
+                            g_ImmediateModeEmulator.Color3f(l, l, l);
                         }
                         else if (tail < j)
                         {
-                            glColor3f(0.f, 0.f, 0.f);
+                            g_ImmediateModeEmulator.Color3f(0.f, 0.f, 0.f);
                         }
                         else
                         {
-                            glColor3f(0.7f, 0.7f, 0.7f);
+                            g_ImmediateModeEmulator.Color3f(0.7f, 0.7f, 0.7f);
                         }
                     }
                     else if (o->Type == BITMAP_FLARE + 1 && o->SubType == 6)
@@ -7202,13 +7202,13 @@ void RenderJoints(BYTE bRenderOneMore)
                     {
                         float Luminosity = ((float)(((int)o->NumTails - 1 - j) / (float)(o->MaxTails)) * 2);
 
-                        glColor3f(o->Light[0] * Luminosity, o->Light[1] * Luminosity, o->Light[2] * Luminosity);
+                        g_ImmediateModeEmulator.Color3f(o->Light[0] * Luminosity, o->Light[1] * Luminosity, o->Light[2] * Luminosity);
                     }
                     else if (o->Type == BITMAP_JOINT_FORCE && o->SubType == 1)
                     {
                         float Luminosity = (1.f - ((int)o->NumTails - j) / (float)(o->NumTails)) * 2.f;
 
-                        glColor3f(o->Light[0] * Luminosity, o->Light[1] * Luminosity, o->Light[2] * Luminosity);
+                        g_ImmediateModeEmulator.Color3f(o->Light[0] * Luminosity, o->Light[1] * Luminosity, o->Light[2] * Luminosity);
                     }
 #ifdef GUILD_WAR_EVENT
                     if (o->Type == BITMAP_FLARE && o->SubType == 22)

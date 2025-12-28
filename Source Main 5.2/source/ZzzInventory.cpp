@@ -1,4 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -46,6 +46,7 @@
 
 #include "MapManager.h"
 #include "CharacterManager.h"
+#include "ModernGL.h"
 #include "SkillManager.h"
 #include "NewUISystem.h"
 
@@ -137,7 +138,7 @@ BYTE BuyItem[4];
 
 static  int iStateNum = 4;
 
-	// ※
+	// ?
 
 
 #ifdef _PVP_ADD_MOVE_SCROLL
@@ -218,28 +219,28 @@ int RenderTextList(int sx, int sy, int TextNum, int Tab, int iSort = RT3_SORT_CE
         case TEXT_COLOR_DARKRED:
         case TEXT_COLOR_DARKBLUE:
         case TEXT_COLOR_DARKYELLOW:
-            glColor3f(1.f, 1.f, 1.f);
+            g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
             break;
         case TEXT_COLOR_BLUE:
-            glColor3f(0.5f, 0.7f, 1.f);
+            g_ImmediateModeEmulator.Color3f(0.5f, 0.7f, 1.f);
             break;
         case TEXT_COLOR_GRAY:
-            glColor3f(0.4f, 0.4f, 0.4f);
+            g_ImmediateModeEmulator.Color3f(0.4f, 0.4f, 0.4f);
             break;
         case TEXT_COLOR_GREEN_BLUE:
-            glColor3f(1.f, 1.f, 1.f);
+            g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
             break;
         case TEXT_COLOR_RED:
-            glColor3f(1.f, 0.2f, 0.1f);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.2f, 0.1f);
             break;
         case TEXT_COLOR_YELLOW:
-            glColor3f(1.f, 0.8f, 0.1f);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.8f, 0.1f);
             break;
         case TEXT_COLOR_GREEN:
-            glColor3f(0.1f, 1.f, 0.5f);
+            g_ImmediateModeEmulator.Color3f(0.1f, 1.f, 0.5f);
             break;
         case TEXT_COLOR_PURPLE:
-            glColor3f(1.f, 0.1f, 1.f);
+            g_ImmediateModeEmulator.Color3f(1.f, 0.1f, 1.f);
             break;
         }
         if (TEXT_COLOR_DARKRED == TextListColor[i])
@@ -384,37 +385,37 @@ void RenderTipTextList(const int sx, const int sy, int TextNum, int Tab, int iSo
             case TEXT_COLOR_DARKRED:
             case TEXT_COLOR_DARKBLUE:
             case TEXT_COLOR_DARKYELLOW:
-                glColor3f(1.f, 1.f, 1.f);
+                g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
                 break;
             case TEXT_COLOR_BLUE:
-                glColor3f(0.5f, 0.7f, 1.f);
+                g_ImmediateModeEmulator.Color3f(0.5f, 0.7f, 1.f);
                 break;
             case TEXT_COLOR_GRAY:
-                glColor3f(0.4f, 0.4f, 0.4f);
+                g_ImmediateModeEmulator.Color3f(0.4f, 0.4f, 0.4f);
                 break;
             case TEXT_COLOR_GREEN_BLUE:
-                glColor3f(1.f, 1.f, 1.f);
+                g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
                 break;
             case TEXT_COLOR_RED:
-                glColor3f(1.f, 0.2f, 0.1f);
+                g_ImmediateModeEmulator.Color3f(1.f, 0.2f, 0.1f);
                 break;
             case TEXT_COLOR_YELLOW:
-                glColor3f(1.f, 0.8f, 0.1f);
+                g_ImmediateModeEmulator.Color3f(1.f, 0.8f, 0.1f);
                 break;
             case TEXT_COLOR_GREEN:
-                glColor3f(0.1f, 1.f, 0.5f);
+                g_ImmediateModeEmulator.Color3f(0.1f, 1.f, 0.5f);
                 break;
             case TEXT_COLOR_PURPLE:
-                glColor3f(1.f, 0.1f, 1.f);
+                g_ImmediateModeEmulator.Color3f(1.f, 0.1f, 1.f);
                 break;
             case TEXT_COLOR_REDPURPLE:
-                glColor3f(0.8f, 0.5f, 0.8f);
+                g_ImmediateModeEmulator.Color3f(0.8f, 0.5f, 0.8f);
                 break;
             case TEXT_COLOR_VIOLET:
-                glColor3f(0.7f, 0.4f, 1.0f);
+                g_ImmediateModeEmulator.Color3f(0.7f, 0.4f, 1.0f);
                 break;
             case TEXT_COLOR_ORANGE:
-                glColor3f(0.9f, 0.42f, 0.04f);
+                g_ImmediateModeEmulator.Color3f(0.9f, 0.42f, 0.04f);
                 break;
             }
             if (TEXT_COLOR_DARKRED == TextListColor[i])
@@ -1499,16 +1500,16 @@ int GuildListStartY;
 int SommonTable[] = { 2,7,14,8,9,41 };
 
 wchar_t ChaosEventName[][100] = {
-    L"히돼?고향 여행권",
-    L"펜티엄4 컴퓨터",
-    L"디지탈카메라",
-    L"로지텍 무선 마우스+키보드 세트",
-    L"256M 램",
-    L"6개?잡지 구독권",
-    L"문화상품권(만원)",
-    L"뮤 머그컵",
-    L"뮤 T셔츠",
-    L"뮤 10시간 무료이용권"
+    L"????? ???",
+    L"???4 ???",
+    L"??????",
+    L"??? ?? ???+??? ??",
+    L"256M ?",
+    L"6???? ???",
+    L"?????(??)",
+    L"? ???",
+    L"? T??",
+    L"? 10?? ?????"
 };
 
 WORD CalcMaxDurability(const ITEM* ip, ITEM_ATTRIBUTE* p, int Level)
@@ -4403,23 +4404,23 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
     }
     else if (ip->Type == ITEM_POTION + 160)
     {
-        // 연장의 보석
+        // ??? ??
         swprintf(TextList[TextNum], GlobalText[3305]);
         TextListColor[TextNum] = TEXT_COLOR_WHITE; TextBold[TextNum] = false; TextNum++;
     }
     else if (ip->Type == ITEM_POTION + 161)
     {
-        // 상승의 보석
+        // ??? ??
         swprintf(TextList[TextNum], GlobalText[2209]);
         TextListColor[TextNum] = TEXT_COLOR_WHITE; TextBold[TextNum] = false; TextNum++;
     }
-    else if ((ip->Type >= ITEM_WINGS_OF_SPIRITS && ip->Type <= ITEM_WINGS_OF_DARKNESS) || ip->Type == ITEM_WINGS_OF_DESPAIR) //날개
+    else if ((ip->Type >= ITEM_WINGS_OF_SPIRITS && ip->Type <= ITEM_WINGS_OF_DARKNESS) || ip->Type == ITEM_WINGS_OF_DESPAIR) //??
     {
-        swprintf(TextList[TextNum], GlobalText[577], 32 + Level);  //  데미지 몇%증가.
+        swprintf(TextList[TextNum], GlobalText[577], 32 + Level);  //  ??? ?%??.
         TextListColor[TextNum] = TEXT_COLOR_WHITE; TextBold[TextNum] = false; TextNum++;
-        swprintf(TextList[TextNum], GlobalText[578], 25 + Level * 2);  //  데미지 몇%흡수.
+        swprintf(TextList[TextNum], GlobalText[578], 25 + Level * 2);  //  ??? ?%??.
         TextListColor[TextNum] = TEXT_COLOR_WHITE; TextBold[TextNum] = false; TextNum++;
-        swprintf(TextList[TextNum], GlobalText[579]);             //  이동 속도 향상.
+        swprintf(TextList[TextNum], GlobalText[579]);             //  ?? ?? ??.
         TextListColor[TextNum] = TEXT_COLOR_WHITE; TextBold[TextNum] = false; TextNum++;
     }
     else if ((ip->Type >= ITEM_WING_OF_STORM && ip->Type <= ITEM_CAPE_OF_EMPEROR) || ip->Type == ITEM_WING_OF_DIMENSION
@@ -4661,11 +4662,11 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
     }
     else if (ip->Type == ITEM_CAPE_OF_FIGHTER || ip->Type == ITEM_CAPE_OF_LORD)
     {
-        // 망토 관련 옵션변경
-        swprintf(TextList[TextNum], GlobalText[577], 20 + Level * 2);  //  데미지 몇%증가
+        // ?? ?? ????
+        swprintf(TextList[TextNum], GlobalText[577], 20 + Level * 2);  //  ??? ?%??
         TextListColor[TextNum] = TEXT_COLOR_WHITE; TextBold[TextNum] = false; TextNum++;
         int _iDamage = (ip->Type == ITEM_CAPE_OF_FIGHTER) ? 10 + Level * 2 : 10 + Level;
-        swprintf(TextList[TextNum], GlobalText[578], _iDamage);  //  데미지 몇%흡수
+        swprintf(TextList[TextNum], GlobalText[578], _iDamage);  //  ??? ?%??
         TextListColor[TextNum] = TEXT_COLOR_WHITE; TextBold[TextNum] = false; TextNum++;
     }
 
@@ -5053,7 +5054,7 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
 
     WORD actualReqVit = GET_ACTUAL_REQUIREMENT(STAT_VITALITY, RequireVitality);
 
-    if (actualReqVit && bRequireStat) //  요구체력.
+    if (actualReqVit && bRequireStat) //  ????.
     {
         swprintf(TextList[TextNum], GlobalText[1930], actualReqVit);
 
@@ -5680,7 +5681,7 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
             TextBold[TextNum] = false;
             TextNum++;
             break;
-        case ITEM_HELPER + 133:	// 골든메이플참
+        case ITEM_HELPER + 133:	// ??????
             swprintf(TextList[TextNum], GlobalText[3134], 150);
             TextListColor[TextNum] = TEXT_COLOR_BLUE;
             TextBold[TextNum] = false;
@@ -6631,7 +6632,7 @@ void RenderSkillInfo(int sx, int sy, int Type, int SkillNum, int iRenderPoint /*
 
 void SetTextColor(float r, float g, float b)
 {
-    glColor3f(r, g, b);
+    g_ImmediateModeEmulator.Color3f(r, g, b);
     g_pRenderText->SetTextColor(r * 255, g * 255, b * 255, 255);
 }
 
@@ -7841,7 +7842,7 @@ bool IsStoreBan(ITEM* pItem)
 sItemAct Set_ItemActOption(int _nIndex, int _nOption)
 {
     sItemAct	sItem;
-    // eITEM_PERSONALSHOP = 개인상점, eITEM_STORE = 창고, eITEM_TRADE = 거래, eITEM_DROP = 버리기, eITEM_SELL = 판매, eITEM_REPAIR = 수리
+    // eITEM_PERSONALSHOP = ????, eITEM_STORE = ??, eITEM_TRADE = ??, eITEM_DROP = ???, eITEM_SELL = ??, eITEM_REPAIR = ??
     int	nItemOption[][eITEM_END] = { 0, 1, 1, 0, 0, 0,
                                         0, 0, 0, 0, 1, 0,
         -1 };
@@ -7881,7 +7882,7 @@ bool Check_ItemAction(ITEM* _pItem, ITEMSETOPTION _eAction, bool _bType)
         }
     }
 
-    // 등록되지 않은 아이템은 무시.
+    // ???? ?? ???? ??.
     return false;
 }
 
@@ -10050,33 +10051,33 @@ void RenderObjectScreen(int Type, int ItemLevel, int excellentFlags, int ancient
             Scale = 0.0013f;
         }
 #ifdef LJH_ADD_ITEMS_EQUIPPED_FROM_INVENTORY_SYSTEM
-        else if (Type == MODEL_HELPER + 128)		// 매조각상
+        else if (Type == MODEL_HELPER + 128)		// ????
         {
             Scale = 0.0035f;
         }
-        else if (Type == MODEL_HELPER + 129)		// 양조각상
+        else if (Type == MODEL_HELPER + 129)		// ????
         {
             Scale = 0.0035f;
         }
-        else if (Type == MODEL_HELPER + 134)		// 편자
+        else if (Type == MODEL_HELPER + 134)		// ??
         {
             Scale = 0.0033f;
         }
 #endif	//LJH_ADD_ITEMS_EQUIPPED_FROM_INVENTORY_SYSTEM
 #ifdef LJH_ADD_ITEMS_EQUIPPED_FROM_INVENTORY_SYSTEM_PART_2
-        else if (Type == MODEL_HELPER + 130)		// 오크참
+        else if (Type == MODEL_HELPER + 130)		// ???
         {
             Scale = 0.0032f;
         }
-        else if (Type == MODEL_HELPER + 131)		// 메이플참
+        else if (Type == MODEL_HELPER + 131)		// ????
         {
             Scale = 0.0033f;
         }
-        else if (Type == MODEL_HELPER + 132)		// 골든오크참
+        else if (Type == MODEL_HELPER + 132)		// ?????
         {
             Scale = 0.0025f;
         }
-        else if (Type == MODEL_HELPER + 133)		// 골든메이플참
+        else if (Type == MODEL_HELPER + 133)		// ??????
         {
             Scale = 0.0033f;
         }
@@ -10213,7 +10214,7 @@ void RenderObjectScreen(int Type, int ItemLevel, int excellentFlags, int ancient
             b->BodyHeight = -100.f;
             Scale = 0.0039f;
         }
-        // LEM_TSET  상승의 보석, 연장의 보석 스케일[lem_2010.9.7]
+        // LEM_TSET  ??? ??, ??? ?? ???[lem_2010.9.7]
         else if (Type >= MODEL_HELPER + 135 && Type <= MODEL_HELPER + 145)
         {
             Scale = 0.001f;
@@ -10622,7 +10623,7 @@ void RenderItem3D(float sx, float sy, float Width, float Height, int Type, int L
     vec3_t Position;
     CreateScreenVector((int)(sx), (int)(sy), Position, false);
     //RenderObjectScreen(Type+MODEL_ITEM,Level,Option1,Position,Success,PickUp);
-    if (Type == ITEM_BOX_OF_LUCK && Level == 1)	// 성탄의별
+    if (Type == ITEM_BOX_OF_LUCK && Level == 1)	// ????
     {
         RenderObjectScreen(MODEL_EVENT + 4, Level, excellentFlags, ancientDiscriminator, Position, Success, PickUp);
     }
@@ -10830,19 +10831,19 @@ void InventoryColor(ITEM* p)
     switch (p->Color)
     {
     case 0:
-        glColor3f(1.f, 1.f, 1.f);
+        g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
         break;
     case 1:
-        glColor3f(0.8f, 0.8f, 0.8f);
+        g_ImmediateModeEmulator.Color3f(0.8f, 0.8f, 0.8f);
         break;
     case 2:
-        glColor3f(0.6f, 0.7f, 1.f);
+        g_ImmediateModeEmulator.Color3f(0.6f, 0.7f, 1.f);
         break;
     case 3:
-        glColor3f(1.f, 0.2f, 0.1f);
+        g_ImmediateModeEmulator.Color3f(1.f, 0.2f, 0.1f);
         break;
     case 4:
-        glColor3f(0.5f, 1.f, 0.6f);
+        g_ImmediateModeEmulator.Color3f(0.5f, 1.f, 0.6f);
         break;
     case 5:
         glColor4f(0.8f, 0.7f, 0.f, 1.f);
@@ -10857,7 +10858,7 @@ void InventoryColor(ITEM* p)
         glColor4f(1.0f, 0.f, 0.f, 1.f);
         break;
     case 99:
-        glColor3f(1.f, 0.2f, 0.1f);
+        g_ImmediateModeEmulator.Color3f(1.f, 0.2f, 0.1f);
         break;
     }
 }
@@ -11432,17 +11433,17 @@ void CreateCastleMark(int Type, BYTE* buffer, bool blend)
         case 1:MarkColor[i] = (255 << 24) + (0 << 16) + (0 << 8) + (0); break;
         case 2:MarkColor[i] = (255 << 24) + (128 << 16) + (128 << 8) + (128); break;
         case 3:MarkColor[i] = (255 << 24) + (255 << 16) + (255 << 8) + (255); break;
-        case 4:MarkColor[i] = (255 << 24) + (0 << 16) + (0 << 8) + (255); break;//빨
+        case 4:MarkColor[i] = (255 << 24) + (0 << 16) + (0 << 8) + (255); break;//?
         case 5:MarkColor[i] = (255 << 24) + (0 << 16) + (128 << 8) + (255); break;//
-        case 6:MarkColor[i] = (255 << 24) + (0 << 16) + (255 << 8) + (255); break;//노
+        case 6:MarkColor[i] = (255 << 24) + (0 << 16) + (255 << 8) + (255); break;//?
         case 7:MarkColor[i] = (255 << 24) + (0 << 16) + (255 << 8) + (128); break;//
-        case 8:MarkColor[i] = (255 << 24) + (0 << 16) + (255 << 8) + (0); break;//초
+        case 8:MarkColor[i] = (255 << 24) + (0 << 16) + (255 << 8) + (0); break;//?
         case 9:MarkColor[i] = (255 << 24) + (128 << 16) + (255 << 8) + (0); break;//
-        case 10:MarkColor[i] = (255 << 24) + (255 << 16) + (255 << 8) + (0); break;//청
+        case 10:MarkColor[i] = (255 << 24) + (255 << 16) + (255 << 8) + (0); break;//?
         case 11:MarkColor[i] = (255 << 24) + (255 << 16) + (128 << 8) + (0); break;//
-        case 12:MarkColor[i] = (255 << 24) + (255 << 16) + (0 << 8) + (0); break;//파
+        case 12:MarkColor[i] = (255 << 24) + (255 << 16) + (0 << 8) + (0); break;//?
         case 13:MarkColor[i] = (255 << 24) + (255 << 16) + (0 << 8) + (128); break;//
-        case 14:MarkColor[i] = (255 << 24) + (255 << 16) + (0 << 8) + (255); break;//보
+        case 14:MarkColor[i] = (255 << 24) + (255 << 16) + (0 << 8) + (255); break;//?
         case 15:MarkColor[i] = (255 << 24) + (128 << 16) + (0 << 8) + (255); break;//
         }
     }
@@ -11547,7 +11548,7 @@ void RenderGuildList(int StartX, int StartY)
     GuildListStartX = StartX;
     GuildListStartY = StartY;
 
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
 
     DisableAlphaBlend();
     float x, y, Width, Height;
@@ -11601,7 +11602,7 @@ void RenderServerDivision()
 
     float Width, Height, x, y;
 
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     EnableAlphaTest();
 
     InventoryStartX = 640 - 190;
@@ -11643,13 +11644,13 @@ void RenderServerDivision()
 
     Width = 120; Height = 24; x = (float)InventoryStartX + 35; y = 320;//(Width/2.f); y = 231;
     if (g_bServerDivisionAccept)
-        glColor3f(1.f, 1.f, 1.f);
+        g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     else
-        glColor3f(0.5f, 0.5f, 0.5f);
+        g_ImmediateModeEmulator.Color3f(0.5f, 0.5f, 0.5f);
     RenderBitmap(BITMAP_INTERFACE + 10, (float)x, (float)y, (float)Width, (float)Height, 0.f, 0.f, 213.f / 256.f);
     g_pRenderText->RenderText((int)(x + (Width / 2)), (int)(y + 5), GlobalText[228], 0, 0, RT3_WRITE_CENTER);
 
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
 }
 
 BYTE CaculateFreeTicketLevel(int iType)

@@ -17,6 +17,7 @@
 
 #include "ReadScript.h"
 #include "CMVP1stDirection.h"
+#include "ModernGL.h"
 #include "UIManager.h"
 #include "NewUISystem.h"
 
@@ -647,7 +648,7 @@ void CUITextListBox<T>::Render()
 
     MoveRenderLine();
 
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
 
     g_pRenderText->SetFont(g_hFont);
 
@@ -1353,7 +1354,7 @@ void CUISimpleChatListBox::Render()
     RenderInterface();
     MoveRenderLine();
 
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     g_pRenderText->SetFont(g_hFont);
 
     for (int i = 0; i < m_iNumRenderLine; ++i)
@@ -2240,7 +2241,7 @@ void CUILetterTextListBox::Render()
     RenderInterface();
     MoveRenderLine();
 
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     g_pRenderText->SetFont(g_hFont);
 
     for (int i = 0; i < m_iNumRenderLine; ++i)
@@ -2896,8 +2897,8 @@ void CUIRenderTextOriginal::RenderText(int iPos_x, int iPos_y, const wchar_t* ps
     if (m_dwBackColor != 0)
     {
         EnableAlphaTest();
-        glColor4ub(GetRed(m_dwBackColor), GetGreen(m_dwBackColor),
-            GetBlue(m_dwBackColor), GetAlpha(m_dwBackColor));
+        glColor4f(GetRed(m_dwBackColor)/255.0f, GetGreen(m_dwBackColor)/255.0f,
+            GetBlue(m_dwBackColor)/255.0f, GetAlpha(m_dwBackColor)/255.0f);
         RenderColor(RealBoxPos.x / g_fScreenRate_x, RealBoxPos.y / g_fScreenRate_y,
             RealBoxSize.cx / g_fScreenRate_x, RealBoxSize.cy / g_fScreenRate_y);
         EndRenderColor();
@@ -4119,11 +4120,11 @@ void CUISlideHelp::Render(BOOL bForceFadeOut)
     }
 
     EnableAlphaTest();
-    glColor4ub(0, 0, 0, (m_iAlphaRate > 180 ? m_iAlphaRate : (m_iAlphaRate - 25 < 0 ? 0 : m_iAlphaRate - 25)));
+    glColor4f(0.0f, 0.0f, 0.0f, (m_iAlphaRate > 180 ? m_iAlphaRate : (m_iAlphaRate - 25 < 0 ? 0 : m_iAlphaRate - 25))/255.0f);
 
     RenderColor(0, m_iPos_y - 3, WindowWidth, 1);
     RenderColor(0, m_iPos_y + m_iFontHeight + 2, WindowWidth, 1);
-    glColor4ub(0, 0, 0, (m_iAlphaRate - 25 < 0 ? 0 : m_iAlphaRate - 25));
+    glColor4f(0.0f, 0.0f, 0.0f, (m_iAlphaRate - 25 < 0 ? 0 : m_iAlphaRate - 25)/255.0f);
     RenderColor(0, m_iPos_y - 2, WindowWidth, m_iFontHeight + 4);
 
     EndRenderColor();
@@ -4801,21 +4802,21 @@ BOOL CUINewGuildMemberListBox::RenderDataLine(int iLineNumber)
 
     if (iCharacterLevel == 0)
     {
-        glColor4ub(255, 100, 50, 127);
+        glColor4f(1.0f, 100/255.0f, 50/255.0f, 127/255.0f);
         RenderColor(m_iPos_x, GetRenderLinePos_y(iLineNumber) - 3, m_iWidth - m_fScrollBarWidth + 1, 13);
-        glColor4f(255, 255, 255, 255);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     }
     else if (iCharacterLevel == 1)
     {
-        glColor4ub(255, 150, 80, 127);
+        glColor4f(1.0f, 150/255.0f, 80/255.0f, 127/255.0f);
         RenderColor(m_iPos_x, GetRenderLinePos_y(iLineNumber) - 3, m_iWidth - m_fScrollBarWidth + 1, 13);
-        glColor4f(255, 255, 255, 255);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     }
     else if (iCharacterLevel == 2)
     {
-        glColor4ub(255, 200, 100, 127);
+        glColor4f(1.0f, 200/255.0f, 100/255.0f, 127/255.0f);
         RenderColor(m_iPos_x, GetRenderLinePos_y(iLineNumber) - 3, m_iWidth - m_fScrollBarWidth + 1, 13);
-        glColor4f(255, 255, 255, 255);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     if (SLGetSelectLineNum() == m_iCurrentRenderEndLine + iLineNumber + 1)
@@ -5601,7 +5602,7 @@ void RenderGoldRect(float fPos_x, float fPos_y, float fWidth, float fHeight, int
     switch (iFillType)
     {
     case 1:
-        glColor4ub(146, 144, 141, 200);
+        glColor4f(146/255.0f, 144/255.0f, 141/255.0f, 200/255.0f);
         RenderColor(fPos_x, fPos_y, fWidth, fHeight);
         EndRenderColor();
         break;

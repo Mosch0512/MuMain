@@ -1,4 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -997,7 +997,7 @@ void BMD::RenderMesh(int meshIndex, int renderFlags, float alpha, int blendMeshI
     bool enableLight = LightEnable;
     if (meshIndex == StreamMesh)
     {
-        glColor3fv(BodyLight);
+        g_ImmediateModeEmulator.Color3fv(BodyLight);
         enableLight = false;
     }
     else if (enableLight)
@@ -1033,7 +1033,7 @@ void BMD::RenderMesh(int meshIndex, int renderFlags, float alpha, int blendMeshI
         DisableTexture();
         if (alpha >= 0.99f)
         {
-            glColor3fv(BodyLight);
+            g_ImmediateModeEmulator.Color3fv(BodyLight);
         }
         else
         {
@@ -1209,10 +1209,10 @@ void BMD::RenderMesh(int meshIndex, int renderFlags, float alpha, int blendMeshI
             DisableDepthTest();
         }
 
-        glColor3f(BodyLight[0] * blendMeshAlpha, 
+        g_ImmediateModeEmulator.Color3f(BodyLight[0] * blendMeshAlpha, 
             BodyLight[1] * blendMeshAlpha,
             BodyLight[2] * blendMeshAlpha);
-        //glColor3f(BlendMeshLight,BlendMeshLight,BlendMeshLight);
+        //g_ImmediateModeEmulator.Color3f(BlendMeshLight,BlendMeshLight,BlendMeshLight);
         enableLight = false;
     }
     else if ((renderFlags & RENDER_TEXTURE) == RENDER_TEXTURE)
@@ -1406,7 +1406,7 @@ void BMD::RenderMeshAlternative(int iRndExtFlag, int iParam, int i, int RenderFl
     {
         //vec3_t Light;
         //Vector(1.f,1.f,1.f,Light);
-        glColor3fv(BodyLight);
+        g_ImmediateModeEmulator.Color3fv(BodyLight);
         EnableLight = false;
     }
     else if (EnableLight)
@@ -1436,7 +1436,7 @@ void BMD::RenderMeshAlternative(int iRndExtFlag, int iParam, int i, int RenderFl
         DisableTexture();
         if (Alpha >= 0.99f)
         {
-            glColor3fv(BodyLight);
+            g_ImmediateModeEmulator.Color3fv(BodyLight);
         }
         else
         {
@@ -1592,8 +1592,8 @@ void BMD::RenderMeshAlternative(int iRndExtFlag, int iParam, int i, int RenderFl
             DisableDepthTest();
         }
 
-        glColor3f(BodyLight[0] * BlendMeshLight, BodyLight[1] * BlendMeshLight, BodyLight[2] * BlendMeshLight);
-        //glColor3f(BlendMeshLight,BlendMeshLight,BlendMeshLight);
+        g_ImmediateModeEmulator.Color3f(BodyLight[0] * BlendMeshLight, BodyLight[1] * BlendMeshLight, BodyLight[2] * BlendMeshLight);
+        //g_ImmediateModeEmulator.Color3f(BlendMeshLight,BlendMeshLight,BlendMeshLight);
         EnableLight = false;
     }
     else if ((RenderFlag & RENDER_TEXTURE) == RENDER_TEXTURE)
@@ -1678,11 +1678,11 @@ void BMD::RenderMeshAlternative(int iRndExtFlag, int iParam, int i, int RenderFl
             case RENDER_CHROME:
             {
                 if (Alpha >= 0.99f)
-                    glColor3fv(BodyLight);
+                    g_ImmediateModeEmulator.Color3fv(BodyLight);
                 else
                     glColor4f(BodyLight[0], BodyLight[1], BodyLight[2], Alpha);
                 int ni = tp->NormalIndex[k];
-                glTexCoord2f(g_chrome[ni][0], g_chrome[ni][1]);
+                g_ImmediateModeEmulator.TexCoord2f(g_chrome[ni][0], g_chrome[ni][1]);
                 break;
             }
             }
@@ -1819,10 +1819,10 @@ void BMD::RenderMeshEffect(int i, int iType, int iSubType, vec3_t Angle, VOID* o
             case MODEL_GOLEM_STONE:
                 if (rand_fps_check(45) && iEffectCount < 20)
                 {
-                    if (iSubType == 0) {	//. 불골렘
+                    if (iSubType == 0) {	//. ???
                         CreateEffect(MODEL_GOLEM_STONE, VertexTransform[i][vi], angle, Light);
                     }
-                    else if (iSubType == 1) {	//. 독골렘
+                    else if (iSubType == 1) {	//. ???
                         CreateEffect(MODEL_BIG_STONE_PART1, VertexTransform[i][vi], angle, Light, 2);
                         CreateEffect(MODEL_BIG_STONE_PART2, VertexTransform[i][vi], angle, Light, 2);
                     }
@@ -1876,7 +1876,7 @@ void BMD::RenderBody(int Flag, float Alpha, int BlendMesh, float BlendMeshLight,
     if (!LightEnable)
     {
         if (Alpha >= 0.99f)
-            glColor3fv(BodyLight);
+            g_ImmediateModeEmulator.Color3fv(BodyLight);
         else
             glColor4f(BodyLight[0], BodyLight[1], BodyLight[2], Alpha);
     }
@@ -1900,23 +1900,23 @@ void BMD::RenderBody(int Flag, float Alpha, int BlendMesh, float BlendMeshLight,
                 {
                     DisableAlphaBlend();
                     if (Alpha >= 0.99f)
-                        glColor3f(0.f, 0.f, 0.f);
+                        g_ImmediateModeEmulator.Color3f(0.f, 0.f, 0.f);
                     else
                         glColor4f(0.f, 0.f, 0.f, Alpha);
 
                     RenderMesh(i, RENDER_COLOR | RENDER_SHADOWMAP, Alpha, iBlendMesh, BlendMeshLight, BlendMeshTexCoordU, BlendMeshTexCoordV);
-                    glColor3f(1.f, 1.f, 1.f);
+                    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
                 }
                 else if (shadowType == SHADOW_RENDER_TEXTURE)
                 {
                     DisableAlphaBlend();
                     if (Alpha >= 0.99f)
-                        glColor3f(0.f, 0.f, 0.f);
+                        g_ImmediateModeEmulator.Color3f(0.f, 0.f, 0.f);
                     else
                         glColor4f(0.f, 0.f, 0.f, Alpha);
 
                     RenderMesh(i, RENDER_TEXTURE | RENDER_SHADOWMAP, Alpha, iBlendMesh, BlendMeshLight, BlendMeshTexCoordU, BlendMeshTexCoordV);
-                    glColor3f(1.f, 1.f, 1.f);
+                    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
                 }
             }
         }
@@ -1939,7 +1939,7 @@ void BMD::RenderBodyAlternative(int iRndExtFlag, int iParam, int Flag, float Alp
     if (!LightEnable)
     {
         if (Alpha >= 0.99f)
-            glColor3fv(BodyLight);
+            g_ImmediateModeEmulator.Color3fv(BodyLight);
         else
             glColor4f(BodyLight[0], BodyLight[1], BodyLight[2], Alpha);
     }
@@ -1995,7 +1995,7 @@ void BMD::RenderMeshTranslate(int i, int RenderFlag, float Alpha, int BlendMesh,
     {
         //vec3_t Light;
         //Vector(1.f,1.f,1.f,Light);
-        glColor3fv(BodyLight);
+        g_ImmediateModeEmulator.Color3fv(BodyLight);
         EnableLight = false;
     }
     else if (EnableLight)
@@ -2017,7 +2017,7 @@ void BMD::RenderMeshTranslate(int i, int RenderFlag, float Alpha, int BlendMesh,
         else
             DisableAlphaBlend();
         DisableTexture();
-        glColor3fv(BodyLight);
+        g_ImmediateModeEmulator.Color3fv(BodyLight);
     }
     else if ((RenderFlag & RENDER_CHROME) == RENDER_CHROME
         || (RenderFlag & RENDER_METAL) == RENDER_METAL
@@ -2091,8 +2091,8 @@ void BMD::RenderMeshTranslate(int i, int RenderFlag, float Alpha, int BlendMesh,
             EnableAlphaBlendMinus();
         else
             EnableAlphaBlend();
-        glColor3f(BodyLight[0] * BlendMeshLight, BodyLight[1] * BlendMeshLight, BodyLight[2] * BlendMeshLight);
-        //glColor3f(BlendMeshLight,BlendMeshLight,BlendMeshLight);
+        g_ImmediateModeEmulator.Color3f(BodyLight[0] * BlendMeshLight, BodyLight[1] * BlendMeshLight, BodyLight[2] * BlendMeshLight);
+        //g_ImmediateModeEmulator.Color3f(BlendMeshLight,BlendMeshLight,BlendMeshLight);
         EnableLight = false;
     }
     else if ((RenderFlag & RENDER_TEXTURE) == RENDER_TEXTURE)
@@ -2192,7 +2192,7 @@ void BMD::RenderBodyTranslate(int Flag, float Alpha, int BlendMesh, float BlendM
     if (!LightEnable)
     {
         if (Alpha >= 0.99f)
-            glColor3fv(BodyLight);
+            g_ImmediateModeEmulator.Color3fv(BodyLight);
         else
             glColor4f(BodyLight[0], BodyLight[1], BodyLight[2], Alpha);
     }
@@ -2456,7 +2456,7 @@ void BMD::RenderBone(float(*BoneMatrix)[3][4])
 {
     DisableTexture();
     glDepthFunc(GL_ALWAYS);
-    glColor3f(0.8f, 0.8f, 0.2f);
+    g_ImmediateModeEmulator.Color3f(0.8f, 0.8f, 0.2f);
     for (int i = 0; i < NumBones; i++)
     {
         Bone_t* b = &Bones[i];

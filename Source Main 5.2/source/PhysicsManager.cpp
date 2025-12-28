@@ -788,11 +788,11 @@ void CPhysicsCloth::Render(vec3_t* pvColor, int iLevel)
 
     if (pvColor)
     {
-        glColor3fv(*pvColor);
+        g_ImmediateModeEmulator.Color3fv(*pvColor);
     }
     else
     {
-        glColor3f(1.f, 1.f, 1.f);
+        g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     }
 
     if (PCT_MASK_LIGHT & m_dwType)
@@ -814,7 +814,7 @@ void CPhysicsCloth::Render(vec3_t* pvColor, int iLevel)
                 iOffset++;
             }
         }
-        glColor3f(Lum, Lum, Lum);
+        g_ImmediateModeEmulator.Color3f(Lum, Lum, Lum);
         EnableAlphaBlend();
     }
 #ifdef RENDER_CLOTH
@@ -877,7 +877,7 @@ void CPhysicsCloth::RenderVertex(vec3_t* pvRenderPos, int xVertex, int yVertex)
 void CPhysicsCloth::RenderCollisions(void)
 {
 #ifdef RENDER_COLLISION
-    glColor3f(1.0f, 1.0f, 0.6f);
+    g_ImmediateModeEmulator.Color3f(1.0f, 1.0f, 0.6f);
     BindTexture(BITMAP_CLOUD);
     CNode<CPhysicsCollision*>* pHead = m_lstCollision.FindHead();
     for (; pHead; pHead = m_lstCollision.GetNext(pHead))

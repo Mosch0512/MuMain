@@ -47,6 +47,8 @@
 #include "MonkSystem.h"
 #include <NewUISystem.h>
 
+#include "ModernGL.h"
+
 CHARACTER* CharactersClient;
 CHARACTER CharacterView;
 CHARACTER* Hero;
@@ -6389,7 +6391,7 @@ void RenderGuild(OBJECT* o, int Type, vec3_t vPos)
 {
     EnableAlphaTest();
     EnableCullFace();
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     BindTexture(BITMAP_GUILD);
     glPushMatrix();
 

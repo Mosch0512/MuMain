@@ -648,7 +648,7 @@ void SEASON3B::CNewUIGuildInfoWindow::Render_Guild_History()
     RenderImage(IMAGE_GUILDINFO_BOTTOM_LEFT, m_Pos.x + 10, m_Pos.y + 215, 14, 14);
     RenderImage(IMAGE_GUILDINFO_BOTTOM_RIGHT, m_Pos.x + 167, m_Pos.y + 215, 14, 14);
 
-    glColor4ub(0, 0, 0, 255);
+    glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
     RenderColor(m_Pos.x + 11, m_Pos.y + 260, 165, 84);
     EndRenderColor();
 
@@ -791,10 +791,10 @@ void SEASON3B::CNewUIGuildInfoWindow::Render_Guild_Info()
     }
     else
     {
-        glColor4ub(21, 21, 21, 150);
+        glColor4f(21/255.0f, 21/255.0f, 21/255.0f, 150/255.0f);
         RenderColor(m_Pos.x + 12, m_Pos.y + 12 + 113, 165, 85);
 
-        glColor4ub(59, 59, 59, 150);
+        glColor4f(59/255.0f, 59/255.0f, 59/255.0f, 150/255.0f);
         RenderColor(m_Pos.x + 12, m_Pos.y + 12 + 98, 165, 15);
         EndRenderColor();
 
@@ -829,9 +829,9 @@ void SEASON3B::CNewUIGuildInfoWindow::Render_Guild_Info()
 
 void SEASON3B::CNewUIGuildInfoWindow::Render_Guild_Enum()
 {
-    glColor4ub(21, 21, 21, 150);
+    glColor4f(21/255.0f, 21/255.0f, 21/255.0f, 150/255.0f);
     RenderColor(m_Pos.x + 12, m_Pos.y + 12 + 113, 165, 232);
-    glColor4ub(59, 59, 59, 150);
+    glColor4f(59/255.0f, 59/255.0f, 59/255.0f, 150/255.0f);
     RenderColor(m_Pos.x + 12, m_Pos.y + 12 + 93, 165, 20);
     EndRenderColor();
 

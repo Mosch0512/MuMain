@@ -349,7 +349,7 @@ float CSWaterTerrain::GetWaterTerrain(float xf, float yf)
 void CSWaterTerrain::RenderWaterAlphaBitmap(int Texture, float xf, float yf, float SizeX, float SizeY, vec3_t Light, float Rotation, float Alpha, float Height)
 {
     if (Alpha == 1.f)
-        glColor3fv(Light);
+        g_ImmediateModeEmulator.Color3fv(Light);
     else
         glColor4f(Light[0], Light[1], Light[2], Alpha);
 

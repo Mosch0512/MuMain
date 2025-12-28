@@ -967,10 +967,10 @@ void SEASON3B::CNewUICursedTempleSystem::RenderMiniMap()
 /*
     for ( int j = 0; j < 7; ++j )
     {
-        glColor3f ( 1.f, 0.f, 0.f );
+        glColor4f ( 1.f, 0.f, 0.f, 1.f );
         RenderColor( MiniMapPos( posX[j], posY[j], m_Scale, AXIS_X ),
                      MiniMapPos( posX[j], posY[j], m_Scale, AXIS_Y ), 3, 3 );
-        glColor3f ( 1.f, 1.f, 1.f );
+        glColor4f ( 1.f, 1.f, 1.f, 1.f );
     }
     DisableAlphaBlend();
 */

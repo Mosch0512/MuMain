@@ -1895,7 +1895,7 @@ void RenderTerrainBitmapTile(float xf, float yf, float lodf, int lodi, vec3_t c[
 
 void RenderTerrainBitmap(int Texture, int mxi, int myi, float Rotation)
 {
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
 
     vec3_t Angle;
     Vector(0.f, 0.f, Rotation, Angle);
@@ -1931,7 +1931,7 @@ void RenderTerrainBitmap(int Texture, int mxi, int myi, float Rotation)
 void RenderTerrainAlphaBitmap(int Texture, float xf, float yf, float SizeX, float SizeY, vec3_t Light, float Rotation, float Alpha, float Height)
 {
     if (Alpha == 1.f)
-        glColor3fv(Light);
+        g_ImmediateModeEmulator.Color3fv(Light);
     else
         glColor4f(Light[0], Light[1], Light[2], Alpha);
 

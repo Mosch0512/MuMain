@@ -22,6 +22,7 @@
 #include "BoneManager.h"
 
 #include "GuildCache.h"
+#include "ModernGL.h"
 #include "ZzzInterface.h"
 
 
@@ -592,7 +593,7 @@ namespace battleCastle
 
         EnableAlphaTest();
 
-        glColor3f(0.3f, 0.3f, 0.25f);
+        g_ImmediateModeEmulator.Color3f(0.3f, 0.3f, 0.25f);
         float WindX2 = (float)((int)WorldTime % 100000) * 0.0005f;
         RenderBitmapUV(BITMAP_CHROME + 3, 0.f, 0.f, 640.f, 480.f - 45.f, WindX2, 0.f, 3.f, 2.f);
         EnableAlphaBlend();
@@ -1216,7 +1217,7 @@ namespace battleCastle
             if (IsBattleCastleStart() == false)
             {
                 DisableAlphaBlend();
-                glColor3f(0.f, 0.f, 0.f);
+                g_ImmediateModeEmulator.Color3f(0.f, 0.f, 0.f);
                 b->RenderBodyShadow(o->BlendMesh, o->HiddenMesh);
             }
             return true;
@@ -1226,7 +1227,7 @@ namespace battleCastle
             if (IsBattleCastleStart())
             {
                 b->BeginRender(o->Alpha);
-                glColor3fv(b->BodyLight);
+                g_ImmediateModeEmulator.Color3fv(b->BodyLight);
                 b->RenderMesh(3, RENDER_TEXTURE, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
                 Vector(0.3f, 0.3f, 0.3f, b->BodyLight);
                 b->RenderMesh(3, RENDER_BRIGHT | RENDER_CHROME, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV, BITMAP_CHROME);

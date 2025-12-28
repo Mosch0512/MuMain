@@ -24,6 +24,8 @@
 
 #include <cmath>
 
+#include "ModernGL.h"
+
 float RainTarget = 0;
 float RainCurrent = 0.f;
 
@@ -528,7 +530,7 @@ void RenderLeaves()
         EnableAlphaTest();
     }
 
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
 #ifdef DEVIAS_XMAS_EVENT
     int iMaxLeaves;
     if (World == WD_2DEVIAS)

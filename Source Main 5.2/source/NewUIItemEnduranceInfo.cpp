@@ -6,6 +6,7 @@
 #include "NewUISystem.h"
 
 #include "CharacterManager.h"
+#include "ModernGL.h"
 
 #ifdef PJH_FIX_SPRIT
 #include "GIPetManager.h"
@@ -245,7 +246,7 @@ bool SEASON3B::CNewUIItemEnduranceInfo::Update()
 bool SEASON3B::CNewUIItemEnduranceInfo::Render()
 {
     EnableAlphaTest();
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     g_pRenderText->SetFont(g_hFont);
     g_pRenderText->SetBgColor(0, 0, 0, 0);
     g_pRenderText->SetTextColor(255, 255, 255, 255);

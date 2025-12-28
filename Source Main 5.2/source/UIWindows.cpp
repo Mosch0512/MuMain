@@ -16,6 +16,7 @@
 #include "MapManager.h"
 #include "CharacterManager.h"
 #include "DSPlaySound.h"
+#include "ModernGL.h"
 #include "NewUISystem.h"
 
 
@@ -801,43 +802,43 @@ void SetLineColor(int iType, float fAlphaRate = 1.0f)
     switch (iType)
     {
     case 0:
-        glColor4ub(146, 134, 121, ubWindowAlpha);	break;
+        glColor4f(146/255.0f, 134/255.0f, 121/255.0f, ubWindowAlpha/255.0f);	break;
     case 1:
-        glColor4ub(37, 37, 37, ubWindowAlpha);		break;
+        glColor4f(37/255.0f, 37/255.0f, 37/255.0f, ubWindowAlpha/255.0f);		break;
     case 2:
-        glColor4ub(106, 97, 88, ubWindowAlpha);		break;
+        glColor4f(106/255.0f, 97/255.0f, 88/255.0f, ubWindowAlpha/255.0f);		break;
     case 3:
-        glColor4ub(0, 0, 0, 179 * fAlphaRate);		break;
+        glColor4f(0.0f, 0.0f, 0.0f, 179/255.0f * fAlphaRate);		break;
     case 4:
-        glColor4ub(173, 167, 150, ubWindowAlpha);	break;
+        glColor4f(173/255.0f, 167/255.0f, 150/255.0f, ubWindowAlpha/255.0f);	break;
     case 5:
-        glColor4ub(53, 49, 48, ubWindowAlpha);		break;
+        glColor4f(53/255.0f, 49/255.0f, 48/255.0f, ubWindowAlpha/255.0f);		break;
     case 6:
-        glColor4ub(26, 22, 21, ubWindowAlpha);		break;
+        glColor4f(26/255.0f, 22/255.0f, 21/255.0f, ubWindowAlpha/255.0f);		break;
     case 7:
-        glColor4ub(0, 0, 0, 255 * fAlphaRate);		break;
+        glColor4f(0.0f, 0.0f, 0.0f, fAlphaRate);		break;
     case 8:
-        glColor4ub(153, 156, 166, ubWindowAlpha);	break;
+        glColor4f(153/255.0f, 156/255.0f, 166/255.0f, ubWindowAlpha/255.0f);	break;
     case 9:
-        glColor4ub(136, 138, 147, ubWindowAlpha);	break;
+        glColor4f(136/255.0f, 138/255.0f, 147/255.0f, ubWindowAlpha/255.0f);	break;
     case 10:
-        glColor4ub(83, 85, 93, ubWindowAlpha);		break;
+        glColor4f(83/255.0f, 85/255.0f, 93/255.0f, ubWindowAlpha/255.0f);		break;
     case 11:
-        glColor4ub(102, 104, 112, ubWindowAlpha);	break;
+        glColor4f(102/255.0f, 104/255.0f, 112/255.0f, ubWindowAlpha/255.0f);	break;
     case 12:
-        glColor4ub(0, 0, 8, ubWindowAlpha);			break;
+        glColor4f(0.0f, 0.0f, 8/255.0f, ubWindowAlpha/255.0f);			break;
     case 13:
-        glColor4ub(0, 0, 0, ubWindowAlpha);			break;
+        glColor4f(0.0f, 0.0f, 0.0f, ubWindowAlpha/255.0f);			break;
     case 14:
-        glColor4ub(185, 185, 185, ubWindowAlpha);	break;
+        glColor4f(185/255.0f, 185/255.0f, 185/255.0f, ubWindowAlpha/255.0f);	break;
     case 15:
-        glColor4ub(194, 194, 194, ubWindowAlpha);	break;
+        glColor4f(194/255.0f, 194/255.0f, 194/255.0f, ubWindowAlpha/255.0f);	break;
     case 16:
-        glColor4ub(194, 194, 194, ubWindowAlpha);	break;
+        glColor4f(194/255.0f, 194/255.0f, 194/255.0f, ubWindowAlpha/255.0f);	break;
     case 17:
-        glColor4ub(209, 188, 134, ubWindowAlpha);	break;
+        glColor4f(209/255.0f, 188/255.0f, 134/255.0f, ubWindowAlpha/255.0f);	break;
     case 18:
-        glColor4ub(205, 209, 133, ubWindowAlpha);	break;
+        glColor4f(205/255.0f, 209/255.0f, 133/255.0f, ubWindowAlpha/255.0f);	break;
     default:	break;
     }
 }
@@ -5520,9 +5521,9 @@ void CUIFriendMenu::RenderWindowList()
         auto* pWindow = (CUIChatWindow*)g_pWindowMgr->GetWindow(*m_WindowListIter);
         if (pWindow != NULL && pWindow->GetUserCount() > 2)
         {
-            glColor3f(255, 0, 0);
+            g_ImmediateModeEmulator.Color3f(255, 0, 0);
             RenderBitmap(BITMAP_INTERFACE_EX + 15, (float)m_iPos_x + m_iWidth - 7, (float)m_iFriendMenuPos_y - (m_fLineHeight + 4) * i + 5, (float)4, (float)6, 0.f, 0.f, 4.f / 8.f, 6.f / 8.f);
-            glColor3f(255, 255, 255);
+            g_ImmediateModeEmulator.Color3f(255, 255, 255);
         }
     }
 }

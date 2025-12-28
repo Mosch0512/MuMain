@@ -28,7 +28,7 @@ void RenderShadowVolumesAsFrame(void)
     DisableAlphaBlend();
     DisableTexture();
     vec3_t vLight = { 0.4f, 0.f, 0.f };
-    glColor3fv(vLight);
+    g_ImmediateModeEmulator.Color3fv(vLight);
 
     while (m_qSV.GetCount() > 0)
     {

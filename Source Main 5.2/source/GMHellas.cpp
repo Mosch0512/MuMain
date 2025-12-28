@@ -18,6 +18,7 @@
 #include "NewUISystem.h"
 #include "MapManager.h"
 #include "CharacterManager.h"
+#include "ModernGL.h"
 #include "SkillManager.h"
 
 extern  int  WaterTextureNumber;
@@ -274,7 +275,7 @@ void AddObjectDescription(wchar_t* Text, vec3_t position)
 
 void RenderObjectDescription()
 {
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     while (!g_qObjDes.empty())
     {
         ObjectDescript QD = g_qObjDes.front();

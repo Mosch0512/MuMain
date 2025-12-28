@@ -20,6 +20,7 @@
 #include "CSChaosCastle.h"
 #include "MapManager.h"
 #include "CharacterManager.h"
+#include "ModernGL.h"
 #include "SkillManager.h"
 #include "./Time/CTimCheck.h"
 #include "MonkSystem.h"
@@ -2511,9 +2512,9 @@ void SEASON3B::CNewUISkillList::RenderSkillIcon(int iIndex, float x, float y, fl
 
     if (iHotKey != -1)
     {
-        glColor3f(1.f, 0.9f, 0.8f);
+        g_ImmediateModeEmulator.Color3f(1.f, 0.9f, 0.8f);
         SEASON3B::RenderNumber(x + 20, y + 20, iHotKey);
-        glColor3f(1.f, 1.f, 1.f);
+        g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     }
 
     if ((bySkillType == AT_SKILL_CHAIN_DRIVE

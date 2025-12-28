@@ -13,6 +13,7 @@
 #include "npcBreeder.h"
 #include "ZzzOpenData.h"
 #include "DuelMgr.h"
+#include "ModernGL.h"
 #include "NewUISystem.h"
 #include "w_CursedTemple.h"
 
@@ -446,9 +447,9 @@ void SEASON3B::CNewUIKeyPadButton::Render()
     }
     else
     {
-        glColor3f(0.80f, 0.80f, 0.80f);
+        g_ImmediateModeEmulator.Color3f(0.80f, 0.80f, 0.80f);
         RenderImage(BITMAP_INVENTORY + 17, GetPosX(), GetPosY(), GetWidth(), GetHeight());
-        glColor3f(1.f, 1.f, 1.f);
+        g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     }
 }
 
@@ -790,14 +791,14 @@ void SEASON3B::CNewUIKeyPadMsgBox::RenderFrame()
 void SEASON3B::CNewUIKeyPadMsgBox::RenderKeyPadInput()
 {
     float x, y, width, height;
-    glColor3f(0.3f, 0.3f, 0.3f);
+    g_ImmediateModeEmulator.Color3f(0.3f, 0.3f, 0.3f);
     width = 10.f * m_iInputLimit + 12.f;
     height = 18.f;
     x = GetPos().x + (MSGBOX_WIDTH / 2) - (width / 2);
     y = GetPos().y + 55;
 
     RenderBitmap(BITMAP_INTERFACE + 23, x, y, width, height, 0.f, 0.f, 40 / 64.f, 18 / 32.f);
-    glColor3f(1.0f, 1.0f, 1.0f);
+    g_ImmediateModeEmulator.Color3f(1.0f, 1.0f, 1.0f);
 
     std::wstring strInput = L"";
     for (int i = 0; i < GetInputSize(); ++i)
@@ -1557,7 +1558,7 @@ void SEASON3B::CGemIntegrationUnityMsgBox::SetButtonInfo()
     for (int k = 0; k < (int)COMGEM::eCOMTYPE_END; k++)
     {
         cButton.SetInfo(CNewUIMessageBoxMng::IMAGE_MSGBOX_BTN_EMPTY, x + 50.0f, y + (height + 10.0f) * k, MSGBOX_BTN_EMPTY_WIDTH + 20, height, CNewUIMessageBoxButton::MSGBOX_BTN_SIZE_EMPTY);
-        // 1808 "%d개 조합(%d젠 소요)"
+        // 1808 "%d? ??(%d? ??)"
         swprintf(szTemp, GlobalText[1808], 10 * (k + 1), 500000 * (k + 1));
         cButton.SetText(szTemp);
         m_cMixButton.push_back(cButton);
@@ -2449,7 +2450,7 @@ CALLBACK_RESULT SEASON3B::CSystemMenuMsgBox::ChooseCharacterBtnDown(class CNewUI
     g_ErrorReport.Write(L"> Menu - Join with another character. ");
     g_ErrorReport.WriteCurrentTime();
 
-    //  게임내에서 설정한 데이터 저장.
+    //  ????? ??? ??? ??.
     SaveOptions();
     SaveMacro(L"Data\\Macro.txt");
 
@@ -4353,7 +4354,7 @@ void CCherryBlossomMsgBox::SetButtonInfo()
     x = GetPos().x + msgboxhalfwidth - btnhalfwidth;
     y = GetPos().y + GetSize().cy - (MSGBOX_BTN_EMPTY_HEIGHT + MSGBOX_BTN_BOTTOM_BLANK);
     m_BtnExit.SetInfo(CNewUIMessageBoxMng::IMAGE_MSGBOX_BTN_EMPTY_SMALL, x, y, width, height, CNewUIMessageBoxButton::MSGBOX_BTN_SIZE_EMPTY_SMALL);
-    // 1002 "닫기"
+    // 1002 "??"
     m_BtnExit.SetText(GlobalText[1002]);
 }
 
@@ -5847,11 +5848,11 @@ void SEASON3B::CLuckyTradeMenuMsgBox::SetButtonInfo()
     x = GetPos().x + msgboxhalfwidth - btnhalfwidth;
     y = GetPos().y + 85;
     m_BtnTrade.SetInfo(CNewUIMessageBoxMng::IMAGE_MSGBOX_BTN_EMPTY, x, y, width, height, CNewUIMessageBoxButton::MSGBOX_BTN_SIZE_EMPTY);
-    m_BtnTrade.SetText(L"럭키아이템 교환");	// "GlobalText"
+    m_BtnTrade.SetText(L"????? ??");	// "GlobalText"
 
     y = GetPos().y + 120;
     m_BtnRefinery.SetInfo(CNewUIMessageBoxMng::IMAGE_MSGBOX_BTN_EMPTY, x, y, width, height, CNewUIMessageBoxButton::MSGBOX_BTN_SIZE_EMPTY);
-    m_BtnRefinery.SetText(L"럭키아이템 제련");	// "GlobalText"
+    m_BtnRefinery.SetText(L"????? ??");	// "GlobalText"
 
     width = MSGBOX_BTN_EMPTY_SMALL_WIDTH;
     btnhalfwidth = width / 2.f;
@@ -5891,12 +5892,12 @@ void SEASON3B::CLuckyTradeMenuMsgBox::RenderTexts()
     g_pRenderText->SetBgColor(0, 0, 0, 0);
     g_pRenderText->SetTextColor(255, 255, 255, 255);
     g_pRenderText->SetFont(g_hFontBold);
-    swprintf(szText, L"럭키아이템 교환NPC");	// "LuckyItem Trade NPC"
+    swprintf(szText, L"????? ??NPC");	// "LuckyItem Trade NPC"
     g_pRenderText->RenderText(fPos_x, fPos_y, szText, MSGBOX_WIDTH - 20.0f, 0, RT3_SORT_CENTER);
 
     fPos_y += 15;
     g_pRenderText->SetFont(g_hFont);
-    swprintf(szText, L"럭키아이템으로 교환하거나 제련할 수 있습니?");
+    swprintf(szText, L"??????? ????? ??? ? ????");
     g_pRenderText->RenderText(fPos_x, fPos_y + 1 * 18, szText, MSGBOX_WIDTH - 20.0f, 0, RT3_SORT_CENTER);
 }
 
@@ -6503,7 +6504,7 @@ void SEASON3B::CElpisMsgBox::RenderTexts()
     g_pRenderText->RenderText(fPos_x, fPos_y + 0 * 18, szText, MSGBOX_WIDTH - 20.0f, 0, RT3_SORT_CENTER);
 
     fPos_y += 15;
-    g_pRenderText->SetTextColor(220, 183, 131, 255);	// 황금색
+    g_pRenderText->SetTextColor(220, 183, 131, 255);	// ???
 
     switch (m_iMessageType)
     {
@@ -6965,7 +6966,7 @@ void SEASON3B::CResetCharacterPointMsgBox::SetButtonInfo()
     x = GetPos().x + msgboxhalfwidth - btnhalfwidth;
     y = GetPos().y + 105;
     m_ResetCharacterPointBtn.SetInfo(CNewUIMessageBoxMng::IMAGE_MSGBOX_BTN_EMPTY, x, y, width, height, CNewUIMessageBoxButton::MSGBOX_BTN_SIZE_EMPTY);
-    m_ResetCharacterPointBtn.SetText(GlobalText[1884]); // "스탯 초기화"
+    m_ResetCharacterPointBtn.SetText(GlobalText[1884]); // "?? ???"
 
     width = MSGBOX_BTN_EMPTY_SMALL_WIDTH;
     btnhalfwidth = width / 2.f;

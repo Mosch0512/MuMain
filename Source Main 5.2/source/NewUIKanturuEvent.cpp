@@ -12,6 +12,7 @@
 #include "ChangeRingManager.h"
 #include "CDirection.h"
 #include "DSPlaySound.h"
+#include "ModernGL.h"
 
 SEASON3B::CNewUIKanturu2ndEnterNpc::CNewUIKanturu2ndEnterNpc()
 {
@@ -739,7 +740,7 @@ void SEASON3B::CNewUIKanturuInfoWindow::RenderInfo()
         g_pRenderText->RenderText(m_Pos.x + 48, m_Pos.y + 57, L":");
     }
 
-    glColor3f(134.f / 255.f, 134.f / 255.f, 199.f / 255.f);
+    g_ImmediateModeEmulator.Color3f(134.f / 255.f, 134.f / 255.f, 199.f / 255.f);
     SEASON3B::RenderNumber(m_Pos.x + 35, m_Pos.y + 55, m_iMinute, 1.f);
     SEASON3B::RenderNumber(m_Pos.x + 65, m_Pos.y + 55, iSecond, 1.f);
 }

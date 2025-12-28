@@ -16,6 +16,7 @@
 #include "ZzzCharacter.h"
 
 #include "DSPlaySound.h"
+#include "ModernGL.h"
 #include "SocketSystem.h"
 
 using namespace SEASON3B;
@@ -1005,7 +1006,7 @@ void CNewUIMixInventory::RenderMixEffect()
         {
             for (int w = 0; w < iWidth; ++w)
             {
-                glColor3f((float)(rand() % 6 + 6) * 0.1f, (float)(rand() % 4 + 4) * 0.1f, 0.2f);
+                g_ImmediateModeEmulator.Color3f((float)(rand() % 6 + 6) * 0.1f, (float)(rand() % 4 + 4) * 0.1f, 0.2f);
                 float Rotate = (float)((int)(WorldTime) % 100) * 20.f;
                 float Scale = 5.f + (rand() % 10);
                 float x = m_pNewInventoryCtrl->GetPos().x +

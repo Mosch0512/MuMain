@@ -695,7 +695,7 @@ void CUIGuildInfo::Render()
 
     ptOrigin.x = GetPosition_x() + 15;
     ptOrigin.y = GetPosition_y() + 91;
-    glColor4ub(146, 144, 141, 255);
+    glColor4f(146/255.0f, 144/255.0f, 141/255.0f, 1.0f);
     if (m_nCurrentTab != 0) RenderColor(ptOrigin.x, ptOrigin.y, 54, 1);
     ptOrigin.x += 54;
     if (m_nCurrentTab != 1) RenderColor(ptOrigin.x, ptOrigin.y, 54, 1);

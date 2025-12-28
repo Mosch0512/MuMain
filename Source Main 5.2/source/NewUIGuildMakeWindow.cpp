@@ -115,7 +115,7 @@ namespace
         switch (fill)
         {
         case 1:
-            glColor4ub(146, 144, 141, 200);
+            glColor4f(146/255.0f, 144/255.0f, 141/255.0f, 200/255.0f);
             RenderColor(x, y, sx, sy);
             EndRenderColor();
             break;

@@ -97,7 +97,7 @@ void CSideHair::RenderLine(vec3_t v1, vec3_t v2, vec3_t c1, vec3_t c2)
 {
     vec3_t p1, p2, d;
 
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     VectorSubtract(v2, v1, d);
     const float fLength = VectorLength(d);
     float fTextureMove = 0.0f;
@@ -111,7 +111,7 @@ void CSideHair::RenderLine(vec3_t v1, vec3_t v2, vec3_t c1, vec3_t c2)
     VectorAdd(p2, d, p2);
 
     float fTextureV = (float)(rand() % 100) * 0.01f;
-    glColor3f(1.f, 1.f, 1.f);
+    g_ImmediateModeEmulator.Color3f(1.f, 1.f, 1.f);
     BindTexture(BITMAP_ROBE + 4);
     EnableAlphaBlendMinus();
     //EnableAlphaTest();
@@ -140,12 +140,12 @@ void CSideHair::RenderLine(vec3_t v1, vec3_t v2, vec3_t c1, vec3_t c2)
     VectorNormalize(vOrtho);
     VectorScale(vOrtho, 10.f, vOrtho);
     g_ImmediateModeEmulator.Begin(GL_QUADS);
-    //glColor3fv( c1);
+    //g_ImmediateModeEmulator.Color3fv( c1);
     g_ImmediateModeEmulator.TexCoord2f(0.f, 0.f + fTextureMove + fTextureV); g_ImmediateModeEmulator.Vertex3f(p1[0] - vOrtho[0], p1[1] - vOrtho[1], p1[2] - vOrtho[2]);
-    //glColor3fv( c2);
+    //g_ImmediateModeEmulator.Color3fv( c2);
     g_ImmediateModeEmulator.TexCoord2f(0.f, 1.f - fTextureMove + fTextureV); g_ImmediateModeEmulator.Vertex3f(p2[0] - vOrtho[0], p2[1] - vOrtho[1], p2[2] - vOrtho[2]);
     g_ImmediateModeEmulator.TexCoord2f(1.f, 1.f - fTextureMove + fTextureV); g_ImmediateModeEmulator.Vertex3f(p2[0] + vOrtho[0], p2[1] + vOrtho[1], p2[2] + vOrtho[2]);
-    //glColor3fv( c1);
+    //g_ImmediateModeEmulator.Color3fv( c1);
     g_ImmediateModeEmulator.TexCoord2f(1.f, 0.f + fTextureMove + fTextureV); g_ImmediateModeEmulator.Vertex3f(p1[0] + vOrtho[0], p1[1] + vOrtho[1], p1[2] + vOrtho[2]);
     g_ImmediateModeEmulator.End();
     //g_OpenglLib.Enable(GL_CULL_FACE);
