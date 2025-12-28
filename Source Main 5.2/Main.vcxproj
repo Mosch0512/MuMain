@@ -399,6 +399,7 @@
     <ClCompile Include="source\CSPetSystem.cpp" />
     <ClCompile Include="source\CSQuest.cpp" />
     <ClCompile Include="source\CSWaterTerrain.cpp" />
+    <ClCompile Include="source\CustomCamera3D.cpp" />
     <ClCompile Include="source\Dotnet\Connection.cpp" />
     <ClCompile Include="source\DSplaysound.cpp" />
     <ClCompile Include="source\DSwaveIO.cpp" />
@@ -809,6 +810,7 @@
     <ClInclude Include="source\CSPetSystem.h" />
     <ClInclude Include="source\CSQuest.h" />
     <ClInclude Include="source\CSWaterTerrain.h" />
+    <ClInclude Include="source\CustomCamera3D.h" />
     <ClInclude Include="source\Defined_Global.h" />
     <ClInclude Include="source\Dotnet\Connection.h" />
     <ClInclude Include="source\DSPlaySound.h" />
