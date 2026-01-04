@@ -123,7 +123,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_FOREIGN_DEBUG;_LANGUAGE_FOREIGN;_LANGUAGE_ENG;UNICODE;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_EDITOR;WIN32;_DEBUG;_WINDOWS;_FOREIGN_DEBUG;_LANGUAGE_FOREIGN;_LANGUAGE_ENG;UNICODE;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -349,6 +349,10 @@
     <ClInclude Include="ThirdParty\imgui\imstb_truetype.h" Condition="'$(Configuration)'=='Global Debug'" />
     <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_opengl2.h" Condition="'$(Configuration)'=='Global Debug'" />
     <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_win32.h" Condition="'$(Configuration)'=='Global Debug'" />
+    
+    <!-- MU Editor (Debug only) -->
+    <ClInclude Include="source\MuEditor\**\*.h" Condition="'$(Configuration)'=='Global Debug'" />
+    <ClCompile Include="source\MuEditor\**\*.cpp" Condition="'$(Configuration)'=='Global Debug'" />
   </ItemGroup>
   <ItemGroup>
     <None Include="script\Mu_Chs.py" />
