@@ -588,7 +588,7 @@ void PrintItem(wchar_t* FileName)
             for (int j = 0; j < Plus; j++)
             {
                 int Level = j;
-                int RequireStrength = 0;
+                int RequireStrength = p->RequireStrength;
                 int RequireDexterity = 0;
                 int RequireEnergy = 0;
                 int DamageMin = p->DamageMin;
