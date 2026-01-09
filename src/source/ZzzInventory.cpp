@@ -4065,22 +4065,9 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
     // Apply level bonus
     if (pAttr->DamageMin > 0)
     {
-        int levelBonus = (std::min<int>(9, ip->Level) * 3);
+        int levelBonus = CalculateWeaponLevelBonus(ip->Level);
         baseDamageMin += levelBonus;
         baseDamageMax += levelBonus;
-
-        // Cumulative bonuses for levels 10-15 (fall-through intentional)
-        switch (ip->Level - 9)
-        {
-        case 6: baseDamageMin += 9; baseDamageMax += 9;  // +15: add 9
-        case 5: baseDamageMin += 8; baseDamageMax += 8;  // +14: add 8
-        case 4: baseDamageMin += 7; baseDamageMax += 7;  // +13: add 7
-        case 3: baseDamageMin += 6; baseDamageMax += 6;  // +12: add 6
-        case 2: baseDamageMin += 5; baseDamageMax += 5;  // +11: add 5
-        case 1: baseDamageMin += 4; baseDamageMax += 4;  // +10: add 4
-            break;
-        default: break;
-        }
     }
 #else
     // In game mode, use pre-calculated values from SetItemAttributes

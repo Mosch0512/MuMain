@@ -493,6 +493,27 @@ int GetExcellentAddValue(ITEM *ip)
     return 0;
 }
 
+// Helper function to calculate level bonus for damage/magic/defense
+int CalculateWeaponLevelBonus(int enhancementLevel)
+{
+    int bonus = (std::min<int>(9, enhancementLevel) * 3);
+
+    // Cumulative bonuses for levels 10-15 (fall-through intentional)
+    switch (enhancementLevel - 9)
+    {
+    case 6: bonus += 9;  // +15: add 9
+    case 5: bonus += 8;  // +14: add 8
+    case 4: bonus += 7;  // +13: add 7
+    case 3: bonus += 6;  // +12: add 6
+    case 2: bonus += 5;  // +11: add 5
+    case 1: bonus += 4;  // +10: add 4
+        break;
+    default: break;
+    }
+
+    return bonus;
+}
+
 void CalcDamageMin(ITEM* ip, ITEM_ATTRIBUTE* p, int excelAddValue)
 {
     //ITEM_ATTRIBUTE* p = &ItemAttribute[ip->Type];
@@ -523,20 +544,7 @@ void CalcDamageMin(ITEM* ip, ITEM_ATTRIBUTE* p, int excelAddValue)
         ip->DamageMin += 5 + (GetDropLevel(p) / 40);
     }
 
-    ip->DamageMin += (std::min<int>(9, ip->Level) * 3);
-
-    // Cumulative bonuses for levels 10-15 (fall-through intentional)
-    switch (ip->Level - 9)
-    {
-    case 6: ip->DamageMin += 9;  // +15: add 9
-    case 5: ip->DamageMin += 8;  // +14: add 8
-    case 4: ip->DamageMin += 7;  // +13: add 7
-    case 3: ip->DamageMin += 6;  // +12: add 6
-    case 2: ip->DamageMin += 5;  // +11: add 5
-    case 1: ip->DamageMin += 4;  // +10: add 4
-        break;
-    default: break;
-    }
+    ip->DamageMin += CalculateWeaponLevelBonus(ip->Level);
 }
 
 void CalcDamageMax(ITEM* ip, ITEM_ATTRIBUTE* p, int excelAddValue)
@@ -564,20 +572,7 @@ void CalcDamageMax(ITEM* ip, ITEM_ATTRIBUTE* p, int excelAddValue)
         ip->DamageMax += 5 + (GetDropLevel(p) / 40);
     }
 
-    ip->DamageMax += (std::min<int>(9, ip->Level) * 3);
-
-    // Cumulative bonuses for levels 10-15 (fall-through intentional)
-    switch (ip->Level - 9)
-    {
-    case 6: ip->DamageMax += 9;  // +15: add 9
-    case 5: ip->DamageMax += 8;  // +14: add 8
-    case 4: ip->DamageMax += 7;  // +13: add 7
-    case 3: ip->DamageMax += 6;  // +12: add 6
-    case 2: ip->DamageMax += 5;  // +11: add 5
-    case 1: ip->DamageMax += 4;  // +10: add 4
-        break;
-    default: break;
-    }
+    ip->DamageMax += CalculateWeaponLevelBonus(ip->Level);
 }
 
 void CalcMagicPower(ITEM* ip, ITEM_ATTRIBUTE* p, int excelAddValue)
@@ -605,20 +600,7 @@ void CalcMagicPower(ITEM* ip, ITEM_ATTRIBUTE* p, int excelAddValue)
         ip->MagicPower += 2 + (GetDropLevel(p) / 60);
     }
 
-    ip->MagicPower += (std::min<int>(9, ip->Level) * 3);
-
-    // Cumulative bonuses for levels 10-15 (fall-through intentional)
-    switch (ip->Level - 9)
-    {
-    case 6: ip->MagicPower += 9;  // +15: add 9
-    case 5: ip->MagicPower += 8;  // +14: add 8
-    case 4: ip->MagicPower += 7;  // +13: add 7
-    case 3: ip->MagicPower += 6;  // +12: add 6
-    case 2: ip->MagicPower += 5;  // +11: add 5
-    case 1: ip->MagicPower += 4;  // +10: add 4
-        break;
-    default: break;
-    }
+    ip->MagicPower += CalculateWeaponLevelBonus(ip->Level);
 
     ip->MagicPower /= 2;
 

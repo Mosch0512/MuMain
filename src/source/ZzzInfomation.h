@@ -29,6 +29,7 @@ extern ITEM_ATTRIBUTE* ItemAttribute;
 extern ActionSkillType GetSkillByBook(int Type);
 void SetItemAttributes(ITEM* ip);
 int CalculateDefenseValue(int baseDefense, int itemType, int enhancementLevel, int excellentFlags, int ancientDiscriminator, int itemLevel);
+int CalculateWeaponLevelBonus(int enhancementLevel);
 extern float CalcDurabilityPercent(BYTE dur, BYTE maxDur, int Level, int excellentFlags, int ancientDiscriminator = 0);
 extern int64_t ItemValue(ITEM* ip, int goldType = 1);
 extern void PrintItem(wchar_t* FileName);
