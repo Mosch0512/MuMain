@@ -505,14 +505,16 @@ void CalcDamageMin(ITEM* ip, ITEM_ATTRIBUTE* p, int excelAddValue)
     {
         
     }
+    int excellentBonus = 0;
     if (ip->ExcellentFlags > 0) // TODO: For wings, too?
     {
         if (p->Level)
         {
             if (excelAddValue)
-                ip->DamageMin += excelAddValue;
+                excellentBonus = excelAddValue;
             else
-                ip->DamageMin += p->DamageMin * 25 / p->Level + 5;
+                excellentBonus = p->DamageMin * 25 / p->Level + 5;
+            ip->DamageMin += excellentBonus;
         }
     }
 
@@ -523,9 +525,17 @@ void CalcDamageMin(ITEM* ip, ITEM_ATTRIBUTE* p, int excelAddValue)
 
     ip->DamageMin += (std::min<int>(9, ip->Level) * 3);
 
-    if (ip->Level - 9 > 0)
+    // Cumulative bonuses for levels 10-15 (fall-through intentional)
+    switch (ip->Level - 9)
     {
-        ip->DamageMin += ip->Level - 6;
+    case 6: ip->DamageMin += 9;  // +15: add 9
+    case 5: ip->DamageMin += 8;  // +14: add 8
+    case 4: ip->DamageMin += 7;  // +13: add 7
+    case 3: ip->DamageMin += 6;  // +12: add 6
+    case 2: ip->DamageMin += 5;  // +11: add 5
+    case 1: ip->DamageMin += 4;  // +10: add 4
+        break;
+    default: break;
     }
 }
 
@@ -536,14 +546,16 @@ void CalcDamageMax(ITEM* ip, ITEM_ATTRIBUTE* p, int excelAddValue)
         return;
     }
 
+    int excellentBonus = 0;
     if (ip->ExcellentFlags > 0)
     {
         if (p->Level)
         {
             if (excelAddValue)
-                ip->DamageMax += excelAddValue;
+                excellentBonus = excelAddValue;
             else
-                ip->DamageMax += p->DamageMax * 25 / p->Level + 5;
+                excellentBonus = p->DamageMin * 25 / p->Level + 5;  // Use DamageMin, not DamageMax!
+            ip->DamageMax += excellentBonus;
         }
     }
 
@@ -554,9 +566,17 @@ void CalcDamageMax(ITEM* ip, ITEM_ATTRIBUTE* p, int excelAddValue)
 
     ip->DamageMax += (std::min<int>(9, ip->Level) * 3);
 
-    if (ip->Level - 9 > 0)
+    // Cumulative bonuses for levels 10-15 (fall-through intentional)
+    switch (ip->Level - 9)
     {
-        ip->DamageMax += ip->Level - 6;
+    case 6: ip->DamageMax += 9;  // +15: add 9
+    case 5: ip->DamageMax += 8;  // +14: add 8
+    case 4: ip->DamageMax += 7;  // +13: add 7
+    case 3: ip->DamageMax += 6;  // +12: add 6
+    case 2: ip->DamageMax += 5;  // +11: add 5
+    case 1: ip->DamageMax += 4;  // +10: add 4
+        break;
+    default: break;
     }
 }
 
@@ -567,14 +587,16 @@ void CalcMagicPower(ITEM* ip, ITEM_ATTRIBUTE* p, int excelAddValue)
         return;
     }
 
+    int excellentBonus = 0;
     if (ip->ExcellentFlags > 0)
     {
         if (p->Level)
         {
             if (excelAddValue)
-                ip->MagicPower += excelAddValue;
+                excellentBonus = excelAddValue;
             else
-                ip->MagicPower += p->MagicPower * 25 / p->Level + 5;
+                excellentBonus = p->MagicPower * 25 / p->Level + 5;
+            ip->MagicPower += excellentBonus;
         }
     }
 
@@ -585,9 +607,17 @@ void CalcMagicPower(ITEM* ip, ITEM_ATTRIBUTE* p, int excelAddValue)
 
     ip->MagicPower += (std::min<int>(9, ip->Level) * 3);
 
-    if (ip->Level - 9 > 0)
+    // Cumulative bonuses for levels 10-15 (fall-through intentional)
+    switch (ip->Level - 9)
     {
-        ip->MagicPower += ip->Level - 6;
+    case 6: ip->MagicPower += 9;  // +15: add 9
+    case 5: ip->MagicPower += 8;  // +14: add 8
+    case 4: ip->MagicPower += 7;  // +13: add 7
+    case 3: ip->MagicPower += 6;  // +12: add 6
+    case 2: ip->MagicPower += 5;  // +11: add 5
+    case 1: ip->MagicPower += 4;  // +10: add 4
+        break;
+    default: break;
     }
 
     ip->MagicPower /= 2;

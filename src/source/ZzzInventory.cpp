@@ -4020,12 +4020,70 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         TextNum++;
     }
 
-    // Read damage from ItemAttribute in editor mode for immediate updates
+    // Read damage from ItemAttribute or pre-calculated item values
     ITEM_ATTRIBUTE* pAttr = &ItemAttribute[ip->Type];
 #ifdef _EDITOR
+    // In editor mode, always recalculate from ItemAttribute for immediate updates
     int baseDamageMin = pAttr->DamageMin;
     int baseDamageMax = pAttr->DamageMax;
+
+    // Apply excellent bonus
+    if (ip->ExcellentFlags > 0 && pAttr->DamageMin > 0 && pAttr->Level > 0)
+    {
+        // GetExcellentAddValue logic inlined
+        int excelAddValue = 0;
+        if (ip->Type == ITEM_CHAOS_DRAGON_AXE)
+            excelAddValue = 15;
+        else if (ip->Type == ITEM_CHAOS_NATURE_BOW)
+            excelAddValue = 30;
+        else if (ip->Type == ITEM_CHAOS_LIGHTNING_STAFF)
+            excelAddValue = 25;
+
+        if (excelAddValue)
+        {
+            baseDamageMin += excelAddValue;
+            baseDamageMax += excelAddValue;
+        }
+        else
+        {
+            // Excellent bonus uses DamageMin only for both min and max
+            int excellentBonus = pAttr->DamageMin * 25 / pAttr->Level + 5;
+            baseDamageMin += excellentBonus;
+            baseDamageMax += excellentBonus;
+        }
+    }
+
+    // Apply ancient bonus
+    if (ip->AncientDiscriminator > 0 && pAttr->DamageMin > 0)
+    {
+        // GetDropLevel logic inlined: dropLevel = itemLevel + 30
+        int ancientBonus = 5 + ((pAttr->Level + 30) / 40);
+        baseDamageMin += ancientBonus;
+        baseDamageMax += ancientBonus;
+    }
+
+    // Apply level bonus
+    if (pAttr->DamageMin > 0)
+    {
+        int levelBonus = (std::min<int>(9, ip->Level) * 3);
+        baseDamageMin += levelBonus;
+        baseDamageMax += levelBonus;
+
+        // Cumulative bonuses for levels 10-15 (fall-through intentional)
+        switch (ip->Level - 9)
+        {
+        case 6: baseDamageMin += 9; baseDamageMax += 9;  // +15: add 9
+        case 5: baseDamageMin += 8; baseDamageMax += 8;  // +14: add 8
+        case 4: baseDamageMin += 7; baseDamageMax += 7;  // +13: add 7
+        case 3: baseDamageMin += 6; baseDamageMax += 6;  // +12: add 6
+        case 2: baseDamageMin += 5; baseDamageMax += 5;  // +11: add 5
+        case 1: baseDamageMin += 4; baseDamageMax += 4;  // +10: add 4
+            break;
+        default: break;
+        }
+    }
 #else
+    // In game mode, use pre-calculated values from SetItemAttributes
     int baseDamageMin = ip->DamageMin;
     int baseDamageMax = ip->DamageMax;
 #endif
