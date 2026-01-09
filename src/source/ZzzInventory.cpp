@@ -3927,7 +3927,17 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         TextNum++;
     }
 
-    if (ip->DamageMin)
+    // Read damage from ItemAttribute in editor mode for immediate updates
+#ifdef _EDITOR
+    ITEM_ATTRIBUTE* pAttr = &ItemAttribute[ip->Type];
+    int baseDamageMin = pAttr->DamageMin;
+    int baseDamageMax = pAttr->DamageMax;
+#else
+    int baseDamageMin = ip->DamageMin;
+    int baseDamageMax = ip->DamageMax;
+#endif
+
+    if (baseDamageMin || ip->DamageMin)
     {
         int minindex = 0, maxindex = 0, magicalindex = 0;
 
@@ -3943,8 +3953,8 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
                 magicalindex = SC.SI_SP.SI_magicalpower;
             }
         }
-        int DamageMin = ip->DamageMin;
-        int DamageMax = ip->DamageMax;
+        int DamageMin = baseDamageMin;
+        int DamageMax = baseDamageMax;
         if (ip->Type >> 4 == 15)
         {
             mu_swprintf(TextList[TextNum], L"%ls: %d ~ %d", GlobalText[40 + 2], DamageMin, DamageMax);
@@ -3998,7 +4008,15 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
             TextNum--;
         }
     }
-    if (ip->Defense)
+    // Read defense from ItemAttribute in editor mode for immediate updates
+#ifdef _EDITOR
+    ITEM_ATTRIBUTE* pDefAttr = &ItemAttribute[ip->Type];
+    int baseDefense = pDefAttr->Defense;
+#else
+    int baseDefense = ip->Defense;
+#endif
+
+    if (baseDefense || ip->Defense)
     {
         int maxdefense = 0;
 
@@ -4012,7 +4030,7 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
                 maxdefense = SC.SI_SD.SI_defense;
             }
         }
-        mu_swprintf(TextList[TextNum], GlobalText[65], ip->Defense + maxdefense);
+        mu_swprintf(TextList[TextNum], GlobalText[65], baseDefense + maxdefense);
 
         if (maxdefense != 0)
             TextListColor[TextNum] = TEXT_COLOR_YELLOW;
@@ -4845,18 +4863,41 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         }
     }
 
-    if (ip->RequireStrength && bRequireStat)
+    // In editor mode, read fresh data from ItemAttribute
+#ifdef _EDITOR
+    ITEM_ATTRIBUTE* pStr = &ItemAttribute[ip->Type];
+    WORD actualReqStr;
+    if (pStr->RequireStrength)
     {
-        mu_swprintf(TextList[TextNum], GlobalText[73], ip->RequireStrength - si_iNeedStrength);
+        // Apply the same formula used when creating items
+        int ItemLevel = pStr->Level;
+        bool isExcellent = ip->ExcellentFlags > 0;
+        if (isExcellent)
+        {
+            ItemLevel = pStr->Level + 25;
+        }
+        actualReqStr = 20 + (pStr->RequireStrength) * (ItemLevel + ip->Level * 3) * 3 / 100;
+    }
+    else
+    {
+        actualReqStr = 0;
+    }
+#else
+    WORD actualReqStr = ip->RequireStrength;
+#endif
+
+    if (actualReqStr && bRequireStat)
+    {
+        mu_swprintf(TextList[TextNum], GlobalText[73], actualReqStr - si_iNeedStrength);
 
         WORD Strength;
         Strength = CharacterAttribute->Strength + CharacterAttribute->AddStrength;
-        if (Strength < ip->RequireStrength - si_iNeedStrength)
+        if (Strength < actualReqStr - si_iNeedStrength)
         {
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
-            mu_swprintf(TextList[TextNum], GlobalText[74], (ip->RequireStrength - Strength) - si_iNeedStrength);
+            mu_swprintf(TextList[TextNum], GlobalText[74], (actualReqStr - Strength) - si_iNeedStrength);
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
@@ -4876,18 +4917,41 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
             TextNum++;
         }
     }
-    if (ip->RequireDexterity && bRequireStat)
+    // In editor mode, read fresh data from ItemAttribute
+#ifdef _EDITOR
+    ITEM_ATTRIBUTE* pDex = &ItemAttribute[ip->Type];
+    WORD actualReqDex;
+    if (pDex->RequireDexterity)
     {
-        mu_swprintf(TextList[TextNum], GlobalText[75], ip->RequireDexterity - si_iNeedDex);
+        // Apply the same formula used when creating items
+        int ItemLevel = pDex->Level;
+        bool isExcellent = ip->ExcellentFlags > 0;
+        if (isExcellent)
+        {
+            ItemLevel = pDex->Level + 25;
+        }
+        actualReqDex = 20 + (pDex->RequireDexterity) * (ItemLevel + ip->Level * 3) * 3 / 100;
+    }
+    else
+    {
+        actualReqDex = 0;
+    }
+#else
+    WORD actualReqDex = ip->RequireDexterity;
+#endif
+
+    if (actualReqDex && bRequireStat)
+    {
+        mu_swprintf(TextList[TextNum], GlobalText[75], actualReqDex - si_iNeedDex);
         WORD Dexterity;
         Dexterity = CharacterAttribute->Dexterity + CharacterAttribute->AddDexterity;
-        if (Dexterity < (ip->RequireDexterity - si_iNeedDex))
+        if (Dexterity < (actualReqDex - si_iNeedDex))
         {
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
 
-            mu_swprintf(TextList[TextNum], GlobalText[74], (ip->RequireDexterity - Dexterity) - si_iNeedDex);
+            mu_swprintf(TextList[TextNum], GlobalText[74], (actualReqDex - Dexterity) - si_iNeedDex);
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
@@ -4907,18 +4971,41 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         }
     }
 
-    if (ip->RequireVitality && bRequireStat) //  요구체력.
+    // In editor mode, read fresh data from ItemAttribute
+#ifdef _EDITOR
+    ITEM_ATTRIBUTE* pVit = &ItemAttribute[ip->Type];
+    WORD actualReqVit;
+    if (pVit->RequireVitality)
     {
-        mu_swprintf(TextList[TextNum], GlobalText[1930], ip->RequireVitality);
+        // Apply the same formula used when creating items
+        int ItemLevel = pVit->Level;
+        bool isExcellent = ip->ExcellentFlags > 0;
+        if (isExcellent)
+        {
+            ItemLevel = pVit->Level + 25;
+        }
+        actualReqVit = 20 + (pVit->RequireVitality) * (ItemLevel + ip->Level * 3) * 3 / 100;
+    }
+    else
+    {
+        actualReqVit = 0;
+    }
+#else
+    WORD actualReqVit = ip->RequireVitality;
+#endif
+
+    if (actualReqVit && bRequireStat) //  요구체력.
+    {
+        mu_swprintf(TextList[TextNum], GlobalText[1930], actualReqVit);
 
         WORD Vitality;
         Vitality = CharacterAttribute->Vitality + CharacterAttribute->AddVitality;
-        if (Vitality < ip->RequireVitality)
+        if (Vitality < actualReqVit)
         {
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
-            mu_swprintf(TextList[TextNum], GlobalText[74], ip->RequireVitality - Vitality);
+            mu_swprintf(TextList[TextNum], GlobalText[74], actualReqVit - Vitality);
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
@@ -4931,19 +5018,42 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         }
     }
 
-    if (ip->RequireEnergy && bRequireStat)
+    // In editor mode, read fresh data from ItemAttribute
+#ifdef _EDITOR
+    ITEM_ATTRIBUTE* pEne = &ItemAttribute[ip->Type];
+    WORD actualReqEne;
+    if (pEne->RequireEnergy)
     {
-        mu_swprintf(TextList[TextNum], GlobalText[77], ip->RequireEnergy);
+        // Apply the same formula used when creating items
+        int ItemLevel = pEne->Level;
+        bool isExcellent = ip->ExcellentFlags > 0;
+        if (isExcellent)
+        {
+            ItemLevel = pEne->Level + 25;
+        }
+        actualReqEne = 20 + (pEne->RequireEnergy) * (ItemLevel + ip->Level * 3) * 3 / 100;
+    }
+    else
+    {
+        actualReqEne = 0;
+    }
+#else
+    WORD actualReqEne = ip->RequireEnergy;
+#endif
+
+    if (actualReqEne && bRequireStat)
+    {
+        mu_swprintf(TextList[TextNum], GlobalText[77], actualReqEne);
 
         WORD Energy;
         Energy = CharacterAttribute->Energy + CharacterAttribute->AddEnergy;
 
-        if (Energy < ip->RequireEnergy)
+        if (Energy < actualReqEne)
         {
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
-            mu_swprintf(TextList[TextNum], GlobalText[74], ip->RequireEnergy - Energy);
+            mu_swprintf(TextList[TextNum], GlobalText[74], actualReqEne - Energy);
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
@@ -4956,18 +5066,41 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
         }
     }
 
-    if (ip->RequireCharisma && bRequireStat)
+    // In editor mode, read fresh data from ItemAttribute
+#ifdef _EDITOR
+    ITEM_ATTRIBUTE* pCha = &ItemAttribute[ip->Type];
+    WORD actualReqCha;
+    if (pCha->RequireCharisma)
     {
-        mu_swprintf(TextList[TextNum], GlobalText[698], ip->RequireCharisma);
+        // Apply the same formula used when creating items
+        int ItemLevel = pCha->Level;
+        bool isExcellent = ip->ExcellentFlags > 0;
+        if (isExcellent)
+        {
+            ItemLevel = pCha->Level + 25;
+        }
+        actualReqCha = 20 + (pCha->RequireCharisma) * (ItemLevel + ip->Level * 3) * 3 / 100;
+    }
+    else
+    {
+        actualReqCha = 0;
+    }
+#else
+    WORD actualReqCha = ip->RequireCharisma;
+#endif
+
+    if (actualReqCha && bRequireStat)
+    {
+        mu_swprintf(TextList[TextNum], GlobalText[698], actualReqCha);
 
         WORD Charisma;
         Charisma = CharacterAttribute->Charisma + CharacterAttribute->AddCharisma;
-        if (Charisma < ip->RequireCharisma)
+        if (Charisma < actualReqCha)
         {
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
-            mu_swprintf(TextList[TextNum], GlobalText[74], ip->RequireCharisma - Charisma);
+            mu_swprintf(TextList[TextNum], GlobalText[74], actualReqCha - Charisma);
             TextListColor[TextNum] = TEXT_COLOR_RED;
             TextBold[TextNum] = false;
             TextNum++;
