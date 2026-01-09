@@ -1674,6 +1674,49 @@ WORD CalcStatRequirement(STAT_TYPE statType, WORD baseRequirement, int itemLevel
            ItemRequirement::ENERGY_DEFAULT_MULTIPLIER_DEN;
 }
 
+void ApplyItemSpecificRequirementOverrides(ITEM* ip, ITEM_ATTRIBUTE* p)
+{
+    // Special case: Orb of Summoning - hardcoded energy requirements by level
+    if (ip->Type == ITEM_ORB_OF_SUMMONING)
+    {
+        WORD Energy = 0;
+        switch (ip->Level)
+        {
+        case 0: Energy = 30; break;
+        case 1: Energy = 60; break;
+        case 2: Energy = 90; break;
+        case 3: Energy = 130; break;
+        case 4: Energy = 170; break;
+        case 5: Energy = 210; break;
+        case 6: Energy = 300; break;
+        case 7: Energy = 500; break;
+        }
+        ip->RequireEnergy = Energy;
+    }
+
+    // Special case: Dark Raven - special charisma formula
+    if (p->RequireCharisma)
+    {
+        if (ip->Type == MODEL_DARK_RAVEN_ITEM)
+        {
+            ip->RequireCharisma = (185 + (p->RequireCharisma * 15));
+        }
+        else
+        {
+            ip->RequireCharisma = p->RequireCharisma;
+        }
+    }
+
+    // Special case: Transformation Ring - hardcoded level requirements
+    if (ip->Type == ITEM_TRANSFORMATION_RING)
+    {
+        if (ip->Level <= 2)
+            ip->RequireLevel = 20;
+        else
+            ip->RequireLevel = 50;
+    }
+}
+
 void GetItemName(int iType, int iLevel, wchar_t* Text)
 {
     ITEM_ATTRIBUTE* p = &ItemAttribute[iType];
