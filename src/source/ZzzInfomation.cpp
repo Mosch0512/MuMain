@@ -709,17 +709,31 @@ int CalculateDefenseValue(int baseDefense, int itemType, int enhancementLevel, i
         }
         else if (itemType >= ITEM_WINGS_OF_SPIRITS && itemType <= ITEM_WINGS_OF_DARKNESS)
         {
-            // Mid-tier wings (Spirits, Soul, Dragon, Darkness): sum from 3 to (levelsAbove9 + 2)
-            int first = 3;
-            int last = levelsAbove9 + 2;
-            calculatedDefense += levelsAbove9 * (first + last) / 2;
+            // Mid-tier wings (Spirits, Soul, Dragon, Darkness): use standard 4+5+6+7+8+9 for 10-15
+            switch (enhancementLevel - 9)
+            {
+            case 6: calculatedDefense += 9;
+            case 5: calculatedDefense += 8;
+            case 4: calculatedDefense += 7;
+            case 3: calculatedDefense += 6;
+            case 2: calculatedDefense += 5;
+            case 1: calculatedDefense += 4;
+                break;
+            }
         }
         else if (itemType == ITEM_CAPE_OF_LORD || itemType == ITEM_CAPE_OF_FIGHTER)
         {
-            // Basic capes: sum from 3 to (levelsAbove9 + 2)
-            int first = 3;
-            int last = levelsAbove9 + 2;
-            calculatedDefense += levelsAbove9 * (first + last) / 2;
+            // Basic capes: use standard 4+5+6+7+8+9 for 10-15 (same as mid-tier wings)
+            switch (enhancementLevel - 9)
+            {
+            case 6: calculatedDefense += 9;
+            case 5: calculatedDefense += 8;
+            case 4: calculatedDefense += 7;
+            case 3: calculatedDefense += 6;
+            case 2: calculatedDefense += 5;
+            case 1: calculatedDefense += 4;
+                break;
+            }
         }
         else
         {
