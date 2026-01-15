@@ -25,6 +25,7 @@
 #include "NewUISystem.h"
 #include "CharacterManager.h"
 #include "SkillManager.h"
+#include "GameData/ItemCalculations/EnhancementBonus.h"
 
 CLASS_ATTRIBUTE     ClassAttribute[MAX_CLASS];
 MONSTER_SCRIPT      MonsterScript[MAX_MONSTER];
@@ -622,11 +623,9 @@ void CalcSuccessfulBlocking(ITEM* ip, ITEM_ATTRIBUTE* p)
         if (p->Level)
             ip->SuccessfulBlocking += p->SuccessfulBlocking * 25 / p->Level + 5;
     }
-    ip->SuccessfulBlocking += (std::min<int>(9, p->Level) * 3);	// ~ +9
-    if (p->Level - 9 > 0)
-    {
-        ip->SuccessfulBlocking += p->Level - 6;
-    }
+
+    // Add standard enhancement bonus
+    ip->SuccessfulBlocking += EnhancementBonus::CalculateStandard(p->Level);
 }
 
 // Unified defense calculation function used by both CalcDefense and RenderItemInfo
@@ -746,7 +745,7 @@ int CalculateDefenseValue(int baseDefense, int itemType, int enhancementLevel, i
         else
         {
             // Early wings (Elf, Heaven, Satan): sum from 4 to (levelsAbove9 + 3)
-            int first = 4;
+            int first = 25;
             int last = levelsAbove9 + 3;
             calculatedDefense += levelsAbove9 * (first + last) / 2;
         }
@@ -757,18 +756,24 @@ int CalculateDefenseValue(int baseDefense, int itemType, int enhancementLevel, i
 
 void CalcDefense(ITEM* ip, ITEM_ATTRIBUTE* p)
 {
-    // Calculate magic defense
+    // Calculate magic defense with enhancement bonus
     if (p->MagicDefense > 0)
     {
-        ip->MagicDefense += (std::min<int>(9, p->Level) * 3);	// ~ +9
-        if(p->Level - 9 > 0)
-        {
-            ip->MagicDefense += p->Level - 6;
-        }
+        ip->MagicDefense += EnhancementBonus::CalculateStandard(p->Level);
     }
 
-    // Use the unified CalculateDefenseValue function
+    // Use the unified CalculateDefenseValue function for base defense + special bonuses
     ip->Defense = CalculateDefenseValue(p->Defense, ip->Type, ip->Level, ip->ExcellentFlags, ip->AncientDiscriminator, p->Level);
+
+    // Add enhancement bonus for normal armor (Helm through Boots)
+    // NOT for shields (handled in CalculateDefenseValue), wings (handled separately), or items with no defense
+    if (p->Defense > 0 &&
+        ip->Type >= ITEM_HELM && ip->Type < ITEM_BOOTS + MAX_ITEM_INDEX &&
+        !(ip->Type >= ITEM_SHIELD && ip->Type < ITEM_SHIELD + MAX_ITEM_INDEX) &&
+        !(ip->Type >= ITEM_WINGS_OF_SPIRITS))
+    {
+        ip->Defense += EnhancementBonus::CalculateStandard(ip->Level);
+    }
 }
 
 void CalcRequirements(ITEM* ip, ITEM_ATTRIBUTE* p)

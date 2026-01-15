@@ -48,6 +48,7 @@
 #include "CharacterManager.h"
 #include "SkillManager.h"
 #include "NewUISystem.h"
+#include "GameData/ItemCalculations/EnhancementBonus.h"
 
 extern CUITextInputBox* g_pSingleTextInputBox;
 extern int g_iChatInputType;
@@ -904,46 +905,16 @@ void ComputeItemInfo(int iHelpItem)
 
         if (DamageMin > 0)
         {
-            DamageMin += (std::min<int>(9, Level) * 3);
-            switch (Level - 9)
-            {
-            case 6: DamageMin += 9; break;	// +15
-            case 5: DamageMin += 8; break;	// +14
-            case 4: DamageMin += 7; break;	// +13
-            case 3: DamageMin += 6; break;	// +12
-            case 2: DamageMin += 5; break;	// +11
-            case 1: DamageMin += 4; break;	// +10
-            default: break;
-            };
+            DamageMin += EnhancementBonus::CalculateStandard(Level);
         }
         if (DamageMax > 0)
         {
-            DamageMax += (std::min<int>(9, Level) * 3);
-            switch (Level - 9)
-            {
-            case 6: DamageMax += 9; break;	// +15
-            case 5: DamageMax += 8; break;	// +14
-            case 4: DamageMax += 7; break;	// +13
-            case 3: DamageMax += 6; break;	// +12
-            case 2: DamageMax += 5; break;	// +11
-            case 1: DamageMax += 4; break;	// +10
-            default: break;
-            };
+            DamageMax += EnhancementBonus::CalculateStandard(Level);
         }
 
         if (Magic > 0)
         {
-            Magic += (std::min<int>(9, Level) * 3);	// ~ +9
-            switch (Level - 9)
-            {
-            case 6: Magic += 9; break;		// +15
-            case 5: Magic += 8; break;		// +14
-            case 4: Magic += 7; break;	    // +13
-            case 3: Magic += 6; break;		// +12
-            case 2: Magic += 5; break;		// +11
-            case 1: Magic += 4; break;		// +10
-            default: break;
-            };
+            Magic += EnhancementBonus::CalculateStandard(Level);
             Magic /= 2;
 
             if (IsCepterItem(ItemHelp) == false)
@@ -956,36 +927,16 @@ void ComputeItemInfo(int iHelpItem)
         {
             if (ItemHelp >= ITEM_SHIELD && ItemHelp < ITEM_SHIELD + MAX_ITEM_INDEX)
             {
-                Defense += Level;
+                Defense += EnhancementBonus::CalculateShield(Level);
             }
             else
             {
-                Defense += (std::min<int>(9, Level) * 3);	// ~ +9
-                switch (Level - 9)
-                {
-                case 6: Defense += 9; break;	// +15
-                case 5: Defense += 8; break;	// +14
-                case 4: Defense += 7; break;	// +13
-                case 3: Defense += 6; break;	// +12
-                case 2: Defense += 5; break;	// +11
-                case 1: Defense += 4; break;	// +10
-                default: break;
-                };
+                Defense += EnhancementBonus::CalculateStandard(Level);
             }
         }
         if (Blocking > 0)
         {
-            Blocking += (std::min<int>(9, Level) * 3);	// ~ +9
-            switch (Level - 9)
-            {
-            case 6: Blocking += 9; break;	// +15
-            case 5: Blocking += 8; break;	// +14
-            case 4: Blocking += 7; break;	// +13
-            case 3: Blocking += 6; break;	// +12
-            case 2: Blocking += 5; break;	// +11
-            case 1: Blocking += 4; break;	// +10
-            default: break;
-            };
+            Blocking += EnhancementBonus::CalculateStandard(Level);
         }
 
         if (p->RequireLevel)
@@ -4146,26 +4097,9 @@ void RenderItemInfo(int sx, int sy, ITEM* ip, bool Sell, int Inventype, bool bIt
             TextNum--;
         }
     }
-    // For tooltip display, always use ip->Defense which has bonuses from CalcDefense
+    // Use ip->Defense which now has correct bonuses from CalcDefense (including enhancement bonus)
     // In editor mode, CalcDefense recalculates from ItemAttribute, so changes are immediate
     int calculatedDefense = ip->Defense;
-
-    // Apply enhancement level bonus for armor (Helm through Boots) ONLY - not for wings/capes
-    // This bonus is specific to tooltip display and is NOT in CalcDefense
-    if (ip->Type >= ITEM_HELM && ip->Type < ITEM_BOOTS + MAX_ITEM_INDEX)
-    {
-        // Verify this is NOT a wing/cape by checking it's not in the wing range
-        if (!(ip->Type >= ITEM_WINGS_OF_SPIRITS))
-        {
-            // Armor gets +4 defense per enhancement level, with adjustment above +9
-            int armorBonus = ip->Level * 4;
-            if (ip->Level > 9)
-            {
-                armorBonus -= 3;  // Slight reduction for levels above +9
-            }
-            calculatedDefense += armorBonus;
-        }
-    }
 
     if (calculatedDefense || ip->Defense)
     {
