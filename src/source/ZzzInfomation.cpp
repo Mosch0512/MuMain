@@ -649,18 +649,15 @@ void CalcDefense(ITEM* ip, ITEM_ATTRIBUTE* p)
         ip->MagicDefense += EnhancementBonus::CalculateStandard(p->Level);
     }
 
-    // Use the unified CalculateDefenseValue function for base defense + special bonuses
+    // Use the unified CalculateDefenseValue function
+    // This now handles ALL defense calculations including:
+    //   - Base defense
+    //   - Enhancement bonus (for normal armor)
+    //   - Shield bonuses
+    //   - Excellent bonuses
+    //   - Ancient bonuses
+    //   - Wing/Cape bonuses
     ip->Defense = CalculateDefenseValue(p->Defense, ip->Type, ip->Level, ip->ExcellentFlags, ip->AncientDiscriminator, p->Level);
-
-    // Add enhancement bonus for normal armor (Helm through Boots)
-    // NOT for shields (handled in CalculateDefenseValue), wings (handled separately), or items with no defense
-    if (p->Defense > 0 &&
-        ip->Type >= ITEM_HELM && ip->Type < ITEM_BOOTS + MAX_ITEM_INDEX &&
-        !(ip->Type >= ITEM_SHIELD && ip->Type < ITEM_SHIELD + MAX_ITEM_INDEX) &&
-        !(ip->Type >= ITEM_WINGS_OF_SPIRITS))
-    {
-        ip->Defense += EnhancementBonus::CalculateStandard(ip->Level);
-    }
 }
 
 void CalcRequirements(ITEM* ip, ITEM_ATTRIBUTE* p)

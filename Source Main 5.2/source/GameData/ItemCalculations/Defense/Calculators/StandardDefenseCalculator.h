@@ -26,8 +26,12 @@ public:
 
     bool AppliesTo(const ItemDefenseContext& context) const override
     {
-        // Only applies to normal armor (not shields, not wings)
-        return context.IsNormalArmor() && context.baseDefense > 0;
+        // Only applies to normal armor (not shields, not wings, not excellent, not ancient)
+        // Excellent and ancient items get their own special formulas instead
+        return context.IsNormalArmor() &&
+               !context.IsExcellent() &&
+               !context.IsAncient() &&
+               context.baseDefense > 0;
     }
 
     int GetPriority() const override
