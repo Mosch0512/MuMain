@@ -672,11 +672,14 @@ int CalculateDefenseValue(int baseDefense, int itemType, int enhancementLevel, i
 
     if (isWingOrCape)
     {
+        // Check if this is a level 3 wing (Storm through Dimension, excluding Despair which is between them)
+        bool isLevel3Wing = (itemType >= ITEM_WING_OF_STORM && itemType <= ITEM_CAPE_OF_EMPEROR) ||
+                            (itemType >= ITEM_WINGS_OF_DESPAIR && itemType <= ITEM_WING_OF_DIMENSION);
+
         // Different wing tiers get different bonuses
-        if ((itemType >= ITEM_WING_OF_STORM && itemType <= ITEM_CAPE_OF_EMPEROR) ||
-            itemType == ITEM_WING_OF_DIMENSION || itemType == ITEM_CAPE_OF_OVERRULE)
+        if (isLevel3Wing || itemType == ITEM_CAPE_OF_OVERRULE)
         {
-            // Higher tier wings: *4 multiplier
+            // Level 3 wings: *4 multiplier
             calculatedDefense += (std::min<int>(9, enhancementLevel) * 4);
         }
         else if (itemType >= ITEM_WINGS_OF_SPIRITS && itemType <= ITEM_WINGS_OF_DARKNESS)
@@ -700,11 +703,16 @@ int CalculateDefenseValue(int baseDefense, int itemType, int enhancementLevel, i
     if (isWingOrCape && enhancementLevel > 9)
     {
         int levelsAbove9 = enhancementLevel - 9;
-        if ((itemType >= ITEM_WING_OF_STORM && itemType <= ITEM_CAPE_OF_EMPEROR) || itemType == ITEM_WING_OF_DIMENSION || itemType == ITEM_CAPE_OF_OVERRULE)
+
+        // Check if this is a level 3 wing (Storm through Dimension, excluding Despair which is between them)
+        bool isLevel3Wing = (itemType >= ITEM_WING_OF_STORM && itemType <= ITEM_CAPE_OF_EMPEROR) ||
+                            (itemType >= ITEM_WINGS_OF_DESPAIR && itemType <= ITEM_WING_OF_DIMENSION);
+
+        if (isLevel3Wing || itemType == ITEM_CAPE_OF_OVERRULE)
         {
-            // Higher tier wings: sum from 4 to (levelsAbove9 + 3)
-            int first = 4;
-            int last = levelsAbove9 + 3;
+            // Level 3 wings: sum from 5 to (levelsAbove9 + 4) = 5+6+7+8+9+10 for levels 10-15
+            int first = 5;
+            int last = levelsAbove9 + 4;
             calculatedDefense += levelsAbove9 * (first + last) / 2;
         }
         else if (itemType >= ITEM_WINGS_OF_SPIRITS && itemType <= ITEM_WINGS_OF_DARKNESS)
