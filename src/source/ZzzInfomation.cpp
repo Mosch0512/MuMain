@@ -26,6 +26,10 @@
 #include "CharacterManager.h"
 #include "SkillManager.h"
 #include "GameData/ItemCalculations/EnhancementBonus.h"
+#include "GameData/ItemCalculations/Defense/ItemDefense.h"
+
+// Global ItemDefense instance for defense calculations
+static ItemDefense g_ItemDefense;
 
 CLASS_ATTRIBUTE     ClassAttribute[MAX_CLASS];
 MONSTER_SCRIPT      MonsterScript[MAX_MONSTER];
@@ -629,129 +633,12 @@ void CalcSuccessfulBlocking(ITEM* ip, ITEM_ATTRIBUTE* p)
 }
 
 // Unified defense calculation function used by both CalcDefense and RenderItemInfo
+// NOW DELEGATES to the new modular ItemDefense system
 int CalculateDefenseValue(int baseDefense, int itemType, int enhancementLevel, int excellentFlags, int ancientDiscriminator, int itemLevel)
 {
-    if (baseDefense == 0)
-    {
-        return 0;
-    }
-
-    int calculatedDefense = baseDefense;
-    auto isAncientItem = ancientDiscriminator > 0;
-    auto isExcellent = excellentFlags > 0;
-    auto setItemDropLevel = itemLevel + 30; // GetDropLevel inline
-
-    // Shields get +enhancement level bonus
-    if (itemType >= ITEM_SHIELD && itemType < ITEM_SHIELD + MAX_ITEM_INDEX)
-    {
-        calculatedDefense += enhancementLevel;
-        if (isAncientItem)
-        {
-            calculatedDefense = calculatedDefense + (calculatedDefense * 20 / setItemDropLevel + 2);
-        }
-        return calculatedDefense;
-    }
-
-    // Excellent items get a bonus based on item level (not shields/wings)
-    if (isExcellent && itemLevel > 0 && !(itemType >= ITEM_SHIELD && itemType < ITEM_SHIELD + MAX_ITEM_INDEX) && !(itemType >= ITEM_WINGS_OF_SPIRITS))
-    {
-        calculatedDefense += baseDefense * 12 / itemLevel + 4 + itemLevel / 5;
-    }
-
-    // Ancient item bonus
-    if (isAncientItem)
-    {
-        calculatedDefense += baseDefense + (calculatedDefense * 3 / setItemDropLevel + 2 + setItemDropLevel / 30);
-    }
-
-    // Wings/capes defense bonus based on enhancement level
-    // Check if this is a wing/cape item (starts from ITEM_WING)
-    bool isWingOrCape = (itemType >= ITEM_WING && itemType < ITEM_WING + MAX_ITEM_INDEX) ||
-                        (itemType >= ITEM_HELPER + 30); // Capes start at ITEM_HELPER + 30
-
-    if (isWingOrCape)
-    {
-        // Check if this is a level 3 wing (Storm through Dimension, excluding Despair which is between them)
-        bool isLevel3Wing = (itemType >= ITEM_WING_OF_STORM && itemType <= ITEM_CAPE_OF_EMPEROR) ||
-                            (itemType >= ITEM_WINGS_OF_DESPAIR && itemType <= ITEM_WING_OF_DIMENSION);
-
-        // Different wing tiers get different bonuses
-        if (isLevel3Wing || itemType == ITEM_CAPE_OF_OVERRULE)
-        {
-            // Level 3 wings: *4 multiplier
-            calculatedDefense += (std::min<int>(9, enhancementLevel) * 4);
-        }
-        else if (itemType >= ITEM_WINGS_OF_SPIRITS && itemType <= ITEM_WINGS_OF_DARKNESS)
-        {
-            // Mid-tier wings (Spirits, Soul, Dragon, Darkness): *2 multiplier
-            calculatedDefense += (std::min<int>(9, enhancementLevel) * 2);
-        }
-        else if (itemType == ITEM_CAPE_OF_LORD || itemType == ITEM_CAPE_OF_FIGHTER)
-        {
-            // Basic capes: *2 multiplier
-            calculatedDefense += (std::min<int>(9, enhancementLevel) * 2);
-        }
-        else
-        {
-            // Early wings (Elf, Heaven, Satan, etc.): *3 multiplier for levels 0-9
-            calculatedDefense += (std::min<int>(9, enhancementLevel) * 3);
-        }
-    }
-
-    // Additional progressive bonus for levels above +9 for wings/capes only
-    if (isWingOrCape && enhancementLevel > 9)
-    {
-        int levelsAbove9 = enhancementLevel - 9;
-
-        // Check if this is a level 3 wing (Storm through Dimension, excluding Despair which is between them)
-        bool isLevel3Wing = (itemType >= ITEM_WING_OF_STORM && itemType <= ITEM_CAPE_OF_EMPEROR) ||
-                            (itemType >= ITEM_WINGS_OF_DESPAIR && itemType <= ITEM_WING_OF_DIMENSION);
-
-        if (isLevel3Wing || itemType == ITEM_CAPE_OF_OVERRULE)
-        {
-            // Level 3 wings: sum from 5 to (levelsAbove9 + 4) = 5+6+7+8+9+10 for levels 10-15
-            int first = 5;
-            int last = levelsAbove9 + 4;
-            calculatedDefense += levelsAbove9 * (first + last) / 2;
-        }
-        else if (itemType >= ITEM_WINGS_OF_SPIRITS && itemType <= ITEM_WINGS_OF_DARKNESS)
-        {
-            // Mid-tier wings (Spirits, Soul, Dragon, Darkness): use standard 4+5+6+7+8+9 for 10-15
-            switch (enhancementLevel - 9)
-            {
-            case 6: calculatedDefense += 9;
-            case 5: calculatedDefense += 8;
-            case 4: calculatedDefense += 7;
-            case 3: calculatedDefense += 6;
-            case 2: calculatedDefense += 5;
-            case 1: calculatedDefense += 4;
-                break;
-            }
-        }
-        else if (itemType == ITEM_CAPE_OF_LORD || itemType == ITEM_CAPE_OF_FIGHTER)
-        {
-            // Basic capes: use standard 4+5+6+7+8+9 for 10-15 (same as mid-tier wings)
-            switch (enhancementLevel - 9)
-            {
-            case 6: calculatedDefense += 9;
-            case 5: calculatedDefense += 8;
-            case 4: calculatedDefense += 7;
-            case 3: calculatedDefense += 6;
-            case 2: calculatedDefense += 5;
-            case 1: calculatedDefense += 4;
-                break;
-            }
-        }
-        else
-        {
-            // Early wings (Elf, Heaven, Satan): sum from 4 to (levelsAbove9 + 3)
-            int first = 25;
-            int last = levelsAbove9 + 3;
-            calculatedDefense += levelsAbove9 * (first + last) / 2;
-        }
-    }
-
-    return calculatedDefense;
+    // Delegate to the new modular system
+    return g_ItemDefense.CalculateDefense(baseDefense, itemType, enhancementLevel,
+                                          excellentFlags, ancientDiscriminator, itemLevel);
 }
 
 void CalcDefense(ITEM* ip, ITEM_ATTRIBUTE* p)
