@@ -2,7 +2,7 @@
 #include "NewUIChatInputBox.h"
 
 #include "DSPlaySound.h"
-#include "imgui.h"
+
 #include "NewUIChatLogWindow.h"
 #include "UIControls.h"
 #include "NewUISystem.h"
@@ -11,6 +11,7 @@
 #include "ZzzInterface.h"
 
 #ifdef _EDITOR
+#include "imgui.h"
 #include "../MuEditor/Core/MuEditorCore.h"
 #endif
 
