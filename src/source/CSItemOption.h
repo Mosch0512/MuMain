@@ -58,6 +58,22 @@ struct ITEM_SET_OPTION
     std::array<std::uint8_t, MAX_CLASS> byRequireClass{};
 };
 
+// On-disk representation of ITEM_SET_OPTION. Set name is narrow (UTF-8)
+// in the file; loader converts to wchar_t. Order/field layout must match
+// the .bmd byte layout exactly.
+struct ITEM_SET_OPTION_FILE
+{
+    char         strSetName[MAX_ITEM_SET_NAME];
+    std::array<std::array<std::uint8_t, MAX_ITEM_SET_STANDARD_OPTION_PER_ITEM_COUNT>, MAX_ITEM_SET_STANDARD_OPTION_COUNT> byStandardOption{};
+    std::array<std::array<std::uint8_t, MAX_ITEM_SET_STANDARD_OPTION_PER_ITEM_COUNT>, MAX_ITEM_SET_STANDARD_OPTION_COUNT> byStandardOptionValue{};
+    std::array<std::uint8_t, MAX_ITEM_SET_EXT_OPTION_COUNT> byExtOption{};
+    std::array<std::uint8_t, MAX_ITEM_SET_EXT_OPTION_COUNT> byExtOptionValue{};
+    std::uint8_t byOptionCount;
+    std::array<std::uint8_t, MAX_ITEM_SET_FULL_OPTION_COUNT> byFullOption{};
+    std::array<std::uint8_t, MAX_ITEM_SET_FULL_OPTION_COUNT> byFullOptionValue{};
+    std::array<std::uint8_t, MAX_CLASS> byRequireClass{};
+};
+
 struct SET_OPTION
 {
     bool IsActive;
@@ -107,7 +123,6 @@ private:
     static bool isClassRequirementFulfilled(const ITEM_SET_OPTION& setOptions, int firstClass, int secondClass);
     static void TryAddSetOption(std::uint8_t option, int value, int optionIndex, SET_SEARCH_RESULT_OPT& set, const ITEM_SET_OPTION& setOptions, bool isThisSetComplete, bool isFullOption, bool isExtOption, bool fulfillsClassRequirement, int firstClass, int secondClass);
 
-    static bool getExplainText(wchar_t* text, std::uint8_t option, int value);
     static std::uint8_t RenderSetOptionList(const SET_SEARCH_RESULT_OPT& set, std::uint8_t textIndex, bool bIsEquippedItem, bool bShowInactive);
 
     bool	OpenItemSetType(const wchar_t* filename);
@@ -134,6 +149,18 @@ public:
         m_bySameSetItem = 0;
     }
     bool OpenItemSetScript();
+
+    // Formats a set-option id + value into a localized, human-readable
+    // description (e.g. "Damage + 30"). Returns false for empty/unused slots.
+    static bool getExplainText(wchar_t* text, std::uint8_t option, int value);
+
+    // Returns the GlobalText[] row index that holds the localized template
+    // for the given set-option id, or -1 if the option is unknown/empty.
+    // Use this when you want the raw template (with "%d" etc.) without
+    // going through printf — e.g. to show the template in an editor
+    // without risking a format-specifier crash on mastery options whose
+    // templates expect additional runtime args.
+    static int getOptionTemplateTextIndex(std::uint8_t option);
 
     static bool    IsDisableSkill(ActionSkillType Type, int Energy, int Charisma = 0);
     std::uint8_t    IsChangeSetItem(const int Type, const int SubType = -1);
@@ -171,6 +198,17 @@ public:
     void	getAllAddOptionStatesbyCompare(std::uint16_t* Strength, std::uint16_t* Dexterity, std::uint16_t* Energy, std::uint16_t* Vitality, std::uint16_t* Charisma, std::uint16_t iCompareStrength, std::uint16_t iCompareDexterity, std::uint16_t iCompareEnergy, std::uint16_t iCompareVitality, std::uint16_t iC);
 
     void	getAllAddStateOnlyAddValue(std::uint16_t* AddStrength, std::uint16_t* AddDexterity, std::uint16_t* AddEnergy, std::uint16_t* AddVitality, std::uint16_t* AddCharisma) const; // Gets only the added stats of the active ancient set options plus bonus options
+
+    // In-memory access for editor tooling. Returns pointer to the
+    // MAX_SET_OPTION-sized internal array.
+    ITEM_SET_OPTION*       GetItemSetOptions()       { return m_ItemSetOption; }
+    const ITEM_SET_OPTION* GetItemSetOptions() const { return m_ItemSetOption; }
+
+#ifdef _EDITOR
+    // Write m_ItemSetOption[] back to the given .bmd, applying per-record
+    // BuxConvert encryption and appending a checksum (key 0xA2F1).
+    bool SaveItemSetOption(const wchar_t* filename) const;
+#endif
 };
 
 #define g_csItemOption CSItemOption::GetSingleton ()

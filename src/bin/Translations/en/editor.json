@@ -45,5 +45,15 @@
   "popup_export_csv_skills_failed": "Failed to export skill attributes as CSV!",
 
   "label_skill_editor_title": "Skill Editor",
-  "label_search_skills": "Search Skills:"
+  "label_search_skills": "Search Skills:",
+
+  "msg_itemsetopt_save_success": "Item set options saved successfully!",
+  "msg_itemsetopt_save_failed": "Failed to save item set options!",
+  "col_itemsetopt_name": "Set Name",
+  "col_itemsetopt_piecect": "Pieces",
+  "col_itemsetopt_optct": "Option Count",
+  "col_itemsetopt_stdopt": "Standard Options (per-piece, 2nd..7th)",
+  "col_itemsetopt_extopt": "Ext Options (any 2 pieces)",
+  "col_itemsetopt_fullopt": "Full Options (complete set)",
+  "col_itemsetopt_classes": "Classes (KN/EF/ML/DL/SM/RF/GS)"
 }

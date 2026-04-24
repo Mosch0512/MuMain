@@ -33,6 +33,7 @@ CMuEditorCore::CMuEditorCore()
     , m_bFrameStarted(false)
     , m_bShowItemEditor(false)
     , m_bShowSkillEditor(false)
+    , m_bShowItemSetOptionEditor(false)
     , m_bHoveringUI(false)
     , m_bPreviousFrameHoveringUI(false)
 {
@@ -403,12 +404,12 @@ void CMuEditorCore::Render()
     m_bHoveringUI = false;
 
     // Render toolbar (handles both open and closed states)
-    g_MuEditorUI.RenderToolbar(m_bEditorMode, m_bShowItemEditor, m_bShowSkillEditor);
+    g_MuEditorUI.RenderToolbar(m_bEditorMode, m_bShowItemEditor, m_bShowSkillEditor, m_bShowItemSetOptionEditor);
 
     if (m_bEditorMode)
     {
         // Render center pane (handles all editor windows and input blocking)
-        g_MuEditorCenterPaneUI.Render(m_bShowItemEditor, m_bShowSkillEditor);
+        g_MuEditorCenterPaneUI.Render(m_bShowItemEditor, m_bShowSkillEditor, m_bShowItemSetOptionEditor);
 
         // Render console
         g_MuEditorConsoleUI.Render();

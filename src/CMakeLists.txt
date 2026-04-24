@@ -165,15 +165,24 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     "${CMAKE_CURRENT_SOURCE_DIR}/source/resource.rc"
   )
 
-  # Copy assets directory next to executable (portable, IDE-agnostic solution)
+  # Copy assets directory next to executable (portable, IDE-agnostic solution).
+  # copy_directory_if_different (CMake >= 3.26) hashes files and skips unchanged
+  # ones, which on cross-fs build dirs (e.g. WSL -> /mnt/d) saves minutes per
+  # incremental build. Falls back to copy_directory on older CMake.
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.26")
+    set(_MU_ASSET_COPY_CMD copy_directory_if_different)
+  else()
+    set(_MU_ASSET_COPY_CMD copy_directory)
+  endif()
+
   add_custom_command(
     TARGET Main
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E echo "=== DEBUG: Copying assets from ${ASSETS_DIR} to $<TARGET_FILE_DIR:Main>"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    COMMAND ${CMAKE_COMMAND} -E echo "=== DEBUG: Syncing assets from ${ASSETS_DIR} to $<TARGET_FILE_DIR:Main>"
+    COMMAND ${CMAKE_COMMAND} -E ${_MU_ASSET_COPY_CMD}
             "${ASSETS_DIR}"
             "$<TARGET_FILE_DIR:Main>"
-    COMMENT "Copying game assets to executable directory"
+    COMMENT "Syncing game assets to executable directory"
   )
 endif()
 

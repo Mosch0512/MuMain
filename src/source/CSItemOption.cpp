@@ -54,20 +54,6 @@ void ReportFileIssue(const wchar_t* filename, const wchar_t* issue)
 
 static  CSItemOption csItemOption; // do not delete, required for singleton initialization.
 
-struct ITEM_SET_OPTION_FILE
-{
-    char	strSetName[MAX_ITEM_SET_NAME];
-    std::array<std::array<std::uint8_t, MAX_ITEM_SET_STANDARD_OPTION_PER_ITEM_COUNT>, MAX_ITEM_SET_STANDARD_OPTION_COUNT> byStandardOption{};
-    std::array<std::array<std::uint8_t, MAX_ITEM_SET_STANDARD_OPTION_PER_ITEM_COUNT>, MAX_ITEM_SET_STANDARD_OPTION_COUNT> byStandardOptionValue{};
-    std::array<std::uint8_t, MAX_ITEM_SET_EXT_OPTION_COUNT> byExtOption{};
-    std::array<std::uint8_t, MAX_ITEM_SET_EXT_OPTION_COUNT> byExtOptionValue{};
-    std::uint8_t byOptionCount;
-    std::array<std::uint8_t, MAX_ITEM_SET_FULL_OPTION_COUNT> byFullOption{};
-    std::array<std::uint8_t, MAX_ITEM_SET_FULL_OPTION_COUNT> byFullOptionValue{};
-    std::array<std::uint8_t, MAX_CLASS> byRequireClass{};
-};
-
-
 bool CSItemOption::OpenItemSetScript()
 {
     std::wstring strFileName = L"";
@@ -461,18 +447,14 @@ void CSItemOption::calcSetOptionList(const SET_SEARCH_RESULT* optionList)
     }
 }
 
-bool CSItemOption::getExplainText(wchar_t* text, std::uint8_t option, int value)
+int CSItemOption::getOptionTemplateTextIndex(std::uint8_t option)
 {
-    if (option == EMPTY_OPTION)
-    {
-        return false;
-    }
+    if (option == EMPTY_OPTION) return -1;
 
     switch (option + AT_SET_OPTION_IMPROVE_STRENGTH)
     {
     case AT_SET_OPTION_IMPROVE_MAGIC_POWER:
-        mu_swprintf(text, GlobalText[632], value);
-        return true;
+        return 632;
 
     case AT_SET_OPTION_IMPROVE_STRENGTH:
     case AT_SET_OPTION_IMPROVE_DEXTERITY:
@@ -481,8 +463,7 @@ bool CSItemOption::getExplainText(wchar_t* text, std::uint8_t option, int value)
     case AT_SET_OPTION_IMPROVE_CHARISMA:
     case AT_SET_OPTION_IMPROVE_ATTACK_MIN:
     case AT_SET_OPTION_IMPROVE_ATTACK_MAX:
-        mu_swprintf(text, GlobalText[950 + option], value);
-        return true;
+        return 950 + option;
 
     case AT_SET_OPTION_IMPROVE_DAMAGE:
     case AT_SET_OPTION_IMPROVE_ATTACKING_PERCENT:
@@ -497,26 +478,20 @@ bool CSItemOption::getExplainText(wchar_t* text, std::uint8_t option, int value)
     case AT_SET_OPTION_IMPROVE_EXCELLENT_DAMAGE:
     case AT_SET_OPTION_IMPROVE_SKILL_ATTACK:
     case AT_SET_OPTION_DOUBLE_DAMAGE:
-        mu_swprintf(text, GlobalText[949 + option], value);
-        return true;
+        return 949 + option;
 
     case AT_SET_OPTION_DISABLE_DEFENCE:
-        mu_swprintf(text, GlobalText[970], value);
-        return true;
+        return 970;
 
     case AT_SET_OPTION_TWO_HAND_SWORD_IMPROVE_DAMAGE:
-        mu_swprintf(text, GlobalText[983], value);
-        return true;
+        return 983;
 
     case AT_SET_OPTION_IMPROVE_SHIELD_DEFENCE:
-        mu_swprintf(text, GlobalText[984], value);
-        return true;
+        return 984;
 
     case AT_SET_OPTION_IMPROVE_ATTACK_1:
     case AT_SET_OPTION_IMPROVE_ATTACK_2:
     case AT_SET_OPTION_IMPROVE_MAGIC:
-        //	case AT_SET_OPTION_IMPROVE_DEFENCE_1:
-        //	case AT_SET_OPTION_IMPROVE_DEFENCE_2:
     case AT_SET_OPTION_IMPROVE_DEFENCE_3:
     case AT_SET_OPTION_IMPROVE_DEFENCE_4:
     case AT_SET_OPTION_FIRE_MASTERY:
@@ -526,11 +501,19 @@ bool CSItemOption::getExplainText(wchar_t* text, std::uint8_t option, int value)
     case AT_SET_OPTION_WATER_MASTERY:
     case AT_SET_OPTION_WIND_MASTERY:
     case AT_SET_OPTION_EARTH_MASTERY:
-        mu_swprintf(text, GlobalText[971 + (option + AT_SET_OPTION_IMPROVE_STRENGTH - AT_SET_OPTION_IMPROVE_ATTACK_2)], value);
-        return true;
+        return 971 + (option + AT_SET_OPTION_IMPROVE_STRENGTH - AT_SET_OPTION_IMPROVE_ATTACK_2);
+
     default:
-        return false;
+        return -1;
     }
+}
+
+bool CSItemOption::getExplainText(wchar_t* text, std::uint8_t option, int value)
+{
+    const int textIndex = getOptionTemplateTextIndex(option);
+    if (textIndex < 0) return false;
+    mu_swprintf(text, GlobalText[textIndex], value);
+    return true;
 }
 
 int CSItemOption::AggregateOptionValue(int optionNumber) const
@@ -1168,6 +1151,7 @@ int CSItemOption::RenderSetOptionListInItem(const ITEM* ip, int TextNum, bool bI
     mu_swprintf(TextList[TNum], L"\n"); TNum++;
 
 
+    bool rendered = false;
     for (int i = 0; i < m_SetSearchResultCount; i++)
     {
         const auto& set = m_SetSearchResult[i];
@@ -1175,8 +1159,47 @@ int CSItemOption::RenderSetOptionListInItem(const ITEM* ip, int TextNum, bool bI
         {
             // Set Found.
             TNum = RenderSetOptionList(set, TNum, bIsEquippedItem, true);
+            rendered = true;
             break;
         }
+    }
+
+    // Fallback: item is not part of an equipped set. Render the set's
+    // options directly from the set definition, all in gray, so the player
+    // can still see what bonuses the set would grant.
+    if (!rendered)
+    {
+        auto tryRender = [&TNum](std::uint8_t opt, std::uint8_t val)
+        {
+            if (opt == EMPTY_OPTION || val == 0) return;
+            if (getExplainText(TextList[TNum], opt, val))
+            {
+                TextListColor[TNum] = TEXT_COLOR_GRAY;
+                TextBold[TNum] = false;
+                TNum++;
+            }
+        };
+
+        const auto standardOptionCount = std::min<int>(
+            setOption.bySetItemCount - 1, MAX_ITEM_SET_STANDARD_OPTION_COUNT);
+        for (int o = 0; o < standardOptionCount; ++o)
+        {
+            for (int n = 0; n < MAX_ITEM_SET_STANDARD_OPTION_PER_ITEM_COUNT; ++n)
+            {
+                tryRender(setOption.byStandardOption[o][n],
+                          setOption.byStandardOptionValue[o][n]);
+            }
+        }
+        for (int o = 0; o < MAX_ITEM_SET_EXT_OPTION_COUNT; ++o)
+        {
+            tryRender(setOption.byExtOption[o], setOption.byExtOptionValue[o]);
+        }
+        for (int o = 0; o < MAX_ITEM_SET_FULL_OPTION_COUNT; ++o)
+        {
+            tryRender(setOption.byFullOption[o], setOption.byFullOptionValue[o]);
+        }
+
+        mu_swprintf(TextList[TNum], L"\n"); TNum++;
     }
 
     mu_swprintf(TextList[TNum], L"\n"); TNum++;
@@ -1233,3 +1256,58 @@ bool CSItemOption::IsViewOptionList()
 {
     return m_bViewOptionList;
 }
+
+#ifdef _EDITOR
+bool CSItemOption::SaveItemSetOption(const wchar_t* filename) const
+{
+    FILE* fp = _wfopen(filename, L"wb");
+    if (!fp) return false;
+
+    const std::size_t entrySize = sizeof(ITEM_SET_OPTION_FILE);
+    std::vector<std::uint8_t> buffer(entrySize * MAX_SET_OPTION);
+
+    auto* pSeek = buffer.data();
+    for (int i = 0; i < MAX_SET_OPTION; ++i)
+    {
+        ITEM_SET_OPTION_FILE current{};
+        const auto& src = m_ItemSetOption[i];
+
+        // wchar_t (UTF-16) -> UTF-8 narrow for file.
+        WideCharToMultiByte(CP_UTF8, 0, src.strSetName, -1,
+                            current.strSetName,
+                            static_cast<int>(sizeof(current.strSetName)),
+                            nullptr, nullptr);
+
+        current.byStandardOption      = src.byStandardOption;
+        current.byStandardOptionValue = src.byStandardOptionValue;
+        current.byExtOption           = src.byExtOption;
+        current.byExtOptionValue      = src.byExtOptionValue;
+        current.byOptionCount         = src.byOptionCount;
+        current.byFullOption          = src.byFullOption;
+        current.byFullOptionValue     = src.byFullOptionValue;
+        current.byRequireClass        = src.byRequireClass;
+
+        std::memcpy(pSeek, &current, entrySize);
+        BuxConvert(pSeek, static_cast<int>(entrySize));
+        pSeek += entrySize;
+    }
+
+    if (std::fwrite(buffer.data(), buffer.size(), 1, fp) != 1)
+    {
+        std::fclose(fp);
+        return false;
+    }
+
+    const std::uint32_t checksum =
+        GenerateCheckSum2(buffer.data(), static_cast<int>(buffer.size()), 0xA2F1);
+
+    if (std::fwrite(&checksum, sizeof(checksum), 1, fp) != 1)
+    {
+        std::fclose(fp);
+        return false;
+    }
+
+    std::fclose(fp);
+    return true;
+}
+#endif
