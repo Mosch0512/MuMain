@@ -264,18 +264,7 @@ bool SEASON3B::CNewUIChatInputBox::UpdateMouseEvent()
 
     auto const releaseMouse = SEASON3B::IsRelease(VK_LBUTTON);
 
-    if (SelectedCharacter >= 0 && IsVisible() && SEASON3B::IsRelease(VK_RBUTTON))
-    {
-        auto const character = &CharactersClient[SelectedCharacter];
-
-        if (character->Object.Kind == KIND_PLAYER
-            && !gMapManager.InChaosCastle()
-            && !(::IsStrifeMap(gMapManager.WorldActive)
-                && Hero->m_byGensInfluence != character->m_byGensInfluence))
-        {
-            SetWhsprID(character->ID);
-        }
-    }
+    UpdateWhisperTargetFromRightClick();
 
     m_iTooltipType = INPUT_TOOLTIP_NOTHING;
 
@@ -852,6 +841,34 @@ void SEASON3B::CNewUIChatInputBox::GetWhsprID(type_string& strWhsprID)
 void SEASON3B::CNewUIChatInputBox::SetWhsprID(const wchar_t* strWhsprID)
 {
     m_pWhsprIDInputBox->SetText(strWhsprID);
+}
+
+void SEASON3B::CNewUIChatInputBox::UpdateWhisperTargetFromRightClick()
+{
+    if (SelectedCharacter < 0 || !IsVisible() || !SEASON3B::IsRelease(VK_RBUTTON))
+    {
+        return;
+    }
+
+    auto const character = &CharactersClient[SelectedCharacter];
+    if (character->Object.Kind != KIND_PLAYER)
+    {
+        return;
+    }
+
+    if (gMapManager.InChaosCastle())
+    {
+        return;
+    }
+
+    auto const blockedByGensRivalry = ::IsStrifeMap(gMapManager.WorldActive)
+        && Hero->m_byGensInfluence != character->m_byGensInfluence;
+    if (blockedByGensRivalry)
+    {
+        return;
+    }
+
+    SetWhsprID(character->ID);
 }
 
 void SEASON3B::CNewUIChatInputBox::SetTextPosition(int x, int y)

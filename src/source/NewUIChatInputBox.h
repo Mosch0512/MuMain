@@ -186,6 +186,8 @@ namespace SEASON3B
 
         void SetTextPosition(int x, int y);
         void SetBuddyPosition(int x, int y);
+
+        void UpdateWhisperTargetFromRightClick();
     };
 }
 
