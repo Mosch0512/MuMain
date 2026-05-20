@@ -23,6 +23,7 @@
 #include "UI/NewUI/NewUISystem.h"
 #include "GameLogic/Skills/SkillManager.h"
 #include "Engine/Object/ZzzInterface.h"
+#include "I18N/All.h"
 
 using namespace SEASON3B;
 
@@ -1131,7 +1132,7 @@ bool SEASON3B::CServerLostMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK, 10.f))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[402]);
+    pMsgBox->AddMsg(I18N::Game::YouAreDisconnectedFromTheServer);
     pMsgBox->AddCallbackFunc(CServerLostMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->RemoveCallbackFunc(MSGBOX_EVENT_PRESSKEY_ESC);
 
@@ -1214,15 +1215,15 @@ bool SEASON3B::CMapEnterWerwolfMsgBoxLayout::SetLayout()
         return false;
 
     pMsgBox->SetPos((SCREEN_WIDTH / 2) - (MSGBOX_WIDTH / 2), 50);
-    pMsgBox->AddMsg(GlobalText[1658], RGBA(254, 176, 72, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::WerewolfGuardsman, RGBA(254, 176, 72, 255), MSGBOX_FONT_BOLD);
     pMsgBox->AddMsg(L" ");
-    pMsgBox->AddMsg(GlobalText[1659], RGBA(170, 218, 146, 255));
+    pMsgBox->AddMsg(I18N::Game::DoYouEvenKnowAboutMe, RGBA(170, 218, 146, 255));
     pMsgBox->AddMsg(L" ");
-    pMsgBox->AddMsg(GlobalText[1660]);
+    pMsgBox->AddMsg(I18N::Game::IfYouHavePassedThroughThe);
     pMsgBox->AddMsg(L" ");
-    pMsgBox->AddMsg(GlobalText[1676]);
+    pMsgBox->AddMsg(I18N::Game::YouMustBeLocatedCloselyTogether);
     pMsgBox->AddMsg(L" ");
-    pMsgBox->AddMsg(GlobalText[1661]);
+    pMsgBox->AddMsg(I18N::Game::InOrderToReceiveHelpFrom);
 
     BYTE byQuestState = g_csQuest.getQuestState2(QUEST_3RD_CHANGE_UP_2);
     if (QUEST_ING != byQuestState && QUEST_END != byQuestState)
@@ -1245,7 +1246,7 @@ CALLBACK_RESULT SEASON3B::CMapEnterWerwolfMsgBoxLayout::OkBtnDown(class CNewUIMe
     }
     else
     {
-        g_pSystemLogBox->AddText(GlobalText[423], SEASON3B::TYPE_ERROR_MESSAGE);
+        g_pSystemLogBox->AddText(I18N::Game::YouAreShortOfZen, SEASON3B::TYPE_ERROR_MESSAGE);
     }
 
     PlayBuffer(SOUND_CLICK01);
@@ -1263,13 +1264,13 @@ bool CMapEnterGateKeeperMsgBoxLayout::SetLayout()
         return false;
 
     pMsgBox->SetPos((SCREEN_WIDTH / 2) - (MSGBOX_WIDTH / 2), 50);
-    pMsgBox->AddMsg(GlobalText[1662], 0xFF49B0FF, MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::Gatekeeper, 0xFF49B0FF, MSGBOX_FONT_BOLD);
     pMsgBox->AddMsg(L" ");
-    pMsgBox->AddMsg(GlobalText[1663], 0xFF61F191);
+    pMsgBox->AddMsg(I18N::Game::HmmWhoAreYouIMConfusedAreYouEvenApprovedOfBalgass, 0xFF61F191);
     pMsgBox->AddMsg(L" ");
-    pMsgBox->AddMsg(GlobalText[1664]);
+    pMsgBox->AddMsg(I18N::Game::LugadrS12ApostlesAreHelping);
     pMsgBox->AddMsg(L" ");
-    pMsgBox->AddMsg(GlobalText[1677]);
+    pMsgBox->AddMsg(I18N::Game::ApostleDevinSThirdMissionRequest);
 
     BYTE byQuestState = g_csQuest.getQuestState2(QUEST_3RD_CHANGE_UP_3);
     if (QUEST_ING != byQuestState)
@@ -1300,7 +1301,7 @@ bool SEASON3B::CPartyMsgBoxLayout::SetLayout()
         return false;
 
     pMsgBox->AddMsg(CharactersClient[FindCharacterIndex(PartyKey)].ID);
-    pMsgBox->AddMsg(GlobalText[425]);
+    pMsgBox->AddMsg(I18N::Game::SomeoneRequestsYouToJoinTheirAParty);
     pMsgBox->AddCallbackFunc(CPartyMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CPartyMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return true;
@@ -1335,7 +1336,7 @@ bool SEASON3B::CTradeMsgBoxLayout::SetLayout()
     wchar_t szYourID[MAX_USERNAME_SIZE + 1];
     g_pTrade->GetYourID(szYourID);
     pMsgBox->AddMsg(szYourID);
-    pMsgBox->AddMsg(GlobalText[419]);
+    pMsgBox->AddMsg(I18N::Game::WouldLikeToTradeWithYou);
     pMsgBox->AddCallbackFunc(CTradeMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CTradeMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return true;
@@ -1370,7 +1371,7 @@ bool SEASON3B::CTradeAlertMsgBoxLayout::SetLayout()
     DWORD adwColor[4] = { RGBA(255, 178, 0, 255), RGBA(255, 178, 0, 255), RGBA(255, 178, 0, 255), RGBA(255, 32, 32, 255) };
 
     for (int i = 0; i < 4; ++i)
-        pMsgBox->AddMsg(GlobalText[371 + i], adwColor[i], MSGBOX_FONT_BOLD);
+        pMsgBox->AddMsg(I18N::Game::Lookup(371 + i), adwColor[i], MSGBOX_FONT_BOLD);
 
     pMsgBox->AddCallbackFunc(CTradeAlertMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CTradeAlertMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
@@ -1403,9 +1404,9 @@ bool SEASON3B::CGuildWarMsgBoxLayout::SetLayout()
         return false;
 
     wchar_t strText[128];
-    mu_swprintf(strText, GlobalText[430], GuildWarName);
+    mu_swprintf(strText, I18N::Game::SGuildChallengesYou, GuildWarName);
     pMsgBox->AddMsg(strText);
-    pMsgBox->AddMsg(GlobalText[431]);
+    pMsgBox->AddMsg(I18N::Game::ToAGuildWar);
 
     pMsgBox->AddCallbackFunc(CGuildWarMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CGuildWarMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
@@ -1441,9 +1442,9 @@ bool SEASON3B::CBattleSoccerMsgBoxLayout::SetLayout()
         return false;
 
     wchar_t strText[128];
-    mu_swprintf(strText, GlobalText[430], GuildWarName);
+    mu_swprintf(strText, I18N::Game::SGuildChallengesYou, GuildWarName);
     pMsgBox->AddMsg(strText);
-    pMsgBox->AddMsg(GlobalText[432]);
+    pMsgBox->AddMsg(I18N::Game::YouHaveBeenChallengedToBattleSoccer);
 
     pMsgBox->AddCallbackFunc(CBattleSoccerMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CBattleSoccerMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
@@ -1479,7 +1480,7 @@ bool SEASON3B::CServerImmigrationErrorMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[401]);
+    pMsgBox->AddMsg(I18N::Game::ThePasswordYouHaveEnteredIsIncorrect);
 
     pMsgBox->AddCallbackFunc(CServerImmigrationErrorMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
 
@@ -1502,7 +1503,7 @@ bool SEASON3B::CPersonalshopCreateMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[1131]);
+    pMsgBox->AddMsg(I18N::Game::DoYouWantToOpenAStore);
 
     pMsgBox->AddCallbackFunc(CPersonalshopCreateMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CPersonalshopCreateMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
@@ -1542,7 +1543,7 @@ bool SEASON3B::CFenrirRepairMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[1865], RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToRepairFenrirSHorn, RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
 
     pMsgBox->AddCallbackFunc(CFenrirRepairMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CFenrirRepairMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
@@ -1606,7 +1607,7 @@ bool SEASON3B::CInfinityArrowCancelMsgBoxLayout::SetLayout()
         return false;
 
     wchar_t strText[MAX_GLOBAL_TEXT_STRING];
-    mu_swprintf(strText, L"%ls%ls", SkillAttribute[AT_SKILL_INFINITY_ARROW].Name, GlobalText[2046]);
+    mu_swprintf(strText, L"%ls%ls", SkillAttribute[AT_SKILL_INFINITY_ARROW].Name, I18N::Game::WouldYouLikeToCancel);
     g_iCancelSkillTarget = AT_SKILL_INFINITY_ARROW; // todo: is considering master skill required here?
 
     pMsgBox->AddMsg(strText, RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
@@ -1648,7 +1649,7 @@ bool SEASON3B::CBuffSwellOfMPCancelMsgBoxLayOut::SetLayout()
         return false;
 
     wchar_t strText[MAX_GLOBAL_TEXT_STRING];
-    mu_swprintf(strText, L"%ls%ls", SkillAttribute[AT_SKILL_EXPANSION_OF_WIZARDRY].Name, GlobalText[2046]);
+    mu_swprintf(strText, L"%ls%ls", SkillAttribute[AT_SKILL_EXPANSION_OF_WIZARDRY].Name, I18N::Game::WouldYouLikeToCancel);
     g_iCancelSkillTarget = AT_SKILL_EXPANSION_OF_WIZARDRY;
 
     pMsgBox->AddMsg(strText, RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
@@ -1729,7 +1730,7 @@ bool SEASON3B::CGemIntegrationUnityResultMsgBoxLayout::SetLayout()
         return false;
 
     wchar_t strText[256] = { 0, };
-    mu_swprintf(strText, L"%ls%ls %ls", GlobalText[1801], GlobalText[1816], GlobalText[858]);
+    mu_swprintf(strText, L"%ls%ls %ls", I18N::Game::JewelCombination, I18N::Game::To, I18N::Game::CongratulationsYouHaveSuccessfully);
     pMsgBox->AddMsg(strText, RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
     pMsgBox->AddCallbackFunc(CGemIntegrationUnityResultMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
 
@@ -1793,7 +1794,7 @@ bool SEASON3B::CGemIntegrationDisjointResultMsgBoxLayout::SetLayout()
         return false;
 
     wchar_t strText[256] = { 0, };
-    mu_swprintf(strText, L"%ls%ls %ls", GlobalText[1800], GlobalText[1816], GlobalText[858]);
+    mu_swprintf(strText, L"%ls%ls %ls", I18N::Game::DismantleJewel, I18N::Game::To, I18N::Game::CongratulationsYouHaveSuccessfully);
     pMsgBox->AddMsg(strText, RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
     pMsgBox->AddCallbackFunc(CGemIntegrationDisjointResultMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     return true;
@@ -1855,7 +1856,7 @@ bool SEASON3B::CHarvestEventLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2020], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToReceiveTheItem, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
     pMsgBox->AddCallbackFunc(CHarvestEventLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CHarvestEventLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return true;
@@ -1887,7 +1888,7 @@ bool SEASON3B::CWhiteAngelEventLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2020], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToReceiveTheItem, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
 
     pMsgBox->AddCallbackFunc(CWhiteAngelEventLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CWhiteAngelEventLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
@@ -2000,7 +2001,7 @@ bool  SEASON3B::CMixCheckMsgBoxLayout::SetLayout()
 
     pMsgBox->AddMsg(strText, RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
     pMsgBox->AddMsg(L" ");
-    pMsgBox->AddMsg(GlobalText[539], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::DoYouWantToCombineYourItems, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
     pMsgBox->AddCallbackFunc(CMixCheckMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CMixCheckMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return true;
@@ -2035,7 +2036,7 @@ bool SEASON3B::CUseReviveCharmMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2607]);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToSaveTheLocation);
     pMsgBox->AddCallbackFunc(CUseReviveCharmMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CUseReviveCharmMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return true;
@@ -2067,7 +2068,7 @@ bool SEASON3B::CUsePortalCharmMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2609]);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToSaveTheLocation);
     pMsgBox->AddCallbackFunc(CUsePortalCharmMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CUsePortalCharmMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return true;
@@ -2100,7 +2101,7 @@ bool SEASON3B::CReturnPortalCharmMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2607]);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToSaveTheLocation);
     pMsgBox->AddCallbackFunc(CReturnPortalCharmMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CReturnPortalCharmMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return true;
@@ -2133,8 +2134,8 @@ bool SEASON3B::CDuelCreateErrorMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2692], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
-    pMsgBox->AddMsg(GlobalText[2693], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::ColosseumIsOccupied, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::TryItAgainLater, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
 
     pMsgBox->AddCallbackFunc(CDuelCreateErrorMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
 
@@ -2158,9 +2159,9 @@ bool SEASON3B::CDuelWatchErrorMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2706], RGBA(255, 255, 128, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::NotAvailable, RGBA(255, 255, 128, 255), MSGBOX_FONT_BOLD);
     pMsgBox->AddMsg(L" ");
-    pMsgBox->AddMsg(GlobalText[2707], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::TooManyPeopleInTheColossum, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
 
     pMsgBox->AddCallbackFunc(CDuelWatchErrorMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
 
@@ -2321,8 +2322,8 @@ bool SEASON3B::CSiegeLevelMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[1429], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
-    pMsgBox->AddMsg(GlobalText[1430], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::YouHaveNoAbility, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::ToAttackTheCastle, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
 
     pMsgBox->AddCallbackFunc(CSiegeLevelMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
 
@@ -2346,7 +2347,7 @@ bool SEASON3B::CSiegeGiveUpMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[1498], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::AreYouReallyWantToQuitTheSiegeWargare, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
 
     pMsgBox->AddCallbackFunc(CSiegeGiveUpMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CSiegeGiveUpMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
@@ -2381,8 +2382,8 @@ bool SEASON3B::CGatemanMoneyMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[1627], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
-    pMsgBox->AddMsg(GlobalText[1628], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::EnteringIsNotAllowed, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::InsufficientZenForEntering, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
 
     pMsgBox->AddCallbackFunc(CGatemanMoneyMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
 
@@ -2405,7 +2406,7 @@ bool SEASON3B::CGatemanFailMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[860], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::UnfortunatelyYouHaveFailed, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
 
     pMsgBox->AddCallbackFunc(CGatemanFailMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
 
@@ -2428,7 +2429,7 @@ bool SEASON3B::CQuestGiveUpMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2817]);
+    pMsgBox->AddMsg(I18N::Game::IfYouGiveUpYouWill);
 
     pMsgBox->AddCallbackFunc(CQuestGiveUpMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CQuestGiveUpMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
@@ -2465,11 +2466,11 @@ bool SEASON3B::CQuestCountLimitMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[3279]);
-    pMsgBox->AddMsg(GlobalText[3280]);
-    pMsgBox->AddMsg(GlobalText[3281]);
-    pMsgBox->AddMsg(GlobalText[3282]);
-    pMsgBox->AddMsg(GlobalText[3283]);
+    pMsgBox->AddMsg(I18N::Game::YouCannotAcceptAnyMoreQuest);
+    pMsgBox->AddMsg(I18N::Game::YouCanProceedMaximum10Quests);
+    pMsgBox->AddMsg(I18N::Game::AtTheSameTime);
+    pMsgBox->AddMsg(I18N::Game::YouNeedToClearAtLeast1QuestTo);
+    pMsgBox->AddMsg(I18N::Game::AcceptThisOne);
 
     pMsgBox->AddCallbackFunc(CQuestCountLimitMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
 
@@ -2493,8 +2494,8 @@ bool SEASON3B::CCanNotUseWordMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[392], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
-    pMsgBox->AddMsg(GlobalText[393], RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::RestrictedWordsAre, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
+    pMsgBox->AddMsg(I18N::Game::Included, RGBA(255, 255, 255, 255), MSGBOX_FONT_NORMAL);
 
     return true;
 }
@@ -2518,9 +2519,9 @@ bool SEASON3B::CHighValueItemCheckMsgBoxLayout::SetLayout()
         pMsgBox->Set3DItem(pItem);
     }
 
-    pMsgBox->AddMsg(GlobalText[536], RGBA(255, 0, 0, 255), MSGBOX_FONT_BOLD);
-    pMsgBox->AddMsg(GlobalText[537], RGBA(255, 178, 0, 255), MSGBOX_FONT_BOLD);
-    pMsgBox->AddMsg(GlobalText[538], RGBA(255, 178, 0, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::AnExpensiveItem, RGBA(255, 0, 0, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::CheckTheItemPlease, RGBA(255, 178, 0, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::AreYouSureYouWantToSellIt, RGBA(255, 178, 0, 255), MSGBOX_FONT_BOLD);
 
     pMsgBox->AddCallbackFunc(CHighValueItemCheckMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CHighValueItemCheckMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
@@ -2596,25 +2597,25 @@ bool SEASON3B::CUseFruitMsgBoxLayout::SetLayout()
         switch (pItem->Level)
         {
         case 0:
-            mu_swprintf(strName, L"%ls", GlobalText[168]);
+            mu_swprintf(strName, L"%ls", I18N::Game::ENG);
             break;
         case 1:
-            mu_swprintf(strName, L"%ls", GlobalText[169]);
+            mu_swprintf(strName, L"%ls", I18N::Game::STA);
             break;
         case 2:
-            mu_swprintf(strName, L"%ls", GlobalText[167]);
+            mu_swprintf(strName, L"%ls", I18N::Game::AGI);
             break;
         case 3:
-            mu_swprintf(strName, L"%ls", GlobalText[166]);
+            mu_swprintf(strName, L"%ls", I18N::Game::STR);
             break;
         case 4:
-            mu_swprintf(strName, L"%ls", GlobalText[1900]);
+            mu_swprintf(strName, L"%ls", I18N::Game::Command);
             break;
         }
     }
 
     pMsgBox->AddMsg(strName, RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
-    pMsgBox->AddMsg(GlobalText[376], RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::DoYouWantToUseTheFruit, RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
     pMsgBox->AddCallbackFunc(CUseFruitMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CUseFruitMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return true;
@@ -2658,28 +2659,28 @@ bool SEASON3B::CUsePartChargeFruitMsgBoxLayout::SetLayout()
 
     if (pItem->Type == ITEM_HELPER + 54)
     {
-        mu_swprintf(strName, L"%ls", GlobalText[166]);
+        mu_swprintf(strName, L"%ls", I18N::Game::STR);
     }
     else if (pItem->Type == ITEM_HELPER + 55)
     {
-        mu_swprintf(strName, L"%ls", GlobalText[167]);
+        mu_swprintf(strName, L"%ls", I18N::Game::AGI);
     }
     else if (pItem->Type == ITEM_HELPER + 56)
     {
-        mu_swprintf(strName, L"%ls", GlobalText[169]);
+        mu_swprintf(strName, L"%ls", I18N::Game::STA);
     }
     else if (pItem->Type == ITEM_HELPER + 57)
     {
-        mu_swprintf(strName, L"%ls", GlobalText[168]);
+        mu_swprintf(strName, L"%ls", I18N::Game::ENG);
     }
     else if (pItem->Type == ITEM_HELPER + 58)
     {
-        mu_swprintf(strName, L"%ls", GlobalText[1900]);
+        mu_swprintf(strName, L"%ls", I18N::Game::Command);
     }
 
     pMsgBox->AddMsg(strName, RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
-    pMsgBox->AddMsg(GlobalText[2524], RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
-    pMsgBox->AddMsg(GlobalText[2525], RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::ThisIsMoreThanTheValueOfYourResettablePoints, RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToReset, RGBA(255, 255, 0, 255), MSGBOX_FONT_BOLD);
     pMsgBox->AddCallbackFunc(CUsePartChargeFruitMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CUsePartChargeFruitMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return true;
@@ -2828,7 +2829,7 @@ bool SEASON3B::CPersonalShopItemBuyMsgBoxLayout::SetLayout()
         pMsgBox->Set3DItem(pItem);
     }
 
-    pMsgBox->AddMsg(GlobalText[1100]);
+    pMsgBox->AddMsg(I18N::Game::DoYouWantToBuyAnItem);
     pMsgBox->AddCallbackFunc(CPersonalShopItemBuyMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CPersonalShopItemBuyMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return true;
@@ -2870,9 +2871,9 @@ bool SEASON3B::COsbourneMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2223], RGBA(255, 0, 0, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::Warning2223, RGBA(255, 0, 0, 255), MSGBOX_FONT_BOLD);
     pMsgBox->AddMsg(L" ");
-    pMsgBox->AddMsg(GlobalText[2224], RGBA(223, 191, 103, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::RefineryHasStartedRefineryIsA, RGBA(223, 191, 103, 255), MSGBOX_FONT_BOLD);
 
     pMsgBox->AddCallbackFunc(COsbourneMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(COsbourneMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_PRESSKEY_ESC);
@@ -2899,7 +2900,7 @@ bool SEASON3B::CGuildOutPerson::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[1270], RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::AllianceMasterCanTDisbandTheGuild, RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
 
     pMsgBox->AddCallbackFunc(CGuildOutPerson::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CGuildOutPerson::OkBtnDown, MSGBOX_EVENT_PRESSKEY_ESC);
@@ -2923,10 +2924,10 @@ bool SEASON3B::CGuildBreakMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[1363], RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
-    pMsgBox->AddMsg(GlobalText[1364], RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
-    pMsgBox->AddMsg(GlobalText[1365], RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
-    pMsgBox->AddMsg(GlobalText[1366], RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::OnceYouDisbandTheGuild, RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::AllTheItemsAndZenInTheGuildVaultWillDisappear, RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::AlsoTheGuildRankingInformationWillDisappear, RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToDisbandTheGuild, RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
 
     pMsgBox->AddCallbackFunc(CGuildBreakMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CGuildBreakMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
@@ -2961,9 +2962,9 @@ bool SEASON3B::CGuildPerson_Get_Out::SetLayout()
         return false;
 
     wchar_t Buff[300];
-    mu_swprintf(Buff, GlobalText[1367], GuildList[DeleteIndex].Name);
+    mu_swprintf(Buff, I18N::Game::CharacterS, GuildList[DeleteIndex].Name);
     pMsgBox->AddMsg(Buff, RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
-    pMsgBox->AddMsg(GlobalText[1369], RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToRelease, RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
     pMsgBox->AddCallbackFunc(CGuildPerson_Get_Out::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CGuildPerson_Get_Out::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     pMsgBox->AddCallbackFunc(CGuildPerson_Get_Out::CancelBtnDown, MSGBOX_EVENT_PRESSKEY_ESC);
@@ -3030,7 +3031,7 @@ bool SEASON3B::CCry_Wolf_Result_Set_Temple::SetLayout()
 
     wchar_t Text[300];
 
-    mu_swprintf(Text, L"%ls    %ls    %ls    %ls", GlobalText[680], GlobalText[681], GlobalText[1973], GlobalText[1977]);
+    mu_swprintf(Text, L"%ls    %ls    %ls    %ls", I18N::Game::Rank, I18N::Game::Character, I18N::Game::Class, I18N::Game::Score);
 
     int TextColor = (255 << 24) + (21 << 16) + (148 << 8) + (255);
     pMsgBox->AddMsg(Text, TextColor);
@@ -3055,14 +3056,14 @@ bool SEASON3B::CCry_Wolf_Result_Set_Temple::SetLayout()
 
     if (View_Suc_Or_Fail == 1)
     {
-        mu_swprintf(Text, GlobalText[2000]);
+        mu_swprintf(Text, I18N::Game::MonsterStrengthDecreased10);
         pMsgBox->AddMsg(Text, TextColor);
-        mu_swprintf(Text, GlobalText[2001]);
+        mu_swprintf(Text, I18N::Game::_5IncreaseInCastleAndArenaInvitationCombineRate);
         pMsgBox->AddMsg(Text, TextColor);
     }
     else
     {
-        pMsgBox->AddMsg(GlobalText[2009], TextColor);
+        pMsgBox->AddMsg(I18N::Game::AllNPCsInCrywolfHaveBeenDeleted, TextColor);
     }
 
     pMsgBox->AddCallbackFunc(CCry_Wolf_Result_Set_Temple::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
@@ -3086,7 +3087,7 @@ bool SEASON3B::CCry_Wolf_Ing_Set_Temple::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2002]);
+    pMsgBox->AddMsg(I18N::Game::ContractIsOngoingThereforeDualCompactIsNotPossible);
 
     pMsgBox->AddCallbackFunc(CCry_Wolf_Ing_Set_Temple::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     return true;
@@ -3109,7 +3110,7 @@ bool SEASON3B::CCry_Wolf_Destroy_Set_Temple::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2003]);
+    pMsgBox->AddMsg(I18N::Game::FurtherContractCanTBeDoneSinceTheAltarHasBeenDestroyed);
 
     pMsgBox->AddCallbackFunc(CCry_Wolf_Destroy_Set_Temple::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     return true;
@@ -3132,7 +3133,7 @@ bool SEASON3B::CCry_Wolf_Wat_Set_Temple1::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2008]);
+    pMsgBox->AddMsg(I18N::Game::PleaseTryAgainInAWhile);
 
     pMsgBox->AddCallbackFunc(CCry_Wolf_Wat_Set_Temple1::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     return true;
@@ -3155,8 +3156,8 @@ bool SEASON3B::CCry_Wolf_Dont_Set_Temple1::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[2004]);
-    pMsgBox->AddMsg(GlobalText[2005]);
+    pMsgBox->AddMsg(I18N::Game::DisqualifiedForTheContractRequirement);
+    pMsgBox->AddMsg(I18N::Game::OnlyLevelAbove350IsAllowedToMakeAContract);
 
     pMsgBox->AddCallbackFunc(CCry_Wolf_Dont_Set_Temple1::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     return true;
@@ -3179,7 +3180,7 @@ bool SEASON3B::CCry_Wolf_Dont_Set_Temple::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[1956]);
+    pMsgBox->AddMsg(I18N::Game::ContractCanTBeMadeWhenYouAreOnAMount);
 
     pMsgBox->AddCallbackFunc(CCry_Wolf_Dont_Set_Temple::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     return true;
@@ -3202,7 +3203,7 @@ bool SEASON3B::CCry_Wolf_Set_Temple1::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[1952]);
+    pMsgBox->AddMsg(I18N::Game::WeNeedAGuardianToProtectTheWolf);
 
     pMsgBox->AddCallbackFunc(CCry_Wolf_Set_Temple1::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     return true;
@@ -3225,8 +3226,8 @@ bool SEASON3B::CCry_Wolf_Set_Temple::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[1953]);
-    pMsgBox->AddMsg(GlobalText[1954]);
+    pMsgBox->AddMsg(I18N::Game::YouHaveBeenRegisteredToBeAGuardianToProtectTheWolf);
+    pMsgBox->AddMsg(I18N::Game::YourRoleAsAGuardianWillBeCancelledWhenYouWarp);
     BackUp_Key = CharactersClient[TargetNpc].Key;
 
     pMsgBox->AddCallbackFunc(CCry_Wolf_Get_Temple::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
@@ -3252,8 +3253,8 @@ bool SEASON3B::CMaster_Level_Interface::SetLayout()
 
     auto Need_Point = g_pMasterLevelInterface->GetConsumePoint();
     wchar_t szText[256];
-    pMsgBox->AddMsg(GlobalText[1771]);
-    mu_swprintf(szText, GlobalText[1772], Need_Point);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToStrengthenTheSkill);
+    mu_swprintf(szText, I18N::Game::MasterLevelPointRequirementD, Need_Point);
     pMsgBox->AddMsg(szText);
 
     pMsgBox->AddCallbackFunc(CMaster_Level_Interface::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
@@ -3299,9 +3300,9 @@ bool SEASON3B::CCry_Wolf_Get_Temple::SetLayout()
     wchar_t szText[256];
     int Num = CharactersClient[TargetNpc].Object.Type - MODEL_CRYWOLF_ALTAR1;
     BYTE State = (m_AltarState[Num] & 0x0f);
-    mu_swprintf(szText, GlobalText[2006], State);
+    mu_swprintf(szText, I18N::Game::ContractCanBeMadeForDTimes, State);
     pMsgBox->AddMsg(szText);
-    pMsgBox->AddMsg(GlobalText[2007]);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToProceedWithTheContract);
     BackUp_Key = CharactersClient[TargetNpc].Key;
     pMsgBox->AddCallbackFunc(CCry_Wolf_Get_Temple::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CCry_Wolf_Get_Temple::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
@@ -3346,9 +3347,9 @@ bool SEASON3B::CUnionGuild_Break_MsgBoxLayout::SetLayout()
         return false;
 
     wchar_t szText[256];
-    mu_swprintf(szText, GlobalText[1423], DeleteID);
+    mu_swprintf(szText, I18N::Game::SGuildFromTheAlliance, DeleteID);
     pMsgBox->AddMsg(szText);
-    pMsgBox->AddMsg(GlobalText[1369]);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToRelease);
     pMsgBox->AddCallbackFunc(CUnionGuild_Break_MsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CUnionGuild_Break_MsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     pMsgBox->AddCallbackFunc(CUnionGuild_Break_MsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_PRESSKEY_ESC);
@@ -3381,7 +3382,7 @@ bool SEASON3B::CUnionGuild_Out_MsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return false;
 
-    pMsgBox->AddMsg(GlobalText[1271], RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
+    pMsgBox->AddMsg(I18N::Game::AllianceMasterCanTWithdrawTheGuild, RGBA(255, 255, 255, 255), MSGBOX_FONT_BOLD);
     pMsgBox->AddCallbackFunc(CUnionGuild_Out_MsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CUnionGuild_Out_MsgBoxLayout::OkBtnDown, MSGBOX_EVENT_PRESSKEY_ESC);
     return true;
@@ -3403,7 +3404,7 @@ bool SEASON3B::CUseSantaInvitationMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL))
         return FALSE;
 
-    pMsgBox->AddMsg(GlobalText[2590]);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToMoveToTheSantaSVillage);
     pMsgBox->AddCallbackFunc(CUseSantaInvitationMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CUseSantaInvitationMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return TRUE;
@@ -3445,7 +3446,7 @@ bool CSantaTownLeaveMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OKCANCEL))
         return FALSE;
 
-    pMsgBox->AddMsg(GlobalText[2586]);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToReturnToDevias);
     pMsgBox->AddCallbackFunc(CSantaTownLeaveMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CSantaTownLeaveMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return TRUE;
@@ -3509,7 +3510,7 @@ bool SEASON3B::CUseRegistLuckyCoinMsgBoxLayout::SetLayout()
         return FALSE;
 
     wchar_t szText[100] = { 0, };
-    mu_swprintf(szText, GlobalText[580], GlobalText[1894]);
+    mu_swprintf(szText, I18N::Game::YouAreLackOfSItems, I18N::Game::Register);
     pMsgBox->AddMsg(szText);
     pMsgBox->AddCallbackFunc(CUseRegistLuckyCoinMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     return TRUE;
@@ -3531,7 +3532,7 @@ bool SEASON3B::CRegistOverLuckyCoinMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return FALSE;
 
-    pMsgBox->AddMsg(GlobalText[2859]);
+    pMsgBox->AddMsg(I18N::Game::YouCanOnlyApplyOncePerYourAccount);
 
     pMsgBox->AddCallbackFunc(CRegistOverLuckyCoinMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
 
@@ -3554,7 +3555,7 @@ bool SEASON3B::CExchangeLuckyCoinMsgBoxLayout::SetLayout()
         return FALSE;
 
     wchar_t szText[100] = { 0, };
-    mu_swprintf(szText, GlobalText[580], GlobalText[1940]);
+    mu_swprintf(szText, I18N::Game::YouAreLackOfSItems, I18N::Game::Exchange1940);
     pMsgBox->AddMsg(szText);
 
     pMsgBox->AddCallbackFunc(CExchangeLuckyCoinMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
@@ -3578,7 +3579,7 @@ bool SEASON3B::CExchangeLuckyCoinInvenErrMsgBoxLayout::SetLayout()
     if (false == pMsgBox->Create(MSGBOX_COMMON_TYPE_OK))
         return FALSE;
 
-    pMsgBox->AddMsg(GlobalText[2306]);
+    pMsgBox->AddMsg(I18N::Game::MoreThan2X4SpaceInInventoryIsNeeded);
 
     pMsgBox->AddCallbackFunc(CExchangeLuckyCoinInvenErrMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
 
@@ -3607,7 +3608,7 @@ bool SEASON3B::CGambleBuyMsgBoxLayout::SetLayout()
         return false;
     }
     pMsgBox->Set3DItem(pItem);
-    pMsgBox->AddMsg(GlobalText[1612]);
+    pMsgBox->AddMsg(I18N::Game::WouldYouLikeToPurchase);
     pMsgBox->AddCallbackFunc(CGambleBuyMsgBoxLayout::OkBtnDown, MSGBOX_EVENT_USER_COMMON_OK);
     pMsgBox->AddCallbackFunc(CGambleBuyMsgBoxLayout::CancelBtnDown, MSGBOX_EVENT_USER_COMMON_CANCEL);
     return true;
