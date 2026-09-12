@@ -431,7 +431,11 @@ void CNewUITrade::ProcessMyInvenCtrl()
     if (NULL == m_pMyInvenCtrl)
         return;
 
-    if (SEASON3B::IsPress(VK_LBUTTON))
+    // La colocación de ítems se hace al SOLTAR el botón (IsRelease), igual que el
+    // resto del inventario tras el refactor 2bdd366 ("align scaled item interactions").
+    // Antes usaba IsPress, que quedó desalineado con el nuevo modelo de input y hacía
+    // que ningún ítem entrara a la ventana de trade (bug sven-n/MuMain #588).
+    if (SEASON3B::IsRelease(VK_LBUTTON))
     {
         CNewUIPickedItem* pPickedItem = CNewUIInventoryCtrl::GetPickedItem();
         if (NULL == pPickedItem)
@@ -628,7 +632,9 @@ void CNewUITrade::ProcessToReceiveTradeResult(LPPTRADE pTradeData)
         m_bTradeAlert = false;
         m_nYourGuildType = pTradeData->GuildKey;
         wcsncpy(m_szYourID, szTempID, MAX_USERNAME_SIZE);
-        m_nYourLevel = pTradeData->Level;   //  상대방 레벨.
+        // El servidor (OpenMU) envía TradePartnerLevel en big-endian; la struct
+        // PTRADE lo lee como WORD little-endian, así que hay que invertir los bytes.
+        m_nYourLevel = ((pTradeData->Level & 0xFF) << 8) | ((pTradeData->Level >> 8) & 0xFF);   //  상대방 레벨.
         break;
     }
 }
