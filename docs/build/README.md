@@ -50,9 +50,8 @@ buildable for them. See the per-platform notes when that work lands.
 | Windows | x86 | on / off | `MUnique.Client.Library.dll` (win-x86 AOT) | Full client |
 | Linux | x86 | - | none | Not supported (see below) |
 
-Actions build and test Windows native x64 Release, Linux x64 Release, and macOS
-arm64 Release, all with the editor OFF, on every pull request and on `main`.
-Pushes to `main` also upload one no-data runtime artifact per OS.
+Actions validate Windows native x64 Release, Linux x64 Release, and macOS arm64
+Release, all with the editor OFF, and upload one no-data runtime artifact per OS.
 Build every other supported row locally using the setup guides above.
 
 > **Why no 32-bit Linux?** .NET has no 32-bit Linux runtime at all - `dotnet
