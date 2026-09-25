@@ -1,0 +1,194 @@
+# Extra checks for forks. sven-n/MuMain keeps its CI small because of its
+# Actions minutes, so ci.yml builds Windows only on pushes to main and never
+# builds the editor. On forks, which use their own minutes, this workflow
+# covers the rest on every pull request:
+#
+#   Windows x64 Release   editor OFF and ON
+#   Linux x64 Release     editor ON  (editor OFF: ci.yml)
+#   macOS arm64 Release   editor ON  (editor OFF: ci.yml)
+#
+# Editor ON also enables the control socket, like the *-mueditor presets.
+# The jobs only build and run the tests; they upload nothing. They never run
+# on sven-n/MuMain. "Run workflow" starts them by hand.
+name: Fork CI
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: fork-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: Windows x64 Release, editor ${{ matrix.editor }}
+    if: github.repository != 'sven-n/MuMain'
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        editor: ['OFF', 'ON']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Activate Visual Studio developer environment
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
+        with:
+          arch: x64
+
+      - name: Cache FetchContent and NuGet dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            out/build/fork-ci-windows/_deps
+            .nuget
+          key: fork-windows-x64-editor-${{ matrix.editor }}-deps-${{ hashFiles('CMakeLists.txt', 'src/CMakeLists.txt', 'ClientLibrary/**/*.csproj', 'ClientLibrary/**/*.props') }}
+          restore-keys: fork-windows-x64-editor-${{ matrix.editor }}-deps-
+
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:/vcpkg/installed
+            C:/vcpkg/packages
+          key: vcpkg-windows-x64-${{ hashFiles('vcpkg.json') }}
+          restore-keys: vcpkg-windows-x64-
+
+      - name: Configure CMake
+        run: >
+          cmake --preset windows-x64
+          -B out/build/fork-ci-windows
+          -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+          -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${{ github.workspace }}/toolchain-x64.cmake
+          -DVCPKG_TARGET_TRIPLET=x64-windows
+          -DVCPKG_INSTALLED_DIR=C:/vcpkg/installed
+          -DVCPKG_MANIFEST_MODE=ON
+          -DENABLE_EDITOR=${{ matrix.editor }}
+          -DENABLE_CONTROL_SOCKET=${{ matrix.editor }}
+          -DMU_ENABLE_SHADER_COMPILATION=ON
+          -DGLSLANG_EXE=C:/vcpkg/installed/x64-windows/tools/glslang/glslangValidator.exe
+          -DSPIRV_CROSS_EXE=C:/vcpkg/installed/x64-windows/tools/spirv-cross/spirv-cross.exe
+          -DDXC_EXE=C:/vcpkg/installed/x64-windows/tools/directx-dxc/dxc.exe
+          -DMU_COPY_RUNTIME_ASSETS=OFF
+          -DBUILD_TESTING=ON
+
+      - name: Build
+        run: cmake --build out/build/fork-ci-windows --config Release
+
+      - name: Run tests
+        run: >
+          ctest --test-dir out/build/fork-ci-windows --build-config Release
+          --output-on-failure
+          --no-tests=error
+
+  linux-editor:
+    name: Linux x64 Release, editor ON
+    if: github.repository != 'sven-n/MuMain'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake ninja-build gcc g++ \
+            libgl1-mesa-dev libglu1-mesa-dev \
+            libx11-dev libxext-dev libxrandr-dev libxinerama-dev \
+            libxcursor-dev libxi-dev libxss-dev libxtst-dev libxxf86vm-dev \
+            libwayland-dev libxkbcommon-dev wayland-protocols \
+            libasound2-dev libpulse-dev \
+            libssl-dev libcurl4-openssl-dev libturbojpeg0-dev \
+            glslang-tools spirv-cross \
+            pkg-config
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            out/build/fork-ci-linux-editor/_deps
+            .nuget
+          key: fork-linux-x64-editor-ON-deps-${{ hashFiles('CMakeLists.txt', 'src/CMakeLists.txt', 'ClientLibrary/**/*.csproj', 'ClientLibrary/**/*.props') }}
+          restore-keys: fork-linux-x64-editor-ON-deps-
+
+      - name: Configure CMake
+        run: >
+          cmake --preset linux-x64
+          -B out/build/fork-ci-linux-editor
+          -DENABLE_EDITOR=ON
+          -DENABLE_CONTROL_SOCKET=ON
+          -DMU_COPY_RUNTIME_ASSETS=OFF
+          -DBUILD_TESTING=ON
+
+      - name: Build
+        run: cmake --build out/build/fork-ci-linux-editor --config Release
+
+      - name: Run tests
+        run: >
+          ctest --test-dir out/build/fork-ci-linux-editor --build-config Release
+          --output-on-failure
+          --no-tests=error
+
+  macos-editor:
+    name: macOS arm64 Release, editor ON
+    if: github.repository != 'sven-n/MuMain'
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install build tools
+        run: brew install cmake ninja openssl@3 curl brotli glslang spirv-cross
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            out/build/fork-ci-macos-editor/_deps
+            .nuget
+          key: fork-macos-arm64-editor-ON-deps-${{ hashFiles('CMakeLists.txt', 'src/CMakeLists.txt', 'ClientLibrary/**/*.csproj', 'ClientLibrary/**/*.props') }}
+          restore-keys: fork-macos-arm64-editor-ON-deps-
+
+      - name: Configure CMake
+        run: >
+          cmake --preset macos-arm64
+          -B out/build/fork-ci-macos-editor
+          -DENABLE_EDITOR=ON
+          -DENABLE_CONTROL_SOCKET=ON
+          -DMU_COPY_RUNTIME_ASSETS=OFF
+          -DBUILD_TESTING=ON
+          -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
+
+      - name: Build
+        run: cmake --build out/build/fork-ci-macos-editor --config Release
+
+      - name: Run tests
+        run: >
+          ctest --test-dir out/build/fork-ci-macos-editor --build-config Release
+          --output-on-failure
+          --no-tests=error
