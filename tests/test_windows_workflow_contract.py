@@ -272,7 +272,7 @@ check("matrix." not in native_job, "Main Windows asset job must use fixed values
 for required in (
     "name: Windows Native Build (x64, Release, editor OFF)",
     "runs-on: windows-latest",
-    "if: github.event_name == 'push' && github.ref == 'refs/heads/main'",
+    "if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'",
 ):
     check(required in native_job, f"Main Windows job missing {required}")
 
@@ -349,7 +349,12 @@ check(
     in native_archive,
     "Main Windows build must archive the runtime before artifact upload",
 )
+check(
+    "if: github.event_name == 'push'" in native_archive,
+    "Main Windows build must archive only for artifact-producing pushes",
+)
 for required in (
+    "if: github.event_name == 'push'",
     "uses: actions/upload-artifact@v4",
     "name: mu-client-windows-native-x64-release-editor-off-no-data-main",
     "path: MuMain-windows-native-x64-release-editor-off-no-data.tar.gz",
