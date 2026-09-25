@@ -52,7 +52,10 @@ buildable for them. See the per-platform notes when that work lands.
 
 Actions build and test Windows native x64 Release, Linux x64 Release, and macOS
 arm64 Release, all with the editor OFF, on every pull request and on `main`.
-Pushes to `main` also upload one no-data runtime artifact per OS.
+Pushes to `main` also upload one no-data runtime artifact per OS. One more
+check builds and tests Linux x64 Release with the editor ON (preset
+`linux-x64-mueditor`), so the editor code is compiled by CI too; it uploads
+nothing.
 Build every other supported row locally using the setup guides above.
 
 > **Why no 32-bit Linux?** .NET has no 32-bit Linux runtime at all - `dotnet

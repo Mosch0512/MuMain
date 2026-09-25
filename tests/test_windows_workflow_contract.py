@@ -241,9 +241,9 @@ jobs_block = jobs_block_match.group(1) if jobs_block_match else ""
 job_names = re.findall(r"(?m)^  ([\w-]+):\n", jobs_block)
 check(
     job_names
-    == ["quality", "build-windows", "build-linux", "build-macos", "release"],
-    "CI jobs must be quality, build-windows, build-linux, build-macos, "
-    f"release; found {job_names}",
+    == ["quality", "build-windows", "build-linux", "build-linux-editor", "build-macos", "release"],
+    "CI jobs must be quality, build-windows, build-linux, build-linux-editor, "
+    f"build-macos, release; found {job_names}",
 )
 for ignored_path in ("src/bin/Data/**", "src/bin/fonts/**"):
     check(
@@ -254,6 +254,7 @@ for ignored_path in ("src/bin/Data/**", "src/bin/fonts/**"):
 quality_job = job(ci, "quality")
 native_job = job(ci, "build-windows")
 linux_job = job(ci, "build-linux")
+linux_editor_job = job(ci, "build-linux-editor")
 macos_job = job(ci, "build-macos")
 release_job = job(ci, "release")
 
@@ -456,6 +457,40 @@ for required in (
 ):
     check(required in linux_validation, f"Linux validation missing {required}")
 
+# The editor build is a check only: it compiles and tests src/MuEditor and the
+# _EDITOR code that the release builds leave out, and produces no artifacts.
+check("strategy:" not in linux_editor_job, "Linux editor check must not use a matrix")
+check("matrix." not in linux_editor_job, "Linux editor check must use fixed values")
+for required in (
+    "name: Linux Native Build (x64, Release, editor ON)",
+    "runs-on: ubuntu-latest",
+    "if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'",
+):
+    check(required in linux_editor_job, f"Linux editor check missing {required}")
+check(
+    "upload-artifact" not in linux_editor_job and "tar -czf " not in linux_editor_job,
+    "Linux editor check must not archive or upload a runtime",
+)
+linux_editor_configure = step(linux_editor_job, "build-linux-editor", "Configure CMake")
+for required in (
+    "cmake --preset linux-x64-mueditor",
+    "-B out/build/linux-ci-editor",
+    "-DENABLE_EDITOR=ON",
+    "-DMU_COPY_RUNTIME_ASSETS=OFF",
+    "-DBUILD_TESTING=ON",
+):
+    check(required in linux_editor_configure, f"Linux editor configure missing {required}")
+check(
+    "cmake --build out/build/linux-ci-editor --config Release"
+    in step(linux_editor_job, "build-linux-editor", "Build"),
+    "Linux editor check must build Release",
+)
+check(
+    "ctest --test-dir out/build/linux-ci-editor --build-config Release"
+    in step(linux_editor_job, "build-linux-editor", "Run tests"),
+    "Linux editor check must run Release tests",
+)
+
 macos_configure = step(macos_job, "build-macos", "Configure CMake")
 for required in (
     "cmake --preset macos-arm64",
@@ -487,7 +522,7 @@ for required in (
     check(required in macos_validation, f"macOS validation missing {required}")
 
 check(
-    "needs: [quality, build-windows, build-linux, build-macos]" in release_job,
+    "needs: [quality, build-windows, build-linux, build-linux-editor, build-macos]" in release_job,
     "Release must need quality and all hosted platform checks",
 )
 for platform, artifact_name in (
