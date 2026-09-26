@@ -480,6 +480,10 @@
       "height": 1,
       "slot": "ring",
       "durability": 30,
+      "tradable": false,
+      "storable": false,
+      "sellable": false,
+      "personalShopSellable": false,
       "repairable": false,
       "classRequirements": {
         "darkWizard": 1,

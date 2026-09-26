@@ -166,11 +166,11 @@ and are in the code (`GameLogic/Items/TradeRestrictions.cpp`,
 
 - **Item level:** some items are a different item at each level. Rena +3
   (Sign of Lord) can be traded, stored and sold in a personal shop; Box
-  of Luck +13 (Heart of Dark Lord) cannot. The Wizard's Ring above +0
-  cannot be traded, stored or sold in a personal shop, and at +1 and +2
-  not sold to an NPC (+0 not while it is rented). Rena +1 and Remedy of
-  Love +1 to +5 cannot be sold to an NPC. A later phase makes these level
-  variants items of their own, with their own flags.
+  of Luck +13 (Heart of Dark Lord) cannot. Rena +1 and Remedy of Love +1
+  to +5 cannot be sold to an NPC. The Wizard's Ring has level exceptions
+  too, but its flags already block trading, storing and selling at every
+  level, because the server binds it to the character. A later phase makes
+  these level variants items of their own, with their own flags.
 - **Durability:** a Talisman of Mobility with durability 1 cannot be stored.
 - **GM Gift:** only a game master can trade it.
 
