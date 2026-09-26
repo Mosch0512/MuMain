@@ -170,14 +170,16 @@ TEST_CASE("Item level variants have their own rules [data][items][rules]")
     CHECK(PersonalShopBan(ITEM_BOX_OF_LUCK, {13}));
     CHECK(SellingBan(ITEM_BOX_OF_LUCK));
 
-    // The Wizard's Ring can only be traded, stored and sold at +0.
-    CHECK_FALSE(TradeBan(ITEM_WIZARDS_RING));
-    CHECK(TradeBan(ITEM_WIZARDS_RING, {1}));
-    CHECK(StoreBan(ITEM_WIZARDS_RING, {1}));
-    CHECK(PersonalShopBan(ITEM_WIZARDS_RING, {1}));
-    CHECK_FALSE(SellingBan(ITEM_WIZARDS_RING));
-    CHECK(SellingBan(ITEM_WIZARDS_RING, {2}));
-    CHECK(SellingBan(ITEM_WIZARDS_RING, {0, true}));
+    // The Wizard's Ring is bound to the character on the server (OpenMU), so it
+    // can't be traded, stored or sold at any level; it can still be dropped.
+    for (int level : {0, 1, 2})
+    {
+        CHECK(TradeBan(ITEM_WIZARDS_RING, {level}));
+        CHECK(StoreBan(ITEM_WIZARDS_RING, {level}));
+        CHECK(PersonalShopBan(ITEM_WIZARDS_RING, {level}));
+        CHECK(SellingBan(ITEM_WIZARDS_RING, {level}));
+    }
+    CHECK_FALSE(DropBan(ITEM_WIZARDS_RING));
 
     // Remedy of Love +1 to +5 cannot be sold.
     CHECK(SellingBan(ITEM_REMEDY_OF_LOVE, {3}));
