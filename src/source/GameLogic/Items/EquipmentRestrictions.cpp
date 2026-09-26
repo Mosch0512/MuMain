@@ -6,15 +6,15 @@
 
 namespace GameLogic::Items
 {
-    bool CanTakeOff(int equipmentSlot, int world, const ITEM* pItemHelper, const ITEM* pItemWing)
-    {
-        if (world != WD_10HEAVEN)
-            return true;
-
-        if (equipmentSlot == EQUIPMENT_HELPER)
-            return IsWingItem(pItemWing);
-        if (equipmentSlot == EQUIPMENT_WING)
-            return IsFlyingMount(pItemHelper);
+bool CanTakeOff(int equipmentSlot, int world, const ITEM* pItemHelper, const ITEM* pItemWing)
+{
+    if (world != WD_10HEAVEN)
         return true;
-    }
+
+    if (equipmentSlot == EQUIPMENT_HELPER)
+        return IsWingItem(pItemWing);
+    if (equipmentSlot == EQUIPMENT_WING)
+        return IsFlyingMount(pItemHelper);
+    return true;
 }
+} // namespace GameLogic::Items
