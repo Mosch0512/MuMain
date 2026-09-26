@@ -350,32 +350,32 @@ void CNewUITrade::ConvertYourLevel(int& rnLevel, DWORD& rdwColor)
     if (m_nYourLevel >= 400)
     {
         rnLevel = 400;
-        rdwColor = (255 << 24) + (153 << 16) + (153 << 8) + (255);
+        rdwColor = (255u << 24) + (153 << 16) + (153 << 8) + (255);
     }
     else if (m_nYourLevel >= 300)
     {
         rnLevel = 300;
-        rdwColor = (255 << 24) + (255 << 16) + (153 << 8) + (255);
+        rdwColor = (255u << 24) + (255 << 16) + (153 << 8) + (255);
     }
     else if (m_nYourLevel >= 200)
     {
         rnLevel = 200;
-        rdwColor = (255 << 24) + (255 << 16) + (230 << 8) + (210);
+        rdwColor = (255u << 24) + (255 << 16) + (230 << 8) + (210);
     }
     else if (m_nYourLevel >= 100)
     {
         rnLevel = 100;
-        rdwColor = (255 << 24) + (24 << 16) + (201 << 8) + (0);
+        rdwColor = (255u << 24) + (24 << 16) + (201 << 8) + (0);
     }
     else if (m_nYourLevel >= 50)
     {
         rnLevel = 50;
-        rdwColor = (255 << 24) + (0 << 16) + (150 << 8) + (255);
+        rdwColor = (255u << 24) + (0 << 16) + (150 << 8) + (255);
     }
     else							//  빨간색.
     {
         rnLevel = 10;
-        rdwColor = (255 << 24) + (0 << 16) + (0 << 8) + (255);
+        rdwColor = (255u << 24) + (0 << 16) + (0 << 8) + (255);
     }
 }
 
