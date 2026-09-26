@@ -18,6 +18,11 @@
 #include "UI/NewUI/Quests/NewUIMyQuestInfoWindow.h"
 #include "UI/NewUI/Inventory/NewUIStorageInventory.h"
 
+namespace UI::Items::Placement
+{
+struct HeldItemMove;
+}
+
 namespace SEASON3B
 {
     class CNewUITrade : public CNewUIObj
@@ -151,7 +156,7 @@ namespace SEASON3B
         void BackUpYourInven(ITEM* pYourItemObj);
         void AlertYourTradeInven();
 
-        void SendRequestItemToTrade(ITEM* pItemObj, int nInvenIndex, int nTradeIndex);
+        void SendRequestItemToTrade(const UI::Items::Placement::HeldItemMove& move);
     };
 }
 

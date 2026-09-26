@@ -5,6 +5,7 @@
 #include "I18N/All.h"
 
 #include "UI/NewUI/Inventory/NewUILuckyItemWnd.h"
+#include "UI/NewUI/Inventory/HeldItemPlacement.h"
 #include "UI/NewUI/NewUISystem.h"
 #include "UI/NewUI/Dialogs/NewUICustomMessageBox.h"
 #include "Render/Models/ZzzBMD.h"
@@ -104,6 +105,11 @@ void CNewUILuckyItemWnd::Render_Frame(void)
 STORAGE_TYPE CNewUILuckyItemWnd::SetMoveAction()
 {
     m_eWndAction = eLuckyItem_Move;
+    return GetMoveStorageType();
+}
+
+STORAGE_TYPE CNewUILuckyItemWnd::GetMoveStorageType() const
+{
     switch (m_eType)
     {
     case eLuckyItemType_Trade:
@@ -464,40 +470,16 @@ bool CNewUILuckyItemWnd::Process_InventoryCtrl(void)
         return false;
     }
 
-    if (pPickedItem->GetOwnerInventory() == g_pMyInventory->GetInventoryCtrl())
-    {
-        if (SEASON3B::IsRelease(VK_LBUTTON))
-        {
-            int iSourceIndex = pPickedItem->GetSourceLinealPos();
-            int iTargetIndex = pPickedItem->GetTargetLinealPos(m_pNewInventoryCtrl);
-            if (iTargetIndex != -1 && m_pNewInventoryCtrl->CanMove(iTargetIndex, pItemObj))
-            {
-                auto nMoveIndex = SetMoveAction();
-                if (SendRequestEquipmentItem(STORAGE_TYPE::INVENTORY, iSourceIndex, pItemObj, nMoveIndex, iTargetIndex))
-                    return true;
-            }
-        }
-    }
-    else if (pPickedItem->GetOwnerInventory() == m_pNewInventoryCtrl)
-    {
-        if (SEASON3B::IsRelease(VK_LBUTTON))
-        {
-            int iSourceIndex = pPickedItem->GetSourceLinealPos();
-            int iTargetIndex = pPickedItem->GetTargetLinealPos(m_pNewInventoryCtrl);
-            if (iTargetIndex != -1 && m_pNewInventoryCtrl->CanMove(iTargetIndex, pItemObj))
-            {
-                auto nMoveIndex = SetMoveAction();
-                if (SendRequestEquipmentItem(nMoveIndex, iSourceIndex, pItemObj, nMoveIndex, iTargetIndex))
-                {
-                    return true;
-                }
-            }
-        }
-    }
-
-    // InventoryCtrl Background Color
     m_pNewInventoryCtrl->SetSquareColorNormal(m_fInvenClr[0], m_fInvenClr[1], m_fInvenClr[2]);
-    return false;
+    if (!SEASON3B::IsRelease(VK_LBUTTON))
+        return false;
+
+    const auto move = UI::Items::Placement::FindHeldItemMove(m_pNewInventoryCtrl, GetMoveStorageType());
+    if (!move)
+        return false;
+
+    SetMoveAction();
+    return UI::Items::Placement::SendHeldItemMove(*move);
 }
 
 CNewUIInventoryCtrl* CNewUILuckyItemWnd::GetInventoryCtrl() const

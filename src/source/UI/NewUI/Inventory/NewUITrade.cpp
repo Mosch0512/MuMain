@@ -6,6 +6,7 @@
 #include "I18N/All.h"
 
 #include "UI/NewUI/Inventory/NewUITrade.h"
+#include "UI/NewUI/Inventory/HeldItemPlacement.h"
 #include "UI/NewUI/NewUISystem.h"
 #include "UI/NewUI/Dialogs/NewUICustomMessageBox.h"
 
@@ -372,7 +373,7 @@ void CNewUITrade::ConvertYourLevel(int& rnLevel, DWORD& rdwColor)
         rnLevel = 50;
         rdwColor = (255u << 24) + (0 << 16) + (150 << 8) + (255);
     }
-    else							//  빨간색.
+    else
     {
         rnLevel = 10;
         rdwColor = (255u << 24) + (0 << 16) + (0 << 8) + (255);
@@ -427,59 +428,32 @@ void CNewUITrade::ProcessClosing()
 
 void CNewUITrade::ProcessMyInvenCtrl()
 {
-    if (NULL == m_pMyInvenCtrl)
-        return;
-
     // A held item is put down when the button is released, like in every other
     // item window: the inventory above this window takes the press (#588).
-    if (SEASON3B::IsRelease(VK_LBUTTON))
-    {
-        CNewUIPickedItem* pPickedItem = CNewUIInventoryCtrl::GetPickedItem();
-        if (NULL == pPickedItem)
-            return;
+    if (m_pMyInvenCtrl == nullptr || !SEASON3B::IsRelease(VK_LBUTTON))
+        return;
 
-        ITEM* pItemObj = pPickedItem->GetItem();
-        if (pPickedItem->GetOwnerInventory() == g_pMyInventory->GetInventoryCtrl())
-        {
-            int nSrcIndex = pPickedItem->GetSourceLinealPos();
-            int nDstIndex = pPickedItem->GetTargetLinealPos(m_pMyInvenCtrl);
-            if (nDstIndex != -1 && m_pMyInvenCtrl->CanMove(nDstIndex, pItemObj))
-                SendRequestItemToTrade(pItemObj, nSrcIndex, nDstIndex);
-        }
-        else if (pPickedItem->GetOwnerInventory() == m_pMyInvenCtrl)
-        {
-            int nSrcIndex = pPickedItem->GetSourceLinealPos();
-            int nDstIndex = pPickedItem->GetTargetLinealPos(m_pMyInvenCtrl);
-            if (nDstIndex != -1 && m_pMyInvenCtrl->CanMove(nDstIndex, pItemObj))
-            {
-                SendRequestEquipmentItem(STORAGE_TYPE::TRADE, nSrcIndex, pItemObj, STORAGE_TYPE::TRADE, nDstIndex);
-            }
-        }
-        else if (pItemObj->ex_src_type == ITEM_EX_SRC_EQUIPMENT)
-        {
-            int nSrcIndex = pPickedItem->GetSourceLinealPos();
-            int nDstIndex = pPickedItem->GetTargetLinealPos(m_pMyInvenCtrl);
-            if (nDstIndex != -1 && m_pMyInvenCtrl->CanMove(nDstIndex, pItemObj))
-                SendRequestItemToTrade(pItemObj, nSrcIndex, nDstIndex);
-        }
-    }
+    const auto move = UI::Items::Placement::FindHeldItemMove(m_pMyInvenCtrl, STORAGE_TYPE::TRADE);
+    if (!move)
+        return;
+
+    if (move->sourceType == STORAGE_TYPE::TRADE)
+        UI::Items::Placement::SendHeldItemMove(*move);
+    else
+        SendRequestItemToTrade(*move);
 }
 
-void CNewUITrade::SendRequestItemToTrade(ITEM* pItemObj, int nInvenIndex,
-    int nTradeIndex)
+void CNewUITrade::SendRequestItemToTrade(const UI::Items::Placement::HeldItemMove& move)
 {
-    if (GameLogic::Items::IsTradeBan(pItemObj))
+    if (GameLogic::Items::IsTradeBan(move.item))
     {
         g_pSystemLogBox->AddText(I18N::Game::TheseItemsCannotBeTraded, SEASON3B::TYPE_ERROR_MESSAGE);
+        return;
     }
-    else
-    {
-        m_bMyConfirm = false;
-        SocketClient->ToGameServer()->SendTradeButtonStateChange(TradeButtonState::Unchecked);
 
-        SendRequestEquipmentItem(STORAGE_TYPE::INVENTORY, nInvenIndex,
-            pItemObj, STORAGE_TYPE::TRADE, nTradeIndex);
-    }
+    m_bMyConfirm = false;
+    SocketClient->ToGameServer()->SendTradeButtonStateChange(TradeButtonState::Unchecked);
+    UI::Items::Placement::SendHeldItemMove(move);
 }
 
 void CNewUITrade::SendRequestItemToMyInven(ITEM* pItemObj, int nTradeIndex, int nInvenIndex)
@@ -629,9 +603,7 @@ void CNewUITrade::ProcessToReceiveTradeResult(LPPTRADE pTradeData)
         m_bTradeAlert = false;
         m_nYourGuildType = pTradeData->GuildKey;
         wcsncpy(m_szYourID, szTempID, MAX_USERNAME_SIZE);
-        // The server sends TradePartnerLevel big-endian; PTRADE reads it as a
-        // little-endian WORD, so swap the bytes.
-        m_nYourLevel = ((pTradeData->Level & 0xFF) << 8) | ((pTradeData->Level >> 8) & 0xFF); //  상대방 레벨.
+        m_nYourLevel = pTradeData->Level;
         break;
     }
 }

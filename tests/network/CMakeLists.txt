@@ -6,6 +6,14 @@ mu_add_test(
 )
 
 mu_add_test(
+    NAME test_byte_order
+    SOURCES
+        test_byte_order.cpp
+    LINK_LIBS
+        MuClient
+)
+
+mu_add_test(
     NAME test_connection_library_load
     SOURCES
         test_connection_library_load.cpp
