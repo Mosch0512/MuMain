@@ -87,6 +87,9 @@ namespace SEASON3B
 
         void RenderFrame();
         bool InventoryProcess();
+        // Items from the machine's own grid can always move; other items only
+        // while the machine is ready and the item is a source of the recipe.
+        bool AcceptsHeldItem(CNewUIPickedItem* pPickedItem);
         bool BtnProcess();
 
         bool AutoMoveItem(CNewUIInventoryCtrl* srcCtrl, STORAGE_TYPE srcType,

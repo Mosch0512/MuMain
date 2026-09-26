@@ -18,6 +18,11 @@
 #include "UI/NewUI/Quests/NewUIMyQuestInfoWindow.h"
 #include "UI/NewUI/Inventory/NewUIStorageInventory.h"
 
+namespace UI::Items::Placement
+{
+struct HeldItemMove;
+}
+
 namespace SEASON3B
 {
     class CNewUITrade : public CNewUIObj
@@ -115,8 +120,12 @@ namespace SEASON3B
         void SetYourTradeGold(int nGold) { m_nYourTradeGold = nGold; }
 
         void SendRequestMyGoldInput(int nInputGold);
-        void SendRequestItemToMyInven(ITEM* pItemObj,
-            int nTradeIndex, int nInvenIndex);
+        // Right-click: the item under the cursor in sourceCtrl (the inventory or
+        // an extension) goes into my trade grid.
+        bool ProcessMyInvenItemAutoMove(CNewUIInventoryCtrl* sourceCtrl);
+        // Right-click: the item under the cursor in my trade grid goes back
+        // into the inventory.
+        bool ProcessMyTradeItemAutoMoveToInventory();
 
         void ProcessToReceiveTradeRequest(char* pbyYourID);
         void ProcessToReceiveTradeResult(LPPTRADE pTradeData);
@@ -151,7 +160,8 @@ namespace SEASON3B
         void BackUpYourInven(ITEM* pYourItemObj);
         void AlertYourTradeInven();
 
-        void SendRequestItemToTrade(ITEM* pItemObj, int nInvenIndex, int nTradeIndex);
+        void SendRequestItemToTrade(const UI::Items::Placement::HeldItemMove& move);
+        void UncheckMyConfirm();
     };
 }
 

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "UI/NewUI/Inventory/NewUIMixInventory.h"
+#include "UI/NewUI/Inventory/HeldItemPlacement.h"
 #include "UI/NewUI/NewUISystem.h"
 #include "UI/NewUI/Dialogs/NewUICustomMessageBox.h"
 #include "GameLogic/Items/MixMgr.h"
@@ -909,69 +910,30 @@ bool CNewUIMixInventory::Mix()
 bool CNewUIMixInventory::InventoryProcess()
 {
     CNewUIPickedItem* pPickedItem = CNewUIInventoryCtrl::GetPickedItem();
+    if (m_pNewInventoryCtrl == nullptr || pPickedItem == nullptr)
+        return false;
 
-    if (m_pNewInventoryCtrl && pPickedItem)
+    if (!AcceptsHeldItem(pPickedItem))
     {
-        const auto iCurInventory = g_MixRecipeMgr.GetMixInventoryEquipmentIndex();
-
-        ITEM* pItemObj = pPickedItem->GetItem();
-        if (GetMixState() == MIX_READY && g_MixRecipeMgr.IsMixSource(pPickedItem->GetItem()) &&
-            pPickedItem->GetOwnerInventory() == g_pMyInventory->GetInventoryCtrl())
-        {
-            m_pNewInventoryCtrl->SetSquareColorNormal(m_fInventoryColor[0], m_fInventoryColor[1], m_fInventoryColor[2]);
-            if (SEASON3B::IsPress(VK_LBUTTON))
-            {
-                int iSourceIndex = pPickedItem->GetSourceLinealPos();
-                int iTargetIndex = pPickedItem->GetTargetLinealPos(m_pNewInventoryCtrl);
-                if (iTargetIndex != -1 && m_pNewInventoryCtrl->CanMove(iTargetIndex, pItemObj))
-                {
-                    if (SendRequestEquipmentItem(STORAGE_TYPE::INVENTORY, iSourceIndex,
-                        pItemObj, iCurInventory, iTargetIndex))
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        else if (pPickedItem->GetOwnerInventory() == m_pNewInventoryCtrl)
-        {
-            m_pNewInventoryCtrl->SetSquareColorNormal(m_fInventoryColor[0], m_fInventoryColor[1], m_fInventoryColor[2]);
-            if (SEASON3B::IsPress(VK_LBUTTON))
-            {
-                int iSourceIndex = pPickedItem->GetSourceLinealPos();
-                int iTargetIndex = pPickedItem->GetTargetLinealPos(m_pNewInventoryCtrl);
-                if (iTargetIndex != -1 && m_pNewInventoryCtrl->CanMove(iTargetIndex, pItemObj))
-                {
-                    if (SendRequestEquipmentItem(iCurInventory, iSourceIndex,
-                        pItemObj, iCurInventory, iTargetIndex))
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        else if (GetMixState() == MIX_READY && g_MixRecipeMgr.IsMixSource(pPickedItem->GetItem()) &&
-            pItemObj->ex_src_type == ITEM_EX_SRC_EQUIPMENT)
-        {
-            m_pNewInventoryCtrl->SetSquareColorNormal(m_fInventoryColor[0], m_fInventoryColor[1], m_fInventoryColor[2]);
-            if (SEASON3B::IsPress(VK_LBUTTON))
-            {
-                int iSourceIndex = pPickedItem->GetSourceLinealPos();
-                int iTargetIndex = pPickedItem->GetTargetLinealPos(m_pNewInventoryCtrl);
-                if (iTargetIndex != -1 && m_pNewInventoryCtrl->CanMove(iTargetIndex, pItemObj))
-                {
-                    SendRequestEquipmentItem(STORAGE_TYPE::INVENTORY, iSourceIndex,
-                        pItemObj, iCurInventory, iTargetIndex);
-                    return true;
-                }
-            }
-        }
-        else
-        {
-            m_pNewInventoryCtrl->SetSquareColorNormal(m_fInventoryWarningColor[0], m_fInventoryWarningColor[1], m_fInventoryWarningColor[2]);
-        }
+        m_pNewInventoryCtrl->SetSquareColorNormal(m_fInventoryWarningColor[0], m_fInventoryWarningColor[1],
+                                                  m_fInventoryWarningColor[2]);
+        return false;
     }
-    return false;
+
+    m_pNewInventoryCtrl->SetSquareColorNormal(m_fInventoryColor[0], m_fInventoryColor[1], m_fInventoryColor[2]);
+    if (!SEASON3B::IsRelease(VK_LBUTTON))
+        return false;
+
+    const auto move =
+        UI::Items::Placement::FindHeldItemMove(m_pNewInventoryCtrl, g_MixRecipeMgr.GetMixInventoryEquipmentIndex());
+    return move && UI::Items::Placement::SendHeldItemMove(*move);
+}
+
+bool CNewUIMixInventory::AcceptsHeldItem(CNewUIPickedItem* pPickedItem)
+{
+    if (pPickedItem->GetOwnerInventory() == m_pNewInventoryCtrl)
+        return true;
+    return GetMixState() == MIX_READY && g_MixRecipeMgr.IsMixSource(pPickedItem->GetItem());
 }
 
 // Direction-agnostic core of the right-click moves: pick the item under the
@@ -980,42 +942,12 @@ bool CNewUIMixInventory::InventoryProcess()
 bool CNewUIMixInventory::AutoMoveItem(CNewUIInventoryCtrl* srcCtrl, STORAGE_TYPE srcType,
     CNewUIInventoryCtrl* dstCtrl, STORAGE_TYPE dstType, bool requireMixSource)
 {
-    if (CNewUIInventoryCtrl::GetPickedItem())
+    if (GetMixState() != MIX_READY)
         return false;
 
-    if (srcCtrl == nullptr || dstCtrl == nullptr || GetMixState() != MIX_READY)
-        return false;
-
-    ITEM* pItemObj = srcCtrl->FindItemAtPt(MouseX, MouseY);
-    if (pItemObj == nullptr)
-        return false;
-
-    if (requireMixSource && !g_MixRecipeMgr.IsMixSource(pItemObj))
-        return false;
-
-    const ITEM_ATTRIBUTE* pItemAttr = &ItemAttribute[pItemObj->Type];
-    const int iTargetIndex = dstCtrl->FindEmptySlot(pItemAttr->Width, pItemAttr->Height);
-    if (iTargetIndex < 0 || !dstCtrl->CanMove(iTargetIndex, pItemObj))
-        return false;
-
-    if (!CNewUIInventoryCtrl::CreatePickedItem(srcCtrl, pItemObj))
-        return false;
-
-    CNewUIPickedItem* pPickedItem = CNewUIInventoryCtrl::GetPickedItem();
-    if (pPickedItem == nullptr)
-        return false;
-
-    srcCtrl->RemoveItem(pItemObj);
-    pPickedItem->HidePickedItem();
-
-    if (!SendRequestEquipmentItem(srcType, pPickedItem->GetSourceLinealPos(), pItemObj, dstType, iTargetIndex))
-    {
-        CNewUIInventoryCtrl::BackupPickedItem();
-        return false;
-    }
-
-    PlayBuffer(SOUND_GET_ITEM01);
-    return true;
+    return UI::Items::Placement::AutoMoveItemAtCursor(
+        srcCtrl, srcType, dstCtrl, dstType,
+        [requireMixSource](ITEM* item) { return !requireMixSource || g_MixRecipeMgr.IsMixSource(item); });
 }
 
 bool CNewUIMixInventory::ProcessMyInvenItemAutoMove(CNewUIInventoryCtrl* sourceCtrl)

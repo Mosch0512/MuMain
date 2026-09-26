@@ -7289,8 +7289,10 @@ BOOL ReceiveTrade(const BYTE* ReceiveBuffer, BOOL bEncrypted)
 
 void ReceiveTradeResult(const BYTE* ReceiveBuffer)
 {
-    auto Data = (LPPTRADE)ReceiveBuffer;
-    g_pTrade->ProcessToReceiveTradeResult(Data);
+    PTRADE trade = *reinterpret_cast<const PTRADE*>(ReceiveBuffer);
+    // The server sends TradePartnerLevel big-endian.
+    trade.Level = ntoh16(trade.Level);
+    g_pTrade->ProcessToReceiveTradeResult(&trade);
 }
 
 void ReceiveTradeYourInventoryDelete(const BYTE* ReceiveBuffer)

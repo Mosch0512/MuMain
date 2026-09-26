@@ -6,6 +6,7 @@
 #include "I18N/All.h"
 
 #include "UI/NewUI/Inventory/NewUITrade.h"
+#include "UI/NewUI/Inventory/HeldItemPlacement.h"
 #include "UI/NewUI/NewUISystem.h"
 #include "UI/NewUI/Dialogs/NewUICustomMessageBox.h"
 
@@ -14,6 +15,13 @@
 #include "GameLogic/Items/TradeRestrictions.h"
 
 using namespace SEASON3B;
+
+namespace
+{
+// Frames the confirm button waits after my offer changed, so the partner can
+// see the change before I confirm.
+constexpr int MyTradeWaitAfterChange = 150;
+} // namespace
 
 CNewUITrade::CNewUITrade()
 {
@@ -122,9 +130,8 @@ bool CNewUITrade::UpdateMouseEvent()
     if ((m_pYourInvenCtrl && false == m_pYourInvenCtrl->UpdateMouseEvent())
         || (m_pMyInvenCtrl && false == m_pMyInvenCtrl->UpdateMouseEvent()))
     {
-        if (SEASON3B::IsPress(VK_LBUTTON)
-            && CNewUIInventoryCtrl::GetPickedItem()->GetOwnerInventory() == m_pMyInvenCtrl
-            && m_bMyConfirm)
+        if (SEASON3B::IsRelease(VK_LBUTTON) &&
+            CNewUIInventoryCtrl::GetPickedItem()->GetOwnerInventory() == m_pMyInvenCtrl && m_bMyConfirm)
         {
             m_bMyConfirm = false;
             SocketClient->ToGameServer()->SendTradeButtonStateChange(TradeButtonState::Unchecked);
@@ -142,6 +149,7 @@ bool CNewUITrade::UpdateMouseEvent()
     {
         if (SEASON3B::IsPress(VK_RBUTTON))
         {
+            ProcessMyTradeItemAutoMoveToInventory();
             MouseRButton = false;
             MouseRButtonPop = false;
             MouseRButtonPush = false;
@@ -351,32 +359,32 @@ void CNewUITrade::ConvertYourLevel(int& rnLevel, DWORD& rdwColor)
     if (m_nYourLevel >= 400)
     {
         rnLevel = 400;
-        rdwColor = (255 << 24) + (153 << 16) + (153 << 8) + (255);
+        rdwColor = (255u << 24) + (153 << 16) + (153 << 8) + (255);
     }
     else if (m_nYourLevel >= 300)
     {
         rnLevel = 300;
-        rdwColor = (255 << 24) + (255 << 16) + (153 << 8) + (255);
+        rdwColor = (255u << 24) + (255 << 16) + (153 << 8) + (255);
     }
     else if (m_nYourLevel >= 200)
     {
         rnLevel = 200;
-        rdwColor = (255 << 24) + (255 << 16) + (230 << 8) + (210);
+        rdwColor = (255u << 24) + (255 << 16) + (230 << 8) + (210);
     }
     else if (m_nYourLevel >= 100)
     {
         rnLevel = 100;
-        rdwColor = (255 << 24) + (24 << 16) + (201 << 8) + (0);
+        rdwColor = (255u << 24) + (24 << 16) + (201 << 8) + (0);
     }
     else if (m_nYourLevel >= 50)
     {
         rnLevel = 50;
-        rdwColor = (255 << 24) + (0 << 16) + (150 << 8) + (255);
+        rdwColor = (255u << 24) + (0 << 16) + (150 << 8) + (255);
     }
-    else							//  빨간색.
+    else
     {
         rnLevel = 10;
-        rdwColor = (255 << 24) + (0 << 16) + (0 << 8) + (255);
+        rdwColor = (255u << 24) + (0 << 16) + (0 << 8) + (255);
     }
 }
 
@@ -428,68 +436,72 @@ void CNewUITrade::ProcessClosing()
 
 void CNewUITrade::ProcessMyInvenCtrl()
 {
-    if (NULL == m_pMyInvenCtrl)
+    // A held item is put down when the button is released, like in every other
+    // item window: the inventory above this window takes the press (#588).
+    if (m_pMyInvenCtrl == nullptr || !SEASON3B::IsRelease(VK_LBUTTON))
         return;
 
-    if (SEASON3B::IsPress(VK_LBUTTON))
-    {
-        CNewUIPickedItem* pPickedItem = CNewUIInventoryCtrl::GetPickedItem();
-        if (NULL == pPickedItem)
-            return;
+    const auto move = UI::Items::Placement::FindHeldItemMove(m_pMyInvenCtrl, STORAGE_TYPE::TRADE);
+    if (!move)
+        return;
 
-        ITEM* pItemObj = pPickedItem->GetItem();
-        if (pPickedItem->GetOwnerInventory() == g_pMyInventory->GetInventoryCtrl())
-        {
-            int nSrcIndex = pPickedItem->GetSourceLinealPos();
-            int nDstIndex = pPickedItem->GetTargetLinealPos(m_pMyInvenCtrl);
-            if (nDstIndex != -1 && m_pMyInvenCtrl->CanMove(nDstIndex, pItemObj))
-                SendRequestItemToTrade(pItemObj, nSrcIndex, nDstIndex);
-        }
-        else if (pPickedItem->GetOwnerInventory() == m_pMyInvenCtrl)
-        {
-            int nSrcIndex = pPickedItem->GetSourceLinealPos();
-            int nDstIndex = pPickedItem->GetTargetLinealPos(m_pMyInvenCtrl);
-            if (nDstIndex != -1 && m_pMyInvenCtrl->CanMove(nDstIndex, pItemObj))
-            {
-                SendRequestEquipmentItem(STORAGE_TYPE::TRADE, nSrcIndex, pItemObj, STORAGE_TYPE::TRADE, nDstIndex);
-            }
-        }
-        else if (pItemObj->ex_src_type == ITEM_EX_SRC_EQUIPMENT)
-        {
-            int nSrcIndex = pPickedItem->GetSourceLinealPos();
-            int nDstIndex = pPickedItem->GetTargetLinealPos(m_pMyInvenCtrl);
-            if (nDstIndex != -1 && m_pMyInvenCtrl->CanMove(nDstIndex, pItemObj))
-                SendRequestItemToTrade(pItemObj, nSrcIndex, nDstIndex);
-        }
-    }
+    if (move->sourceType == STORAGE_TYPE::TRADE)
+        UI::Items::Placement::SendHeldItemMove(*move);
+    else
+        SendRequestItemToTrade(*move);
 }
 
-void CNewUITrade::SendRequestItemToTrade(ITEM* pItemObj, int nInvenIndex,
-    int nTradeIndex)
+void CNewUITrade::SendRequestItemToTrade(const UI::Items::Placement::HeldItemMove& move)
 {
-    if (GameLogic::Items::IsTradeBan(pItemObj))
+    if (GameLogic::Items::IsTradeBan(move.item))
     {
         g_pSystemLogBox->AddText(I18N::Game::TheseItemsCannotBeTraded, SEASON3B::TYPE_ERROR_MESSAGE);
+        return;
     }
-    else
-    {
-        m_bMyConfirm = false;
-        SocketClient->ToGameServer()->SendTradeButtonStateChange(TradeButtonState::Unchecked);
 
-        SendRequestEquipmentItem(STORAGE_TYPE::INVENTORY, nInvenIndex,
-            pItemObj, STORAGE_TYPE::TRADE, nTradeIndex);
-    }
+    UncheckMyConfirm();
+    UI::Items::Placement::SendHeldItemMove(move);
 }
 
-void CNewUITrade::SendRequestItemToMyInven(ITEM* pItemObj, int nTradeIndex, int nInvenIndex)
+void CNewUITrade::UncheckMyConfirm()
 {
-    SendRequestEquipmentItem(STORAGE_TYPE::TRADE, nTradeIndex, pItemObj, STORAGE_TYPE::INVENTORY, nInvenIndex);
+    m_bMyConfirm = false;
+    SocketClient->ToGameServer()->SendTradeButtonStateChange(TradeButtonState::Unchecked);
+}
 
+bool CNewUITrade::ProcessMyInvenItemAutoMove(CNewUIInventoryCtrl* sourceCtrl)
+{
+    if (sourceCtrl == nullptr || sourceCtrl->GetStorageType() != STORAGE_TYPE::INVENTORY)
+        return false;
+
+    const bool moved = UI::Items::Placement::AutoMoveItemAtCursor(
+        sourceCtrl, STORAGE_TYPE::INVENTORY, m_pMyInvenCtrl, STORAGE_TYPE::TRADE,
+        [](ITEM* item)
+        {
+            if (!GameLogic::Items::IsTradeBan(item))
+                return true;
+            g_pSystemLogBox->AddText(I18N::Game::TheseItemsCannotBeTraded, SEASON3B::TYPE_ERROR_MESSAGE);
+            return false;
+        });
+    if (moved)
+        UncheckMyConfirm();
+    return moved;
+}
+
+bool CNewUITrade::ProcessMyTradeItemAutoMoveToInventory()
+{
+    CNewUIInventoryCtrl* inventory = g_pMyInventory != nullptr ? g_pMyInventory->GetInventoryCtrl() : nullptr;
+    const bool moved = UI::Items::Placement::AutoMoveItemAtCursor(m_pMyInvenCtrl, STORAGE_TYPE::TRADE, inventory,
+                                                                  STORAGE_TYPE::INVENTORY, [](ITEM*) { return true; });
+    if (!moved)
+        return false;
+
+    // Taking an item out after confirming warns the player, and the confirm
+    // button waits a moment so the partner can see the change.
     if (m_bMyConfirm)
-    {
         AlertTrade();
-    }
-    m_nMyTradeWait = 150;
+    m_nMyTradeWait = MyTradeWaitAfterChange;
+    return true;
 }
 
 void CNewUITrade::SendRequestMyGoldInput(int nInputGold)
@@ -503,7 +515,7 @@ void CNewUITrade::SendRequestMyGoldInput(int nInputGold)
         }
 
         if (m_nMyTradeGold > 0)
-            m_nMyTradeWait = 150;
+            m_nMyTradeWait = MyTradeWaitAfterChange;
 
         m_nTempMyTradeGold = nInputGold;
         SocketClient->ToGameServer()->SendSetTradeMoney(nInputGold);
@@ -628,7 +640,7 @@ void CNewUITrade::ProcessToReceiveTradeResult(LPPTRADE pTradeData)
         m_bTradeAlert = false;
         m_nYourGuildType = pTradeData->GuildKey;
         wcsncpy(m_szYourID, szTempID, MAX_USERNAME_SIZE);
-        m_nYourLevel = pTradeData->Level;   //  상대방 레벨.
+        m_nYourLevel = pTradeData->Level;
         break;
     }
 }
@@ -777,7 +789,7 @@ void CNewUITrade::ProcessToReceiveYourConfirm(BYTE byState)
     case 2:
         m_bMyConfirm = false;
         m_bYourConfirm = false;
-        m_nMyTradeWait = 150;
+        m_nMyTradeWait = MyTradeWaitAfterChange;
         break;
     case 3:
         break;
