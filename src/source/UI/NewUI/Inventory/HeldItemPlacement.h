@@ -2,6 +2,7 @@
 
 #include "UI/NewUI/Inventory/NewUIInventoryCtrl.h"
 
+#include <functional>
 #include <optional>
 
 // Putting the item on the mouse cursor down into an item window (trade, chaos
@@ -29,4 +30,12 @@ struct HeldItemMove
 
 // Asks the server to do the move. Returns false when the request was not sent.
 bool SendHeldItemMove(const HeldItemMove& move);
+
+// Moves the item under the cursor in `source` to the first free squares of
+// `target`, the way a right-click moves an item between two open windows.
+// `accepts` decides whether the item may move there. Returns true when the
+// move was sent.
+bool AutoMoveItemAtCursor(SEASON3B::CNewUIInventoryCtrl* source, STORAGE_TYPE sourceType,
+                          SEASON3B::CNewUIInventoryCtrl* target, STORAGE_TYPE targetType,
+                          const std::function<bool(ITEM*)>& accepts);
 } // namespace UI::Items::Placement

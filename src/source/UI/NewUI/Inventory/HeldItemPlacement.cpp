@@ -2,6 +2,8 @@
 
 #include "UI/NewUI/Inventory/HeldItemPlacement.h"
 
+#include "Audio/DSPlaySound.h"
+#include "Engine/Object/ZzzInfomation.h"
 #include "Engine/Object/ZzzInventory.h"
 
 using SEASON3B::CNewUIInventoryCtrl;
@@ -43,5 +45,39 @@ std::optional<HeldItemMove> FindHeldItemMove(CNewUIInventoryCtrl* target, STORAG
 bool SendHeldItemMove(const HeldItemMove& move)
 {
     return SendRequestEquipmentItem(move.sourceType, move.sourceIndex, move.item, move.targetType, move.targetIndex);
+}
+
+bool AutoMoveItemAtCursor(CNewUIInventoryCtrl* source, STORAGE_TYPE sourceType, CNewUIInventoryCtrl* target,
+                          STORAGE_TYPE targetType, const std::function<bool(ITEM*)>& accepts)
+{
+    if (CNewUIInventoryCtrl::GetPickedItem() != nullptr || source == nullptr || target == nullptr)
+        return false;
+
+    ITEM* item = source->FindItemAtPt(MouseX, MouseY);
+    if (item == nullptr || !accepts(item))
+        return false;
+
+    const ITEM_ATTRIBUTE& attribute = ItemAttribute[item->Type];
+    const int targetIndex = target->FindEmptySlot(attribute.Width, attribute.Height);
+    if (targetIndex < 0 || !target->CanMove(targetIndex, item))
+        return false;
+
+    // Picked up and hidden, so the item is off both grids until the server
+    // answers; the answer puts it into the target or back.
+    if (!CNewUIInventoryCtrl::CreatePickedItem(source, item))
+        return false;
+    CNewUIPickedItem* pickedItem = CNewUIInventoryCtrl::GetPickedItem();
+    source->RemoveItem(item);
+    pickedItem->HidePickedItem();
+
+    if (!SendRequestEquipmentItem(sourceType, pickedItem->GetSourceLinealPos(), pickedItem->GetItem(), targetType,
+                                  targetIndex))
+    {
+        CNewUIInventoryCtrl::BackupPickedItem();
+        return false;
+    }
+
+    PlayBuffer(SOUND_GET_ITEM01);
+    return true;
 }
 } // namespace UI::Items::Placement

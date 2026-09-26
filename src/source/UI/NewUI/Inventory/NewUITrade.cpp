@@ -16,6 +16,13 @@
 
 using namespace SEASON3B;
 
+namespace
+{
+// Frames the confirm button waits after my offer changed, so the partner can
+// see the change before I confirm.
+constexpr int MyTradeWaitAfterChange = 150;
+} // namespace
+
 CNewUITrade::CNewUITrade()
 {
     m_pNewUIMng = NULL;
@@ -142,6 +149,7 @@ bool CNewUITrade::UpdateMouseEvent()
     {
         if (SEASON3B::IsPress(VK_RBUTTON))
         {
+            ProcessMyTradeItemAutoMoveToInventory();
             MouseRButton = false;
             MouseRButtonPop = false;
             MouseRButtonPush = false;
@@ -451,20 +459,49 @@ void CNewUITrade::SendRequestItemToTrade(const UI::Items::Placement::HeldItemMov
         return;
     }
 
-    m_bMyConfirm = false;
-    SocketClient->ToGameServer()->SendTradeButtonStateChange(TradeButtonState::Unchecked);
+    UncheckMyConfirm();
     UI::Items::Placement::SendHeldItemMove(move);
 }
 
-void CNewUITrade::SendRequestItemToMyInven(ITEM* pItemObj, int nTradeIndex, int nInvenIndex)
+void CNewUITrade::UncheckMyConfirm()
 {
-    SendRequestEquipmentItem(STORAGE_TYPE::TRADE, nTradeIndex, pItemObj, STORAGE_TYPE::INVENTORY, nInvenIndex);
+    m_bMyConfirm = false;
+    SocketClient->ToGameServer()->SendTradeButtonStateChange(TradeButtonState::Unchecked);
+}
 
+bool CNewUITrade::ProcessMyInvenItemAutoMove(CNewUIInventoryCtrl* sourceCtrl)
+{
+    if (sourceCtrl == nullptr || sourceCtrl->GetStorageType() != STORAGE_TYPE::INVENTORY)
+        return false;
+
+    const bool moved = UI::Items::Placement::AutoMoveItemAtCursor(
+        sourceCtrl, STORAGE_TYPE::INVENTORY, m_pMyInvenCtrl, STORAGE_TYPE::TRADE,
+        [](ITEM* item)
+        {
+            if (!GameLogic::Items::IsTradeBan(item))
+                return true;
+            g_pSystemLogBox->AddText(I18N::Game::TheseItemsCannotBeTraded, SEASON3B::TYPE_ERROR_MESSAGE);
+            return false;
+        });
+    if (moved)
+        UncheckMyConfirm();
+    return moved;
+}
+
+bool CNewUITrade::ProcessMyTradeItemAutoMoveToInventory()
+{
+    CNewUIInventoryCtrl* inventory = g_pMyInventory != nullptr ? g_pMyInventory->GetInventoryCtrl() : nullptr;
+    const bool moved = UI::Items::Placement::AutoMoveItemAtCursor(m_pMyInvenCtrl, STORAGE_TYPE::TRADE, inventory,
+                                                                  STORAGE_TYPE::INVENTORY, [](ITEM*) { return true; });
+    if (!moved)
+        return false;
+
+    // Taking an item out after confirming warns the player, and the confirm
+    // button waits a moment so the partner can see the change.
     if (m_bMyConfirm)
-    {
         AlertTrade();
-    }
-    m_nMyTradeWait = 150;
+    m_nMyTradeWait = MyTradeWaitAfterChange;
+    return true;
 }
 
 void CNewUITrade::SendRequestMyGoldInput(int nInputGold)
@@ -478,7 +515,7 @@ void CNewUITrade::SendRequestMyGoldInput(int nInputGold)
         }
 
         if (m_nMyTradeGold > 0)
-            m_nMyTradeWait = 150;
+            m_nMyTradeWait = MyTradeWaitAfterChange;
 
         m_nTempMyTradeGold = nInputGold;
         SocketClient->ToGameServer()->SendSetTradeMoney(nInputGold);
@@ -752,7 +789,7 @@ void CNewUITrade::ProcessToReceiveYourConfirm(BYTE byState)
     case 2:
         m_bMyConfirm = false;
         m_bYourConfirm = false;
-        m_nMyTradeWait = 150;
+        m_nMyTradeWait = MyTradeWaitAfterChange;
         break;
     case 3:
         break;

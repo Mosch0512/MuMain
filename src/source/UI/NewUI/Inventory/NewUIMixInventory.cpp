@@ -942,42 +942,12 @@ bool CNewUIMixInventory::AcceptsHeldItem(CNewUIPickedItem* pPickedItem)
 bool CNewUIMixInventory::AutoMoveItem(CNewUIInventoryCtrl* srcCtrl, STORAGE_TYPE srcType,
     CNewUIInventoryCtrl* dstCtrl, STORAGE_TYPE dstType, bool requireMixSource)
 {
-    if (CNewUIInventoryCtrl::GetPickedItem())
+    if (GetMixState() != MIX_READY)
         return false;
 
-    if (srcCtrl == nullptr || dstCtrl == nullptr || GetMixState() != MIX_READY)
-        return false;
-
-    ITEM* pItemObj = srcCtrl->FindItemAtPt(MouseX, MouseY);
-    if (pItemObj == nullptr)
-        return false;
-
-    if (requireMixSource && !g_MixRecipeMgr.IsMixSource(pItemObj))
-        return false;
-
-    const ITEM_ATTRIBUTE* pItemAttr = &ItemAttribute[pItemObj->Type];
-    const int iTargetIndex = dstCtrl->FindEmptySlot(pItemAttr->Width, pItemAttr->Height);
-    if (iTargetIndex < 0 || !dstCtrl->CanMove(iTargetIndex, pItemObj))
-        return false;
-
-    if (!CNewUIInventoryCtrl::CreatePickedItem(srcCtrl, pItemObj))
-        return false;
-
-    CNewUIPickedItem* pPickedItem = CNewUIInventoryCtrl::GetPickedItem();
-    if (pPickedItem == nullptr)
-        return false;
-
-    srcCtrl->RemoveItem(pItemObj);
-    pPickedItem->HidePickedItem();
-
-    if (!SendRequestEquipmentItem(srcType, pPickedItem->GetSourceLinealPos(), pItemObj, dstType, iTargetIndex))
-    {
-        CNewUIInventoryCtrl::BackupPickedItem();
-        return false;
-    }
-
-    PlayBuffer(SOUND_GET_ITEM01);
-    return true;
+    return UI::Items::Placement::AutoMoveItemAtCursor(
+        srcCtrl, srcType, dstCtrl, dstType,
+        [requireMixSource](ITEM* item) { return !requireMixSource || g_MixRecipeMgr.IsMixSource(item); });
 }
 
 bool CNewUIMixInventory::ProcessMyInvenItemAutoMove(CNewUIInventoryCtrl* sourceCtrl)
