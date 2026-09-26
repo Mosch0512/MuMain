@@ -17,6 +17,7 @@ namespace GameLogic::Items
     bool IsRideableMountModel(int modelType);
     bool IsHornMountModel(int modelType);
     bool IsFlyingMount(const ITEM* pItem);
+    // Wings or a flying mount that are not broken (durability above 0).
     bool HasFlightEquipment(const ITEM* pItemHelper, const ITEM* pItemWing);
     bool IsDarkLordPet(const ITEM* pItem);
     bool IsDarkLordPetType(int itemType);

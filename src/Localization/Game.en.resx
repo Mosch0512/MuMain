@@ -12970,4 +12970,7 @@
   <data name="ChatCommandsUnknownCommand" xml:space="preserve">
     <value>This command is not available anymore.</value>
   </data>
+  <data name="KeepFlightEquipmentInIcarus" xml:space="preserve">
+    <value>In Icarus you cannot take off your last wings or flying mount.</value>
+  </data>
 </root>

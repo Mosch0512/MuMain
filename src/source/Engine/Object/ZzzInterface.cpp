@@ -64,6 +64,8 @@
 #include "Camera/CameraProjection.h"
 #include "Scenes/SceneCommon.h"
 
+#include <iterator>
+
 extern int g_iChatInputType;
 extern BOOL g_bUseChatListBox;
 extern DWORD g_dwMouseUseUIID;
@@ -2424,13 +2426,16 @@ bool CheckCommand(wchar_t* Text, bool bMacroText)
                     return  false;
                 }
 
-                int iTextSize = 0;
-                for (int j = 3; j <= (int)wcslen(Text); j++)
+                // The macro text follows the "/N " prefix. "/N" alone gives
+                // an empty macro; a long text is cut to fit.
+                constexpr size_t MacroPrefixLength = 3;
+                const size_t textLength = wcslen(Text);
+                size_t macroLength = 0;
+                for (size_t j = MacroPrefixLength; j < textLength && macroLength + 1 < std::size(MacroText[i]); j++)
                 {
-                    MacroText[i][j - 3] = Text[j];
-                    iTextSize = j;
+                    MacroText[i][macroLength++] = Text[j];
                 }
-                MacroText[i][iTextSize - 3] = 0;
+                MacroText[i][macroLength] = 0;
                 PlayBuffer(SOUND_CLICK01);
                 return true;
             }
@@ -4196,9 +4201,9 @@ bool IsIllegalMovementByUsingMsg(const wchar_t* szChatText)
     short pEquipedRightRingType = (&CharacterMachine->Equipment[EQUIPMENT_RING_RIGHT])->Type;
     short pEquipedLeftRingType = (&CharacterMachine->Equipment[EQUIPMENT_RING_LEFT])->Type;
     short pEquipedHelperType = (&CharacterMachine->Equipment[EQUIPMENT_HELPER])->Type;
-    short pEquipedWingType = (&CharacterMachine->Equipment[EQUIPMENT_WING])->Type;
 
-    if ((pEquipedWingType == -1 && !GameLogic::Items::IsFlyingMount(&CharacterMachine->Equipment[EQUIPMENT_HELPER])) ||
+    if (!GameLogic::Items::HasFlightEquipment(&CharacterMachine->Equipment[EQUIPMENT_HELPER],
+                                              &CharacterMachine->Equipment[EQUIPMENT_WING]) ||
         pEquipedHelperType == ITEM_HORN_OF_UNIRIA)
     {
         bCantFly = true;
