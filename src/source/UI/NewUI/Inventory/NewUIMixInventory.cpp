@@ -919,7 +919,7 @@ bool CNewUIMixInventory::InventoryProcess()
             pPickedItem->GetOwnerInventory() == g_pMyInventory->GetInventoryCtrl())
         {
             m_pNewInventoryCtrl->SetSquareColorNormal(m_fInventoryColor[0], m_fInventoryColor[1], m_fInventoryColor[2]);
-            if (SEASON3B::IsPress(VK_LBUTTON))
+            if (SEASON3B::IsRelease(VK_LBUTTON))
             {
                 int iSourceIndex = pPickedItem->GetSourceLinealPos();
                 int iTargetIndex = pPickedItem->GetTargetLinealPos(m_pNewInventoryCtrl);
@@ -936,7 +936,7 @@ bool CNewUIMixInventory::InventoryProcess()
         else if (pPickedItem->GetOwnerInventory() == m_pNewInventoryCtrl)
         {
             m_pNewInventoryCtrl->SetSquareColorNormal(m_fInventoryColor[0], m_fInventoryColor[1], m_fInventoryColor[2]);
-            if (SEASON3B::IsPress(VK_LBUTTON))
+            if (SEASON3B::IsRelease(VK_LBUTTON))
             {
                 int iSourceIndex = pPickedItem->GetSourceLinealPos();
                 int iTargetIndex = pPickedItem->GetTargetLinealPos(m_pNewInventoryCtrl);
@@ -954,7 +954,7 @@ bool CNewUIMixInventory::InventoryProcess()
             pItemObj->ex_src_type == ITEM_EX_SRC_EQUIPMENT)
         {
             m_pNewInventoryCtrl->SetSquareColorNormal(m_fInventoryColor[0], m_fInventoryColor[1], m_fInventoryColor[2]);
-            if (SEASON3B::IsPress(VK_LBUTTON))
+            if (SEASON3B::IsRelease(VK_LBUTTON))
             {
                 int iSourceIndex = pPickedItem->GetSourceLinealPos();
                 int iTargetIndex = pPickedItem->GetTargetLinealPos(m_pNewInventoryCtrl);

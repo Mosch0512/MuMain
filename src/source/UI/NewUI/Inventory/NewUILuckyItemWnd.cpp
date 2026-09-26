@@ -466,7 +466,7 @@ bool CNewUILuckyItemWnd::Process_InventoryCtrl(void)
 
     if (pPickedItem->GetOwnerInventory() == g_pMyInventory->GetInventoryCtrl())
     {
-        if (SEASON3B::IsPress(VK_LBUTTON))
+        if (SEASON3B::IsRelease(VK_LBUTTON))
         {
             int iSourceIndex = pPickedItem->GetSourceLinealPos();
             int iTargetIndex = pPickedItem->GetTargetLinealPos(m_pNewInventoryCtrl);
@@ -480,7 +480,7 @@ bool CNewUILuckyItemWnd::Process_InventoryCtrl(void)
     }
     else if (pPickedItem->GetOwnerInventory() == m_pNewInventoryCtrl)
     {
-        if (SEASON3B::IsPress(VK_LBUTTON))
+        if (SEASON3B::IsRelease(VK_LBUTTON))
         {
             int iSourceIndex = pPickedItem->GetSourceLinealPos();
             int iTargetIndex = pPickedItem->GetTargetLinealPos(m_pNewInventoryCtrl);
