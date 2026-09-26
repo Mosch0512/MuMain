@@ -122,9 +122,8 @@ bool CNewUITrade::UpdateMouseEvent()
     if ((m_pYourInvenCtrl && false == m_pYourInvenCtrl->UpdateMouseEvent())
         || (m_pMyInvenCtrl && false == m_pMyInvenCtrl->UpdateMouseEvent()))
     {
-        if (SEASON3B::IsRelease(VK_LBUTTON)
-            && CNewUIInventoryCtrl::GetPickedItem()->GetOwnerInventory() == m_pMyInvenCtrl
-            && m_bMyConfirm)
+        if (SEASON3B::IsRelease(VK_LBUTTON) &&
+            CNewUIInventoryCtrl::GetPickedItem()->GetOwnerInventory() == m_pMyInvenCtrl && m_bMyConfirm)
         {
             m_bMyConfirm = false;
             SocketClient->ToGameServer()->SendTradeButtonStateChange(TradeButtonState::Unchecked);
@@ -632,7 +631,7 @@ void CNewUITrade::ProcessToReceiveTradeResult(LPPTRADE pTradeData)
         wcsncpy(m_szYourID, szTempID, MAX_USERNAME_SIZE);
         // The server sends TradePartnerLevel big-endian; PTRADE reads it as a
         // little-endian WORD, so swap the bytes.
-        m_nYourLevel = ((pTradeData->Level & 0xFF) << 8) | ((pTradeData->Level >> 8) & 0xFF);   //  상대방 레벨.
+        m_nYourLevel = ((pTradeData->Level & 0xFF) << 8) | ((pTradeData->Level >> 8) & 0xFF); //  상대방 레벨.
         break;
     }
 }
