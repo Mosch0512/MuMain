@@ -116,7 +116,7 @@
         "es": "Caballo Oscuro",
         "pt": "Cavalo negro"
       },
-      "tags": ["mount", "darkLordPet", "valuable"],
+      "tags": ["mount", "flying", "darkLordPet", "valuable"],
       "width": 1,
       "height": 1,
       "slot": "pet",

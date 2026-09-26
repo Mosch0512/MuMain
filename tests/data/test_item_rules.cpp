@@ -274,7 +274,7 @@ TEST_CASE("Item categories come from the item data [data][items][rules]")
     CHECK_FALSE(IsRideableMountModel(MODEL_ITEM + MAX_ITEM));
 }
 
-TEST_CASE("Only wings, the Dinorant and the Fenrir are flight equipment [data][items][rules]")
+TEST_CASE("Wings, the Dinorant, the Dark Horse and the Fenrir are flight equipment [data][items][rules]")
 {
     ShippedItemsScope items;
     const ItemState durable{0, false, false, 255};
@@ -292,8 +292,7 @@ TEST_CASE("Only wings, the Dinorant and the Fenrir are flight equipment [data][i
     CHECK(HasFlightEquipment(&none, &capeOfLord));
     CHECK(HasFlightEquipment(&dinorant, &none));
     CHECK(HasFlightEquipment(&fenrir, &none));
-    // Like OpenMU (CanFly): the Dark Horse and the Uniria do not fly.
-    CHECK_FALSE(HasFlightEquipment(&darkHorse, &none));
+    CHECK(HasFlightEquipment(&darkHorse, &none));
     CHECK_FALSE(HasFlightEquipment(&uniria, &none));
     // A broken item (0 durability) gives nothing, so it does not fly.
     CHECK_FALSE(HasFlightEquipment(&none, &brokenWings));
@@ -319,10 +318,10 @@ TEST_CASE("In Icarus the last flight equipment cannot be taken off [data][items]
     CHECK_FALSE(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &none, &wings));
     CHECK_FALSE(CanTakeOff(EQUIPMENT_HELPER, WD_10HEAVEN, &fenrir, &none));
 
-    // The Dark Horse does not fly: with it the wings are the last flight
-    // equipment, and the horse itself can go.
-    CHECK_FALSE(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &darkHorse, &wings));
+    // The Dark Horse flies: with wings either one can go, alone it stays on.
+    CHECK(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &darkHorse, &wings));
     CHECK(CanTakeOff(EQUIPMENT_HELPER, WD_10HEAVEN, &darkHorse, &wings));
+    CHECK_FALSE(CanTakeOff(EQUIPMENT_HELPER, WD_10HEAVEN, &darkHorse, &none));
 
     // Broken Fenrir: the wings are the last flight equipment.
     CHECK_FALSE(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &brokenFenrir, &wings));
