@@ -7,9 +7,11 @@
 #include "Data/GameData/ItemData/ItemDatabase.h"
 #include "Data/GameData/ItemData/ItemType.h"
 #include "Engine/Object/ZzzCharacter.h"
+#include "GameLogic/Items/EquipmentRestrictions.h"
 #include "GameLogic/Items/ItemCategories.h"
 #include "GameLogic/Items/ShopRestrictions.h"
 #include "GameLogic/Items/TradeRestrictions.h"
+#include "World/MapInfra/MapManager.h"
 
 #include <filesystem>
 
@@ -262,4 +264,31 @@ TEST_CASE("Item categories come from the item data [data][items][rules]")
     // Model ids outside the item range are no items.
     CHECK_FALSE(IsRideableMountModel(-1));
     CHECK_FALSE(IsRideableMountModel(MODEL_ITEM + MAX_ITEM));
+}
+
+TEST_CASE("In Icarus the last wings or flying mount cannot be taken off [data][items][rules]")
+{
+    ShippedItemsScope items;
+    const ITEM wings = MakeItem(ITEM_WING);
+    const ITEM fenrir = MakeItem(ITEM_HORN_OF_FENRIR);
+    const ITEM uniria = MakeItem(ITEM_HORN_OF_UNIRIA);
+    ITEM none{};
+    none.Type = -1;
+
+    // Wings and a flying mount: either one can go, the other still flies.
+    CHECK(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &fenrir, &wings));
+    CHECK(CanTakeOff(EQUIPMENT_HELPER, WD_10HEAVEN, &fenrir, &wings));
+
+    // Only one of them: it stays on.
+    CHECK_FALSE(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &none, &wings));
+    CHECK_FALSE(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &uniria, &wings));
+    CHECK_FALSE(CanTakeOff(EQUIPMENT_HELPER, WD_10HEAVEN, &fenrir, &none));
+
+    // A helper that cannot fly can go while the wings stay on.
+    CHECK(CanTakeOff(EQUIPMENT_HELPER, WD_10HEAVEN, &uniria, &wings));
+
+    // Other slots and other maps are not restricted.
+    CHECK(CanTakeOff(EQUIPMENT_WEAPON_RIGHT, WD_10HEAVEN, &none, &wings));
+    CHECK(CanTakeOff(EQUIPMENT_WING, WD_0LORENCIA, &none, &wings));
+    CHECK(CanTakeOff(EQUIPMENT_HELPER, WD_0LORENCIA, &fenrir, &none));
 }

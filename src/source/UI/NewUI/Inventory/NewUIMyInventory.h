@@ -195,6 +195,7 @@ namespace SEASON3B
         void RenderInventoryDetails() const;
 
         bool EquipmentWindowProcess();
+        bool CanTakeOff(int equipmentSlot) const;
         bool InventoryProcess() const;
         bool BtnProcess();
         bool WindowProcess();

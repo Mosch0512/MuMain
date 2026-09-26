@@ -30,6 +30,7 @@ extern bool SelectFlag;
 #include "GameLogic/Events/Event.h"
 #endif // CSK_FIX_BLUELUCKYBAG_MOVECOMMAND
 #include "GameLogic/Items/ChangeRingManager.h"
+#include "GameLogic/Items/EquipmentRestrictions.h"
 #include "GameLogic/Social/MonkSystem.h"
 #include "Character/CharacterManager.h"
 #include "GameLogic/Items/ItemCategories.h"
@@ -1468,39 +1469,11 @@ bool CNewUIMyInventory::EquipmentWindowProcess()
             }
 
             ITEM* pEquippedItem = &CharacterMachine->Equipment[m_iPointedSlot];
-            if (pEquippedItem->Type >= 0)
+            if (pEquippedItem->Type >= 0 && CanTakeOff(m_iPointedSlot))
             {
-                if (gMapManager.WorldActive == WD_10HEAVEN)
+                if (CNewUIInventoryCtrl::CreatePickedItem(nullptr, pEquippedItem))
                 {
-                    const ITEM* pEquippedPetItem = &CharacterMachine->Equipment[EQUIPMENT_HELPER];
-                    bool bPicked = true;
-
-                    if (m_iPointedSlot == EQUIPMENT_HELPER || m_iPointedSlot == EQUIPMENT_WING)
-                    {
-                        if (((m_iPointedSlot == EQUIPMENT_HELPER) && !gCharacterManager.IsEquipedWing()))
-                        {
-                            bPicked = false;
-                        }
-                        else if ((m_iPointedSlot == EQUIPMENT_WING) && !GameLogic::Items::IsFlyingMount(pEquippedPetItem))
-                        {
-                            bPicked = false;
-                        }
-                    }
-
-                    if (bPicked == true)
-                    {
-                        if (CNewUIInventoryCtrl::CreatePickedItem(nullptr, pEquippedItem))
-                        {
-                            UnequipItem(m_iPointedSlot);
-                        }
-                    }
-                }
-                else
-                {
-                    if (CNewUIInventoryCtrl::CreatePickedItem(nullptr, pEquippedItem))
-                    {
-                        UnequipItem(m_iPointedSlot);
-                    }
+                    UnequipItem(m_iPointedSlot);
                 }
             }
         }
@@ -1520,7 +1493,7 @@ bool CNewUIMyInventory::EquipmentWindowProcess()
 
             ITEM* pEquippedItem = &CharacterMachine->Equipment[iSourceIndex];
 
-            if (pEquippedItem->Type >= 0)
+            if (pEquippedItem->Type >= 0 && CanTakeOff(iSourceIndex))
             {
                 const int emptySlotIndex = FindEmptySlot(pEquippedItem);
 
@@ -1544,6 +1517,13 @@ bool CNewUIMyInventory::EquipmentWindowProcess()
 
     return false;
 }
+bool CNewUIMyInventory::CanTakeOff(int equipmentSlot) const
+{
+    return GameLogic::Items::CanTakeOff(equipmentSlot, gMapManager.WorldActive,
+                                        &CharacterMachine->Equipment[EQUIPMENT_HELPER],
+                                        &CharacterMachine->Equipment[EQUIPMENT_WING]);
+}
+
 bool CNewUIMyInventory::InventoryProcess() const
 {
     if (CheckMouseIn(m_Pos.x, m_Pos.y, INVENTORY_WIDTH, INVENTORY_HEIGHT) == false)

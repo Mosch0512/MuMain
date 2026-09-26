@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "CharacterManager.h"
 #include "GameLogic/Items/CSItemOption.h"
-#include "GameLogic/Items/ItemCategories.h"
 #include "I18N/All.h"
 #include "GameLogic/Skills/SkillManager.h"
 #include "Engine/Object/ZzzInfomation.h"
@@ -317,11 +316,6 @@ int CCharacterManager::GetEquipedBowType_Skill()
     }
 
     return BOWTYPE_NONE;
-}
-
-bool CCharacterManager::IsEquipedWing()
-{
-    return GameLogic::Items::IsWingItem(&CharacterMachine->Equipment[EQUIPMENT_WING]);
 }
 
 void CCharacterManager::GetMagicSkillDamage(int iType, int* piMinDamage, int* piMaxDamage)
