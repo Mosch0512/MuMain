@@ -4196,9 +4196,9 @@ bool IsIllegalMovementByUsingMsg(const wchar_t* szChatText)
     short pEquipedRightRingType = (&CharacterMachine->Equipment[EQUIPMENT_RING_RIGHT])->Type;
     short pEquipedLeftRingType = (&CharacterMachine->Equipment[EQUIPMENT_RING_LEFT])->Type;
     short pEquipedHelperType = (&CharacterMachine->Equipment[EQUIPMENT_HELPER])->Type;
-    short pEquipedWingType = (&CharacterMachine->Equipment[EQUIPMENT_WING])->Type;
 
-    if ((pEquipedWingType == -1 && !GameLogic::Items::IsFlyingMount(&CharacterMachine->Equipment[EQUIPMENT_HELPER])) ||
+    if (!GameLogic::Items::HasFlightEquipment(&CharacterMachine->Equipment[EQUIPMENT_HELPER],
+                                              &CharacterMachine->Equipment[EQUIPMENT_WING]) ||
         pEquipedHelperType == ITEM_HORN_OF_UNIRIA)
     {
         bCantFly = true;

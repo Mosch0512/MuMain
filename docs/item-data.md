@@ -102,7 +102,7 @@ can have several tags; the file lists them in the order below.
 | `cape` | A cape (Cape of Lord, Cape of Fighter, …); second tier capes have their own wing formulas |
 | `mount` | Can be ridden (Uniria, Dinorant, Dark Horse, Fenrir) |
 | `hornMount` | A mount summoned by a horn (Uniria, Dinorant, Fenrir) |
-| `flying` | A mount that can fly, needed for maps like Icarus |
+| `flying` | A mount that can fly (Dinorant, Fenrir), needed for Icarus; see [Flight equipment](#flight-equipment) |
 | `darkLordPet` | Dark Horse and Dark Raven |
 | `guardianPet` | Demon and Spirit of Guardian |
 | `pandaOrSkeleton` | The panda and skeleton pets and transformation rings |
@@ -123,6 +123,20 @@ can have several tags; the file lists them in the order below.
 | `valuable` | The game asks for confirmation before the item is sold or dropped |
 
 Wings need no tag: an item is a wing when its `slot` is `wings`.
+
+### Flight equipment
+
+Wings (capes included) and mounts with the `flying` tag let a character fly.
+An item at 0 durability does not count. Icarus requires flight equipment:
+without it the character cannot warp or move there, and in Icarus the last
+flight equipment cannot be taken off, neither by dragging it nor by
+right-clicking it.
+
+This matches OpenMU, where only wings, the Dinorant and the Fenrir give
+`CanFly` and a broken item gives no power-ups. The original client also let
+the Dark Horse count; the server never did, so the Dark Horse has no
+`flying` tag. The client check only spares the player the fall; the server
+has to refuse the move as well.
 
 A tag name that does not exist is an error, so a typo cannot silently
 remove an item from a category. New tags need code that uses them; they

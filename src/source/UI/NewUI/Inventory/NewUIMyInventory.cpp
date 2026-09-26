@@ -1469,7 +1469,7 @@ bool CNewUIMyInventory::EquipmentWindowProcess()
             }
 
             ITEM* pEquippedItem = &CharacterMachine->Equipment[m_iPointedSlot];
-            if (pEquippedItem->Type >= 0 && CanTakeOff(m_iPointedSlot))
+            if (pEquippedItem->Type >= 0 && CheckTakeOff(m_iPointedSlot))
             {
                 if (CNewUIInventoryCtrl::CreatePickedItem(nullptr, pEquippedItem))
                 {
@@ -1493,22 +1493,21 @@ bool CNewUIMyInventory::EquipmentWindowProcess()
 
             ITEM* pEquippedItem = &CharacterMachine->Equipment[iSourceIndex];
 
-            if (pEquippedItem->Type >= 0 && CanTakeOff(iSourceIndex))
+            if (pEquippedItem->Type >= 0 && CheckTakeOff(iSourceIndex))
             {
                 const int emptySlotIndex = FindEmptySlot(pEquippedItem);
 
-                if (emptySlotIndex != -1)
+                // Simulates picking the item up and putting it into the free
+                // inventory slot. Without the pick-up nothing is sent, so the
+                // server and the local equipment stay the same.
+                if (emptySlotIndex != -1 && CNewUIInventoryCtrl::CreatePickedItem(nullptr, pEquippedItem))
                 {
-                    // This code looks tricky... it simulates a pick up and click on the inventory slot.
-                    // God knows what happens, when this request to the server goes wrong.
-                    if (CNewUIInventoryCtrl::CreatePickedItem(nullptr, pEquippedItem))
-                    {
-                        CNewUIPickedItem* pPickedItem = CNewUIInventoryCtrl::GetPickedItem();
-                        UnequipItem(iSourceIndex);
-                        pPickedItem->HidePickedItem();
-                    }
-
-                    SendRequestEquipmentItem(STORAGE_TYPE::INVENTORY, iSourceIndex, pEquippedItem, STORAGE_TYPE::INVENTORY, emptySlotIndex);
+                    CNewUIPickedItem* pPickedItem = CNewUIInventoryCtrl::GetPickedItem();
+                    UnequipItem(iSourceIndex);
+                    pPickedItem->HidePickedItem();
+                    // UnequipItem cleared the slot; the picked item has the item's data.
+                    SendRequestEquipmentItem(STORAGE_TYPE::INVENTORY, iSourceIndex, pPickedItem->GetItem(),
+                                             STORAGE_TYPE::INVENTORY, emptySlotIndex);
                     return true;
                 }
             }
@@ -1517,11 +1516,17 @@ bool CNewUIMyInventory::EquipmentWindowProcess()
 
     return false;
 }
-bool CNewUIMyInventory::CanTakeOff(int equipmentSlot) const
+bool CNewUIMyInventory::CheckTakeOff(int equipmentSlot) const
 {
-    return GameLogic::Items::CanTakeOff(equipmentSlot, gMapManager.WorldActive,
-                                        &CharacterMachine->Equipment[EQUIPMENT_HELPER],
-                                        &CharacterMachine->Equipment[EQUIPMENT_WING]);
+    if (GameLogic::Items::CanTakeOff(equipmentSlot, gMapManager.WorldActive,
+                                     &CharacterMachine->Equipment[EQUIPMENT_HELPER],
+                                     &CharacterMachine->Equipment[EQUIPMENT_WING]))
+    {
+        return true;
+    }
+
+    g_pSystemLogBox->AddText(I18N::Game::KeepFlightEquipmentInIcarus, TYPE_ERROR_MESSAGE);
+    return false;
 }
 
 bool CNewUIMyInventory::InventoryProcess() const

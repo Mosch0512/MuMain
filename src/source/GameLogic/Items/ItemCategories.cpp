@@ -82,7 +82,11 @@ namespace GameLogic::Items
 
     bool HasFlightEquipment(const ITEM* pItemHelper, const ITEM* pItemWing)
     {
-        return IsWingItem(pItemWing) || IsFlyingMount(pItemHelper);
+        // An item at 0 durability gives nothing, so it does not fly either
+        // (OpenMU: no power-ups, and so no CanFly, from a broken item).
+        const bool wingsFly = IsWingItem(pItemWing) && pItemWing->Durability > 0;
+        const bool helperFlies = IsFlyingMount(pItemHelper) && pItemHelper->Durability > 0;
+        return wingsFly || helperFlies;
     }
 
     bool IsDarkLordPet(const ITEM* pItem)

@@ -46,6 +46,13 @@ ITEM MakeItem(int itemType, const ItemState& state = {})
     return item;
 }
 
+// The item at 0 durability.
+ITEM Broken(ITEM item)
+{
+    item.Durability = 0;
+    return item;
+}
+
 // Loads the shipped items and gives the rules a Hero (for the GM Gift).
 class ShippedItemsScope
 {
@@ -243,6 +250,7 @@ TEST_CASE("Item categories come from the item data [data][items][rules]")
     const ITEM capeOfLord = MakeItem(ITEM_CAPE_OF_LORD);
     const ITEM uniria = MakeItem(ITEM_HORN_OF_UNIRIA);
     const ITEM fenrir = MakeItem(ITEM_HORN_OF_FENRIR);
+    const ITEM durableFenrir = MakeItem(ITEM_HORN_OF_FENRIR, {0, false, false, 255});
     const ITEM kris = MakeItem(KrisType);
 
     CHECK(IsWingItem(&wingsOfElf));
@@ -256,7 +264,7 @@ TEST_CASE("Item categories come from the item data [data][items][rules]")
     CHECK_FALSE(IsHornMountModel(MODEL_ITEM + ITEM_DARK_HORSE_ITEM));
     CHECK_FALSE(IsFlyingMount(&uniria));
     CHECK(IsFlyingMount(&fenrir));
-    CHECK(HasFlightEquipment(&fenrir, &kris));
+    CHECK(HasFlightEquipment(&durableFenrir, &kris));
 
     CHECK(IsSocketSeedOrSphereType(ITEM_SEED_FIRE));
     CHECK_FALSE(IsSocketSeedOrSphereType(KrisType));
@@ -266,14 +274,42 @@ TEST_CASE("Item categories come from the item data [data][items][rules]")
     CHECK_FALSE(IsRideableMountModel(MODEL_ITEM + MAX_ITEM));
 }
 
-TEST_CASE("In Icarus the last wings or flying mount cannot be taken off [data][items][rules]")
+TEST_CASE("Only wings, the Dinorant and the Fenrir are flight equipment [data][items][rules]")
 {
     ShippedItemsScope items;
-    const ITEM wings = MakeItem(ITEM_WING);
-    const ITEM fenrir = MakeItem(ITEM_HORN_OF_FENRIR);
-    const ITEM uniria = MakeItem(ITEM_HORN_OF_UNIRIA);
-    ITEM none{};
-    none.Type = -1;
+    const ItemState durable{0, false, false, 255};
+    const ITEM none = MakeItem(-1);
+    const ITEM wings = MakeItem(ITEM_WING, durable);
+    const ITEM capeOfLord = MakeItem(ITEM_CAPE_OF_LORD, durable);
+    const ITEM dinorant = MakeItem(ITEM_HORN_OF_DINORANT, durable);
+    const ITEM fenrir = MakeItem(ITEM_HORN_OF_FENRIR, durable);
+    const ITEM darkHorse = MakeItem(ITEM_DARK_HORSE_ITEM, durable);
+    const ITEM uniria = MakeItem(ITEM_HORN_OF_UNIRIA, durable);
+    const ITEM brokenWings = Broken(wings);
+    const ITEM brokenFenrir = Broken(fenrir);
+
+    CHECK(HasFlightEquipment(&none, &wings));
+    CHECK(HasFlightEquipment(&none, &capeOfLord));
+    CHECK(HasFlightEquipment(&dinorant, &none));
+    CHECK(HasFlightEquipment(&fenrir, &none));
+    // Like OpenMU (CanFly): the Dark Horse and the Uniria do not fly.
+    CHECK_FALSE(HasFlightEquipment(&darkHorse, &none));
+    CHECK_FALSE(HasFlightEquipment(&uniria, &none));
+    // A broken item (0 durability) gives nothing, so it does not fly.
+    CHECK_FALSE(HasFlightEquipment(&none, &brokenWings));
+    CHECK_FALSE(HasFlightEquipment(&brokenFenrir, &none));
+}
+
+TEST_CASE("In Icarus the last flight equipment cannot be taken off [data][items][rules]")
+{
+    ShippedItemsScope items;
+    const ItemState durable{0, false, false, 255};
+    const ITEM none = MakeItem(-1);
+    const ITEM wings = MakeItem(ITEM_WING, durable);
+    const ITEM fenrir = MakeItem(ITEM_HORN_OF_FENRIR, durable);
+    const ITEM darkHorse = MakeItem(ITEM_DARK_HORSE_ITEM, durable);
+    const ITEM brokenWings = Broken(wings);
+    const ITEM brokenFenrir = Broken(fenrir);
 
     // Wings and a flying mount: either one can go, the other still flies.
     CHECK(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &fenrir, &wings));
@@ -281,14 +317,22 @@ TEST_CASE("In Icarus the last wings or flying mount cannot be taken off [data][i
 
     // Only one of them: it stays on.
     CHECK_FALSE(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &none, &wings));
-    CHECK_FALSE(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &uniria, &wings));
     CHECK_FALSE(CanTakeOff(EQUIPMENT_HELPER, WD_10HEAVEN, &fenrir, &none));
 
-    // A helper that cannot fly can go while the wings stay on.
-    CHECK(CanTakeOff(EQUIPMENT_HELPER, WD_10HEAVEN, &uniria, &wings));
+    // The Dark Horse does not fly: with it the wings are the last flight
+    // equipment, and the horse itself can go.
+    CHECK_FALSE(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &darkHorse, &wings));
+    CHECK(CanTakeOff(EQUIPMENT_HELPER, WD_10HEAVEN, &darkHorse, &wings));
 
-    // Other slots and other maps are not restricted.
+    // Broken Fenrir: the wings are the last flight equipment.
+    CHECK_FALSE(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &brokenFenrir, &wings));
+    // Nothing flies anyway: taking off broken wings changes nothing.
+    CHECK(CanTakeOff(EQUIPMENT_WING, WD_10HEAVEN, &none, &brokenWings));
+
+    // Other slots and other maps are not restricted; only Icarus requires flight.
     CHECK(CanTakeOff(EQUIPMENT_WEAPON_RIGHT, WD_10HEAVEN, &none, &wings));
     CHECK(CanTakeOff(EQUIPMENT_WING, WD_0LORENCIA, &none, &wings));
-    CHECK(CanTakeOff(EQUIPMENT_HELPER, WD_0LORENCIA, &fenrir, &none));
+    CHECK(CanTakeOff(EQUIPMENT_WING, WD_39KANTURU_3RD, &none, &wings));
+    CHECK(RequiresFlight(WD_10HEAVEN));
+    CHECK_FALSE(RequiresFlight(WD_39KANTURU_3RD));
 }

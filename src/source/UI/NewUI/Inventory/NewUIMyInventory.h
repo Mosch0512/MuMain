@@ -195,7 +195,9 @@ namespace SEASON3B
         void RenderInventoryDetails() const;
 
         bool EquipmentWindowProcess();
-        bool CanTakeOff(int equipmentSlot) const;
+        // Whether the item in equipmentSlot may be taken off here; tells the
+        // player why not.
+        bool CheckTakeOff(int equipmentSlot) const;
         bool InventoryProcess() const;
         bool BtnProcess();
         bool WindowProcess();
