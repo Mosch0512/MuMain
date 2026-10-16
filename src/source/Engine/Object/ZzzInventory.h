@@ -19,7 +19,8 @@ enum _COLUMN_TYPE
     _COLUMN_TYPE_B_SET,
     _COLUMN_TYPE_REQCHA,
     _COLUMN_TYPE_REQVIT,
-    _COLUMN_TYPE_REQNLV
+    _COLUMN_TYPE_REQNLV,
+    _COLUMN_TYPE_COUNT
 };
 
 enum SKILL_TOOLTIP_RENDER_POINT
@@ -41,7 +42,10 @@ enum SKILL_TOOLTIP_RENDER_POINT
 extern int		g_nTaxRate;
 extern int		g_nChaosTaxRate;
 
-extern const int iMaxLevel;
+// The item help table (/<item name> in the chat): ComputeItemInfo fills a row for each + level of
+// the item it is given, with a column for each _COLUMN_TYPE.
+inline constexpr int iMaxLevel = 15;
+extern int g_iItemInfo[iMaxLevel + 1][_COLUMN_TYPE_COUNT];
 
 ///////////////////////////////////////////////////////////////////////////////
 // guild
