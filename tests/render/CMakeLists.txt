@@ -57,6 +57,14 @@ target_compile_definitions(ozt_file_tests PRIVATE
     MU_TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/src/bin/Data"
 )
 
+# The marker of upscaled art that CGlobalBitmap reads from OZJ and OZT files.
+mu_add_test(
+    NAME upscale_marker_tests
+    SOURCES
+        test_upscale_marker.cpp
+        ${CMAKE_SOURCE_DIR}/src/source/Render/Textures/UpscaleMarker.cpp
+)
+
 mu_add_test(
     NAME sdl_gpu_validation_tests
     SOURCES
@@ -118,6 +126,13 @@ add_test(
         "-DMU_BMD_SOURCE=${CMAKE_SOURCE_DIR}/src/source/Render/Models/ZzzBMD.cpp"
         "-DMU_SHADOW_VOLUME_SOURCE=${CMAKE_SOURCE_DIR}/src/source/Render/Models/ShadowVolume.cpp"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/test_projected_shadow_state.cmake"
+)
+
+add_test(
+    NAME terrain_depth_state_contract
+    COMMAND "${CMAKE_COMMAND}"
+        "-DMU_TERRAIN_SOURCE=${CMAKE_SOURCE_DIR}/src/source/Render/Terrain/ZzzLodTerrain.cpp"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/test_terrain_depth_state.cmake"
 )
 
 add_test(
