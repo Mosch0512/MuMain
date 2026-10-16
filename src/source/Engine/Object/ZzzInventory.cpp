@@ -730,16 +730,12 @@ void RequireClass(ITEM_ATTRIBUTE* pItem)
 
 const int iMaxLevel = 15;
 const int iMaxColumn = 17;
-int g_iCurrentItem = -1;
 int g_iItemInfo[iMaxLevel + 1][iMaxColumn];
 
+// Not cached per item: the levels the hero can equip follow the hero's level and stats, and the
+// values follow the item editor's changes.
 void ComputeItemInfo(int iHelpItem)
 {
-    if (g_iCurrentItem == iHelpItem)
-        return;
-    else
-        g_iCurrentItem = iHelpItem;
-
     ITEM_ATTRIBUTE* p = &ItemAttribute[ItemHelp];
 
     for (int Level = 0; Level <= iMaxLevel; Level++)
