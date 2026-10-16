@@ -17,7 +17,8 @@
 namespace
 {
 constexpr const char* kLocaleVariable = "LC_ALL";
-// What setlocale(LC_ALL, "") reads; an app started from the macOS Finder has none of them.
+// Where setlocale(LC_ALL, "") takes LC_CTYPE from; an app started from the macOS Finder has none
+// of them.
 constexpr std::array<const char*, 3> kLocaleVariables = {"LC_ALL", "LC_CTYPE", "LANG"};
 constexpr std::array<const char*, 4> kDecimalCommaLocales = {
     "de_DE.UTF-8", "ru_RU.UTF-8", "fr_FR.UTF-8", "pl_PL.UTF-8"};
