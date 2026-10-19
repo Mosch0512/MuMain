@@ -118,7 +118,8 @@ jobs:
 
   build-windows:
     name: Windows Native Build (x64, Release, editor OFF)
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # FORK TEST ONLY, not for sven-n/MuMain: also run on this pull request.
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: windows-latest
 
     steps:
