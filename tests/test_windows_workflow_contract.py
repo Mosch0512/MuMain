@@ -251,7 +251,8 @@ check("matrix." not in native_job, "Main Windows asset job must use fixed values
 for required in (
     "name: Windows Native Build (x64, Release, editor OFF)",
     "runs-on: windows-latest",
-    "if: github.event_name == 'push' && github.ref == 'refs/heads/main'",
+    # FORK TEST ONLY, not for sven-n/MuMain: matches the test commit in ci.yml.
+    "if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')",
 ):
     check(required in native_job, f"Main Windows job missing {required}")
 
