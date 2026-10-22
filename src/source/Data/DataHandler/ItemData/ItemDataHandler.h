@@ -182,8 +182,10 @@ public:
     bool ExportAsBmd(std::string& changeLog);
 
     // The S6E3 item.bmd and the CSV table have the item names of the UI
-    // locale, also while translated item names are off.
-    bool ExportAsS6E3(wchar_t* fileName);
+    // locale, also while translated item names are off. `notes` gets a line
+    // for each requirement the bmd cannot hold exactly
+    // (ToBmdRequirementWeights); so does ExportAsBmd's change log.
+    bool ExportAsS6E3(wchar_t* fileName, std::string& notes);
     bool ExportToCsv(wchar_t* fileName);
 #endif
 
