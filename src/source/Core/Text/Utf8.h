@@ -7,6 +7,7 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 namespace Core::Text
 {
@@ -16,4 +17,14 @@ namespace Core::Text
 // The other direction, for text that arrives from outside the game (a
 // file path a script asked a screenshot to be written to, for example).
 [[nodiscard]] std::wstring FromUtf8(const std::string& text);
+
+// Cuts UTF-8 text to at most maxUnits UTF-16 units, never inside a
+// character; false when it is not longer. Counted as the client's wide strings
+// hold the text on Windows, the same on every platform: an emoji counts as two.
+bool CutToUtf16Length(std::string& text, std::size_t maxUnits);
+
+// Whether each character of the text is a UTF-8 lead byte followed by as many
+// continuation bytes as it announces. Text in a code page such as
+// Windows-1252 fails this as soon as it holds a letter outside ASCII.
+bool IsValidUtf8(std::string_view text);
 } // namespace Core::Text
