@@ -7,6 +7,7 @@ The MU Editor is a C++ ImGui-based in-game editor that provides real-time game e
 - **Console**: Split view with Editor Console (left) and Game Console (right), docked along the bottom at first
 - **Item Tools**: Browse, add, duplicate, move and remove items and edit their data and models while the game runs, with undo and checks before saving (docs/item-data.md, "Editing items")
 - **Item Translations**: Item names in every language side by side
+- **Item Sync**: Import and Export of the items and item formulas with an OpenMU server through a file; an import shows a diff whose checked rows are applied (docs/item-data.md, "Item Sync")
 
 ## Key Features
 - ✅ Completely wrapped in `#ifdef _EDITOR` - **excluded from release builds**
@@ -45,6 +46,7 @@ stores it when a field is left.
 - **MuItemGlowColorsUI** - The glow color list: new colors, changed values and unused colors removed (GlowColorDialog, which the model tool's color fields open too)
 - **MuItemFormulasUI** - The item stat file: drop level bonus, default, profiles, level bonus tables and profile rules, changed on a copy and applied after the list of the items it reaches (ItemStatTermFields, ItemStatFileChange)
 - **MuItemChecksUI** - The checks of a save, each leading to its item and field (ItemCheckTargets)
+- **MuItemSyncUI** - Import and Export of the item exchange file with OpenMU: the import's diff of the items and formulas with a box per field (ItemSyncDiff, which also keeps the known differences), applied as one undo step after a confirmation; the export of the client's data, confirmed when it replaces a file (ItemSyncApply); and a read-only comparison of two files
 - **ItemToolWindow** - What every item tool window shares: its title, the selected item, and the item edit history as the editor bar's undo target
 
 ### Item Actions (UI/ItemEditor)
@@ -164,6 +166,7 @@ main.exe --editor
 - **Editor Window** - Menu bar to open the tool windows, docked as tabs; Close Editor
 - **Console** - Dual-panel console with auto-scroll and copy/clear
 - **Item Tools** - Live editing of items and their models
+- **Item Sync** - Export and Import of the item data with OpenMU
 - **Input Blocking** - Game input blocked when hovering UI
 - **No Separate Console** - All output in ImGui, no Windows console window
 

@@ -203,11 +203,12 @@
       },
       "width": 1,
       "height": 1,
+      "statProfile": "orb",
       "level": 8,
       "buyPrice": 800,
       "repairable": false,
       "requirements": {
-        "energy": 100
+        "energy": 52
       },
       "classRequirements": {
         "fairyElf": 1
@@ -223,11 +224,12 @@
       },
       "width": 1,
       "height": 1,
+      "statProfile": "orb",
       "level": 13,
       "buyPrice": 3000,
       "repairable": false,
       "requirements": {
-        "energy": 100
+        "energy": 72
       },
       "classRequirements": {
         "fairyElf": 1
@@ -243,11 +245,12 @@
       },
       "width": 1,
       "height": 1,
+      "statProfile": "orb",
       "level": 18,
       "buyPrice": 7000,
       "repairable": false,
       "requirements": {
-        "energy": 100
+        "energy": 92
       },
       "classRequirements": {
         "fairyElf": 1
@@ -380,11 +383,12 @@
       },
       "width": 1,
       "height": 1,
+      "statProfile": "orb",
       "level": 60,
       "buyPrice": 51000,
       "repairable": false,
       "requirements": {
-        "strength": 320
+        "strength": 596
       },
       "classRequirements": {
         "magicGladiator": 1
@@ -420,11 +424,12 @@
       },
       "width": 1,
       "height": 1,
+      "statProfile": "orb",
       "level": 81,
       "buyPrice": 195000,
       "repairable": false,
       "requirements": {
-        "dexterity": 258
+        "dexterity": 646
       },
       "classRequirements": {
         "fairyElf": 2
@@ -460,10 +465,11 @@
       },
       "width": 1,
       "height": 2,
+      "statProfile": "orb",
       "level": 74,
       "buyPrice": 115000,
       "requirements": {
-        "energy": 20
+        "energy": 79
       },
       "classRequirements": {
         "darkLord": 1
@@ -479,10 +485,11 @@
       },
       "width": 1,
       "height": 2,
+      "statProfile": "orb",
       "level": 98,
       "buyPrice": 375000,
       "requirements": {
-        "energy": 34,
+        "energy": 153,
         "leadership": 400
       },
       "classRequirements": {
@@ -499,10 +506,11 @@
       },
       "width": 1,
       "height": 2,
+      "statProfile": "orb",
       "level": 82,
       "buyPrice": 220000,
       "requirements": {
-        "energy": 25,
+        "energy": 102,
         "leadership": 300
       },
       "classRequirements": {
@@ -519,10 +527,11 @@
       },
       "width": 1,
       "height": 2,
+      "statProfile": "orb",
       "level": 92,
       "buyPrice": 295000,
       "requirements": {
-        "energy": 29,
+        "energy": 126,
         "leadership": 340
       },
       "classRequirements": {
@@ -657,10 +666,11 @@
       },
       "width": 1,
       "height": 2,
+      "statProfile": "orb",
       "level": 102,
       "buyPrice": 300000,
       "requirements": {
-        "energy": 32,
+        "energy": 150,
         "leadership": 70
       },
       "classRequirements": {
@@ -907,11 +917,12 @@
       },
       "width": 1,
       "height": 1,
+      "statProfile": "orb",
       "level": 100,
       "buyPrice": 250000,
       "requirements": {
         "level": 220,
-        "energy": 37
+        "energy": 168
       },
       "classRequirements": {
         "fairyElf": 2
@@ -946,11 +957,12 @@
       },
       "width": 1,
       "height": 2,
+      "statProfile": "orb",
       "level": 100,
       "buyPrice": 380000,
       "requirements": {
         "level": 220,
-        "energy": 16
+        "energy": 84
       },
       "classRequirements": {
         "darkLord": 1
