@@ -2797,7 +2797,7 @@ void ReceiveCreateTransformViewport(std::span<const BYTE> ReceiveBuffer)
                 c->Movement = true;
             }
 
-            CMultiLanguage::ConvertFromUtf8(c->ID, Data2->ID, MAX_USERNAME_SIZE);
+            Network::Viewport::WritePlayerName(*Data2, c->ID);
 
             ChangeCharacterExt(FindCharacterIndex(Key), Data2->Equipment);
         }

@@ -2,6 +2,8 @@
 
 #include "Network/Server/TransformViewportEntry.h"
 
+#include "Core/Text/WideString.h"
+
 namespace Network::Viewport
 {
 std::optional<std::size_t> TransformViewportEntryLength(std::span<const BYTE> packet, std::size_t offset)
@@ -25,5 +27,12 @@ std::optional<std::size_t> TransformViewportEntryLength(std::span<const BYTE> pa
     }
 
     return length;
+}
+
+void WritePlayerName(const PCREATE_TRANSFORM_EXTENDED& entry, std::span<wchar_t> name)
+{
+    wchar_t playerName[MAX_USERNAME_SIZE + 1]{};
+    CMultiLanguage::ConvertFromUtf8(playerName, entry.ID, MAX_USERNAME_SIZE);
+    Core::Text::CopyWideString(name.data(), name.size(), playerName);
 }
 } // namespace Network::Viewport

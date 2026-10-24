@@ -1,5 +1,5 @@
-// doctest unit tests for the bounds of head code 45 entries, the transformed
-// players that come into view.
+// doctest unit tests for the bounds and names of head code 45 entries, the
+// transformed players that come into view.
 //
 // Run: ctest --test-dir <build directory> --build-config Release -R "transform_viewport"
 
@@ -7,10 +7,14 @@
 
 #include "Network/Server/TransformViewportEntry.h"
 
+#include <algorithm>
 #include <cstddef>
+#include <cstring>
+#include <string_view>
 #include <vector>
 
 using Network::Viewport::TransformViewportEntryLength;
+using Network::Viewport::WritePlayerName;
 
 namespace
 {
@@ -30,6 +34,14 @@ std::vector<BYTE> TransformPacket(const std::vector<BYTE>& buffCounts)
     }
 
     return packet;
+}
+
+// An entry whose name holds these bytes; the rest of its name stays zero.
+PCREATE_TRANSFORM_EXTENDED EntryNamed(std::string_view name)
+{
+    PCREATE_TRANSFORM_EXTENDED entry{};
+    std::memcpy(entry.ID, name.data(), std::min(name.size(), sizeof entry.ID));
+    return entry;
 }
 } // namespace
 
@@ -83,4 +95,35 @@ TEST_CASE("An entry with more buffs than a character can have is refused [networ
     const std::vector<BYTE> packet = TransformPacket({MAX_BUFF_SLOT_INDEX + 1});
 
     CHECK_FALSE(TransformViewportEntryLength(packet, HeaderLength).has_value());
+}
+
+TEST_CASE("A name of all its bytes replaces the form's name without a tail [network][transform_viewport]")
+{
+    constexpr std::string_view FullName = "Abcdefghij";
+    static_assert(FullName.size() == MAX_USERNAME_SIZE);
+    // The transformed player is created as a monster, with the form's name.
+    wchar_t name[MAX_MONSTER_NAME + 1] = L"Golden Budge Dragon";
+
+    WritePlayerName(EntryNamed(FullName), name);
+
+    CHECK(std::wstring_view(name) == L"Abcdefghij");
+}
+
+TEST_CASE("A shorter name replaces the form's name [network][transform_viewport]")
+{
+    wchar_t name[MAX_MONSTER_NAME + 1] = L"Golden Budge Dragon";
+
+    WritePlayerName(EntryNamed("J\xC3\xB6rg"), name);
+
+    CHECK(std::wstring_view(name) == L"J\u00F6rg");
+}
+
+TEST_CASE("A name is cut to the room it is written to [network][transform_viewport]")
+{
+    wchar_t name[5] = {L'x', L'x', L'x', L'x', L'x'};
+
+    WritePlayerName(EntryNamed("Abcdefghij"), name);
+
+    REQUIRE(name[4] == L'\0');
+    CHECK(std::wstring_view(name) == L"Abcd");
 }

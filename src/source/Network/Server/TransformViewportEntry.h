@@ -1,4 +1,4 @@
-// Bounds of the entries of head code 45, the transformed players that come into view.
+// Bounds and names of the entries of head code 45, the transformed players that come into view.
 #pragma once
 
 #include <cstddef>
@@ -14,4 +14,10 @@ namespace Network::Viewport
 // only its s_BuffCount buffs are sent. nullopt when the packet ends before the
 // entry does, or when the entry carries more buffs than a character can have.
 [[nodiscard]] std::optional<std::size_t> TransformViewportEntryLength(std::span<const BYTE> packet, std::size_t offset);
+
+// Writes the player's name of the entry into `name`, cut to its size and always
+// terminated. A name of MAX_USERNAME_SIZE bytes comes without a terminator, and
+// `name` may still hold a longer name: a transformed player is created as a
+// monster, with the form's name.
+void WritePlayerName(const PCREATE_TRANSFORM_EXTENDED& entry, std::span<wchar_t> name);
 } // namespace Network::Viewport
