@@ -55,7 +55,6 @@
 #include "Data/GameData/MonsterData/MonsterDatabase.h"
 #include "Data/GameData/MonsterData/MonsterModelDatabase.h"
 #include "Engine/Object/MonsterModelBody.h"
-#include "Engine/Object/MonsterSlotSound.h"
 #include "GameLogic/Monsters/MonsterAttackPlay.h"
 #include "GameLogic/Monsters/MonsterSoundEvents.h"
 #include "GameLogic/Monsters/MonsterNames.h"
@@ -74,23 +73,16 @@ namespace
     constexpr float CHARSCENE_PICK_MIN_HEIGHT = 300.0f;
     constexpr float CHARSCENE_PICK_HALF_WIDTH = 72.0f;
 
-    // Plays the sound of the model's sound slot (0 to 4), of the second set
-    // for a monster with SubType 9; a slot without a sound plays nothing.
-    void PlaySlotSound(OBJECT* o, int slot)
+    // The sound events of the monster's sound set at the moment (monsters
+    // design, Q-MN76, Q-MN78), where the sound slots played.
+    void PlayMonsterMoment(CHARACTER* c, Data::Monsters::MonsterSoundMoment moment)
     {
-        const int played = Engine::Object::MonsterSlotSound::SlotFor(slot, o->SubType);
-        if (const std::optional<ESound> sound = Engine::Object::MonsterSlotSound::Find(Models[o->Type], played))
-        {
-            PlayBuffer(*sound, o);
-        }
+        GameLogic::Monsters::SoundEvents::PlayMoment(*c, moment);
     }
 
-    // Whether the slot that PlaySlotSound plays for the monster has a sound:
-    // for SubType 9, the second set's slot.
-    bool HasSlotSound(const OBJECT* o, int slot)
+    bool IsSkeleton(const OBJECT* o)
     {
-        const int played = Engine::Object::MonsterSlotSound::SlotFor(slot, o->SubType);
-        return Engine::Object::MonsterSlotSound::Find(Models[o->Type], played).has_value();
+        return o->SubType >= MODEL_SKELETON1 && o->SubType <= MODEL_SKELETON3;
     }
 }
 
@@ -244,10 +236,11 @@ void FallingMonster(CHARACTER* c, OBJECT* o)
     o->Position[2] -= o->Gravity;
 }
 
-// The sounds of the model's sound events (monsters design, MN7).
-void PlayMonsterSound(OBJECT* pObject)
+// The sounds of the sound events of the monster's set (monsters design, MN7,
+// Q-MN78).
+void PlayMonsterSound(CHARACTER* c)
 {
-    GameLogic::Monsters::SoundEvents::Play(*pObject);
+    GameLogic::Monsters::SoundEvents::Play(*c);
 }
 
 void SetPlayerStop(CHARACTER* c)
@@ -440,21 +433,15 @@ void SetPlayerStop(CHARACTER* c)
             SetAction(&c->Object, MONSTER01_STOP1);
     }
 
-    if (rand_fps_check(16))
+    if (o->Type != MODEL_PLAYER)
     {
-        if (o->Type != MODEL_PLAYER || (o->SubType >= MODEL_SKELETON1 && o->SubType <= MODEL_SKELETON3))
+        PlayMonsterMoment(c, Data::Monsters::MonsterSoundMoment::Stand);
+    }
+    else if (rand_fps_check(16) && !IsSkeleton(o) && c->Helper.Type == MODEL_HORN_OF_FENRIR)
+    {
+        if (rand() % 3 == 0)
         {
-            if (HasSlotSound(o, 0))
-            {
-                PlaySlotSound(o, rand() % 2);
-            }
-        }
-        else if (c->Helper.Type == MODEL_HORN_OF_FENRIR)
-        {
-            if (rand() % 3 == 0)
-            {
-                PlayBuffer(static_cast<ESound>(SOUND_FENRIR_IDLE_1 + rand() % 2), o);
-            }
+            PlayBuffer(static_cast<ESound>(SOUND_FENRIR_IDLE_1 + rand() % 2), o);
         }
     }
 }
@@ -766,7 +753,11 @@ void SetPlayerWalk(CHARACTER* c)
     {
         SetAction(&c->Object, MONSTER01_WALK);
     }
-    PlayMonsterSound(o);
+    PlayMonsterSound(c);
+    if (o->Type != MODEL_PLAYER)
+    {
+        PlayMonsterMoment(c, Data::Monsters::MonsterSoundMoment::Walk);
+    }
     if (o->Type == MODEL_BALROG)
         PlayBuffer(SOUND_BONE2, o);
     else if (gCharacterManager.GetBaseClass(c->Class) == CLASS_DARK_LORD && c->Helper.Type == MODEL_DARK_HORSE_ITEM && !c->SafeZone)
@@ -793,17 +784,10 @@ void SetPlayerWalk(CHARACTER* c)
     {
         PlayBuffer(static_cast<ESound>(SOUND_FENRIR_RUN_1 + rand() % 2), o);
     }
-    else if ((c == Hero && rand_fps_check(64)) || (c != Hero && rand_fps_check(16)))
+    else if (o->Type == MODEL_PLAYER && ((c == Hero && rand_fps_check(64)) || (c != Hero && rand_fps_check(16))))
     {
-        if (o->Type != MODEL_PLAYER || (o->SubType >= MODEL_SKELETON1 && o->SubType <= MODEL_SKELETON3))
-        {
-            if (o->SubType >= MODEL_SKELETON1 && o->SubType <= MODEL_SKELETON3)
-                PlayBuffer(SOUND_BONE1, o);
-            if (HasSlotSound(o, 0))
-            {
-                PlaySlotSound(o, rand() % 2);
-            }
-        }
+        if (IsSkeleton(o))
+            PlayBuffer(SOUND_BONE1, o);
     }
 }
 
@@ -1265,16 +1249,13 @@ void SetPlayerAttack(CHARACTER* c)
     else
         if (c->Object.AnimationFrame == 0.f)
         {
-            PlayMonsterSound(o);
+            PlayMonsterSound(c);
 
             if (o->Type != MODEL_PLAYER || (o->SubType >= MODEL_SKELETON1 && o->SubType <= MODEL_SKELETON3))
             {
-                if (o->SubType >= MODEL_SKELETON1 && o->SubType <= MODEL_SKELETON3)
+                if (IsSkeleton(o))
                     PlayBuffer(static_cast<ESound>(SOUND_BRANDISH_SWORD01 + rand() % 2), o);
-                if (HasSlotSound(o, 2))
-                {
-                    PlaySlotSound(o, 2 + rand() % 2);
-                }
+                PlayMonsterMoment(c, Data::Monsters::MonsterSoundMoment::Attack);
             }
             else
             {
@@ -1386,16 +1367,14 @@ void SetPlayerShock(CHARACTER* c, int Hit)
         }
         if (c->Object.AnimationFrame == 0.f)
         {
-            PlayMonsterSound(o);
+            PlayMonsterSound(c);
 
             if (o->Type != MODEL_PLAYER || (o->SubType >= MODEL_SKELETON1 && o->SubType <= MODEL_SKELETON3))
             {
-                if (o->SubType >= MODEL_SKELETON1 && o->SubType <= MODEL_SKELETON3)
+                if (IsSkeleton(o))
                     PlayBuffer(SOUND_BONE1, o);
-                else if (o->Type != MODEL_ASSASSIN && HasSlotSound(o, 2))
-                {
-                    PlaySlotSound(o, 2 + rand() % 2);
-                }
+                else
+                    PlayMonsterMoment(c, Data::Monsters::MonsterSoundMoment::Hit);
             }
             else
             {
@@ -1513,21 +1492,19 @@ void SetPlayerDie(CHARACTER* c)
 
     if (c->Object.AnimationFrame == 0.f)
     {
-        PlayMonsterSound(o);
+        PlayMonsterSound(c);
+        const bool monsterSounds = o->Type != MODEL_PLAYER || IsSkeleton(o);
+        if (monsterSounds)
+        {
+            PlayMonsterMoment(c, Data::Monsters::MonsterSoundMoment::Death);
+        }
         if (gMapManager.InChaosCastle() == true)
         {
             PlayBuffer(static_cast<ESound>(SOUND_CHAOS_MOB_BOOM01 + rand() % 2), o);
         }
         else
         {
-            if (o->Type != MODEL_PLAYER || (o->SubType >= MODEL_SKELETON1 && o->SubType <= MODEL_SKELETON3))
-            {
-                if (HasSlotSound(o, 4))
-                {
-                    PlaySlotSound(o, 4);
-                }
-            }
-            else
+            if (!monsterSounds)
             {
                 if (!gCharacterManager.IsFemale(c->Class))
                 {
@@ -3621,7 +3598,7 @@ void AnimationCharacter(CHARACTER* c, OBJECT* o, BMD* b)
             EtcStopAnimationSetting(c, o);
         }
         if (o->CurrentAction == MONSTER01_STOP1 || o->CurrentAction == MONSTER01_STOP2)
-            PlayMonsterSound(o);
+            PlayMonsterSound(c);
 
         if (o->Type == MODEL_WARCRAFT)
         {
