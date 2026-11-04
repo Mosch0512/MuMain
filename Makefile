@@ -115,9 +115,34 @@ ifeq ($(UNAME_S),Darwin)
 TEST_OPENSSL_FLAG = $(shell prefix=$$(brew --prefix openssl@3 2>/dev/null); test -n "$$prefix" && echo -DOPENSSL_ROOT_DIR="$$prefix")
 endif
 
+# Ninja Multi-Config writes one build file per configuration, and only once the generate
+# step has succeeded, which makes it the stamp this Makefile needs: a configure that failed
+# leaves none, so the next run tries again, and a configure that succeeded is not repeated on
+# every `make unit`.
+TEST_BUILD_FILE := $(TEST_DIR)/build-$(TEST_CONFIG).ninja
+
+# What makes the configure worth repeating. Ninja re-runs cmake itself when a CMakeLists.txt
+# or an included module changes; what it cannot notice is a change on this side of the
+# command line, so the presets, the toolchain files and this Makefile are prerequisites.
+TEST_CONFIGURE_INPUTS := CMakePresets.json Makefile $(wildcard CMakeUserPresets.json) \
+	$(wildcard cmake/toolchains/*.cmake)
+
+# A host with no preset is not out of luck: it can be tested from a directory configured by
+# hand. That path must never reach `cmake --preset`, which would fail with "No preset
+# specified for --preset", nor re-apply a generator the directory does not have, so it asks
+# the host check for an already configured directory and goes straight to the build.
+ifeq (,$(TEST_PRESET))
+UNIT_PREREQS := check-test-host
+else
+UNIT_PREREQS := $(TEST_BUILD_FILE)
+endif
+
 SOURCES := $(shell find src/source -name '*.cpp' -o -name '*.h' -o -name '*.hpp' | grep -v ThirdParty/ | grep -v 'src/source/Dotnet/')
 
 .PHONY: format format-check lint tidy tidy-gate hooks test unit static check-test-host
+
+# A configure interrupted half way through must not leave a build file that looks current.
+.DELETE_ON_ERROR:
 
 # Format all C++ source files in-place
 format:
@@ -228,17 +253,28 @@ hooks:
 # instead of a quick static failure waiting behind a long first configure. The host check comes
 # first: on a host without a preset there is no point running the static suite for two minutes
 # before saying so.
-test:
-	@$(MAKE) --no-print-directory check-test-host
+# The host check is a prerequisite rather than a stage, so it runs once: `unit` reaches it
+# again only when a configure is actually due.
+test: check-test-host
 	@$(MAKE) --no-print-directory static
 	@$(MAKE) --no-print-directory unit
 
 # The unit tests alone. Useful while a static check is failing for an unrelated reason, and the
-# inner loop when iterating on one test.
-unit: check-test-host
-	cmake --preset $(TEST_PRESET) -B $(TEST_DIR) $(TEST_CONFIGURE_FLAGS)
+# inner loop when iterating on one test: with the configure behind its own rule, a repeat run
+# goes straight to the build.
+unit: $(UNIT_PREREQS)
 	cmake --build $(TEST_DIR) --config $(TEST_CONFIG) -j$(JOBS)
 	ctest --test-dir $(TEST_DIR) -C $(TEST_CONFIG) --output-on-failure --no-tests=error --label-exclude static --parallel $(TEST_PARALLEL)
+
+# Order-only on the host check: it decides whether this configure can work, it does not make
+# the build file out of date.
+$(TEST_BUILD_FILE): $(TEST_CONFIGURE_INPUTS) | check-test-host
+	cmake --preset $(TEST_PRESET) -B $(TEST_DIR) $(TEST_CONFIGURE_FLAGS)
+	@test -f $@ || { \
+		echo "make test: the configure succeeded but wrote no $@. Is the" >&2; \
+		echo "           $(TEST_PRESET) preset still on Ninja Multi-Config?" >&2; \
+		exit 1; \
+	}
 
 # Source-only architecture guards and contracts — what CI's Quality Gates and the pre-push hook
 # run first. No build and no game data needed.
@@ -246,15 +282,29 @@ static:
 	cmake -S tests/static -B out/static-checks
 	ctest --test-dir out/static-checks -C Release --parallel $(JOBS) --output-on-failure --no-tests=error
 
-# What the presets need beyond a compiler, checked before a configure fails halfway in. An
-# already configured directory is taken as-is: it names its own CMAKE_MAKE_PROGRAM, and a host
-# this Makefile has no preset for can still have been configured by hand.
+# What the presets need beyond a compiler, checked before a configure fails halfway in.
+#
+# The build file, not CMakeCache.txt, is what "already configured" means here: a configure
+# that failed writes the cache too, and treating that as done is how an earlier revision of
+# this Makefile made a failed configure permanent.
 check-test-host:
-	@if [ -f "$(TEST_DIR)/CMakeCache.txt" ]; then exit 0; fi; \
+	@if [ -f "$(TEST_BUILD_FILE)" ]; then exit 0; fi; \
+	cache="$(TEST_DIR)/CMakeCache.txt"; \
+	generator=""; \
+	if [ -f "$$cache" ]; then \
+		generator=$$(sed -n 's/^CMAKE_GENERATOR:INTERNAL=//p' "$$cache"); \
+	fi; \
 	if [ -z "$(TEST_PRESET)" ]; then \
+		if [ -f "$$cache" ]; then exit 0; fi; \
 		echo "make test: no CMake preset for $(UNAME_S)/$(UNAME_M). Configure $(TEST_DIR)" >&2; \
 		echo "           yourself (docs/build/reference-tests.md); make test then uses it." >&2; \
 		if [ -n "$(TEST_HOST_NOTE)" ]; then echo "           Note: $(TEST_HOST_NOTE)" >&2; fi; \
+		exit 1; \
+	fi; \
+	if [ -n "$$generator" ] && [ "$$generator" != "Ninja Multi-Config" ]; then \
+		echo "make test: $(TEST_DIR) is configured with $$generator, and the" >&2; \
+		echo "           $(TEST_PRESET) preset needs Ninja Multi-Config. Delete that" >&2; \
+		echo "           directory, or build somewhere else with TEST_DIR=..." >&2; \
 		exit 1; \
 	fi; \
 	if [ "$(TEST_PRESET)" = "windows-x64" ]; then \
