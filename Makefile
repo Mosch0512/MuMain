@@ -1,6 +1,16 @@
 # Developer convenience targets for code quality tooling.
 # Usage: make <target> from the MuMain/ directory.
 
+# Run from a git hook (.githooks/pre-push), GIT_DIR and GIT_INDEX_FILE point at the real
+# repository. Every recipe here runs git one way or another — the static checks build throwaway
+# repositories, a configure clones FetchContent dependencies, applies patches and updates
+# submodules — and those variables would redirect all of it at the real repository. The hook
+# unsets them for its own commands; make has to keep them out of the ones it starts.
+GIT_LOCAL_ENV_VARS := $(shell git rev-parse --local-env-vars 2>/dev/null)
+ifneq (,$(GIT_LOCAL_ENV_VARS))
+unexport $(GIT_LOCAL_ENV_VARS)
+endif
+
 # nproc is Linux-only, sysctl is the macOS spelling, and getconf covers the rest. The literal
 # fallback matters: an empty value leaves `cppcheck -j` and `ctest --parallel` without a number,
 # and ctest before 3.29 then reads the next flag as the level.
@@ -172,12 +182,8 @@ test: static check-test-host
 
 # Source-only architecture guards and contracts — what CI's Quality Gates and the pre-push hook
 # run first. No build and no game data needed.
-# Git's hook-local variables are cleared first, as .githooks/pre-push does: inside a hook,
-# GIT_DIR and GIT_INDEX_FILE would leak into the throwaway repositories the check scripts build
-# and let them touch the real one.
 static:
-	@unset $$(git rev-parse --local-env-vars) 2>/dev/null; \
-	cmake -S tests/static -B out/static-checks && \
+	cmake -S tests/static -B out/static-checks
 	ctest --test-dir out/static-checks -C Release --parallel $(JOBS) --output-on-failure --no-tests=error
 
 # What the presets need beyond a compiler, checked before a configure fails halfway in.
