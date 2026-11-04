@@ -165,8 +165,7 @@ hooks:
 # part of that leaves tests running against stale binaries or failing outright.
 #
 # The `static` label is excluded because `make static` already ran those without needing a build.
-test: static check-test-host
-	cmake --preset $(TEST_PRESET) -B $(TEST_DIR) $(TEST_CONFIGURE_FLAGS)
+test: static | $(TEST_DIR)/CMakeCache.txt
 	cmake --build $(TEST_DIR) --config $(TEST_CONFIG) -j$(JOBS)
 	ctest --test-dir $(TEST_DIR) -C $(TEST_CONFIG) --output-on-failure --no-tests=error --label-exclude static --parallel $(TEST_PARALLEL)
 
@@ -179,6 +178,11 @@ static:
 	@unset $$(git rev-parse --local-env-vars) 2>/dev/null; \
 	cmake -S tests/static -B out/static-checks && \
 	ctest --test-dir out/static-checks -C Release --parallel $(JOBS) --output-on-failure --no-tests=error
+
+# Configuring once is enough: `cmake --build` re-runs it by itself whenever a CMakeLists.txt or
+# a preset changes. An order-only prerequisite, so an existing cache is never treated as stale.
+$(TEST_DIR)/CMakeCache.txt: | check-test-host
+	cmake --preset $(TEST_PRESET) -B $(TEST_DIR) $(TEST_CONFIGURE_FLAGS)
 
 # What the presets need beyond a compiler, checked before a configure fails halfway in.
 check-test-host:
