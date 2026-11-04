@@ -17,11 +17,16 @@ unexport GIT_INDEX_FILE
 # nproc is Linux-only, sysctl is the macOS spelling, and getconf covers the rest. The literal
 # fallback matters: an empty value leaves `cppcheck -j` and `ctest --parallel` without a number,
 # and ctest before 3.29 then reads the next flag as the level.
+#
+# `ifndef` rather than `?=` so the detection runs once instead of on every reference, while
+# `JOBS=2 make lint` from the environment still wins.
+ifndef JOBS
 JOBS := $(shell nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)
+endif
 
 # What CI runs ctest with. Higher levels make the two `dotnet run` self-checks exceed their 30 s
-# timeout while the SDK warms up.
-TEST_PARALLEL := 4
+# timeout while the SDK warms up. Overridable from the environment, like the two below.
+TEST_PARALLEL ?= 4
 
 # The host's native preset, so the local test build matches CI's: both pick up the toolchain
 # file, whose -march=x86-64 baseline the bit-for-bit animation test depends on.
@@ -60,8 +65,9 @@ endif
 # differences the toolchain's -march baseline exists to pin down.
 #
 # `make test TEST_CONFIG=Debug` builds the other one, in its own directory, for the assert()s
-# and the _DEBUG code paths Release never compiles.
-TEST_CONFIG := Release
+# and the _DEBUG code paths Release never compiles, and `TEST_CONFIG=Debug make test` from the
+# environment does the same.
+TEST_CONFIG ?= Release
 
 # Out of tree, under the already ignored /out/, and one directory per configuration:
 #
