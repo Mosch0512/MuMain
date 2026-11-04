@@ -6,13 +6,25 @@ JOBS := $(shell nproc 2>/dev/null || sysctl -n hw.ncpu)
 
 # The host's native preset, so the local test build matches CI's: both pick up the toolchain
 # file, whose -march=x86-64 baseline the bit-for-bit animation test depends on.
+#
+# Architecture is part of the match, not just the OS: linux-x64.cmake's -march=x86-64 fails the
+# compiler check on aarch64, and macos-arm64.cmake's CMAKE_OSX_ARCHITECTURES=arm64 produces
+# binaries an x86_64 Mac cannot run during test discovery. An unrecognized host gets no preset
+# and `make test` says so, rather than configuring something that cannot work. The Windows
+# presets stay out: their condition only enables them on a Windows host, so they cannot be
+# reached from MSYS or Cygwin, where this Makefile runs.
 UNAME_S := $(shell uname -s)
+UNAME_M := $(shell uname -m)
+TEST_PRESET :=
+ifeq ($(UNAME_S),Linux)
+ifneq (,$(filter x86_64 amd64,$(UNAME_M)))
 TEST_PRESET := linux-x64
+endif
+endif
 ifeq ($(UNAME_S),Darwin)
+ifneq (,$(filter arm64 aarch64,$(UNAME_M)))
 TEST_PRESET := macos-arm64
 endif
-ifneq (,$(filter MINGW% MSYS% CYGWIN%,$(UNAME_S)))
-TEST_PRESET := windows-x64
 endif
 # Release, because that is what every native CI job builds and tests. The configuration is not
 # cosmetic: MuClient's PUBLIC definitions differ between the two (_DEBUG/_FOREIGN_DEBUG vs
@@ -33,7 +45,7 @@ TEST_DIR := out/build/test-$(TEST_CONFIG)
 
 SOURCES := $(shell find src/source -name '*.cpp' -o -name '*.h' -o -name '*.hpp' | grep -v ThirdParty/ | grep -v 'src/source/Dotnet/')
 
-.PHONY: format format-check lint tidy tidy-gate hooks test static
+.PHONY: format format-check lint tidy tidy-gate hooks test static check-test-host
 
 # Format all C++ source files in-place
 format:
@@ -138,7 +150,7 @@ hooks:
 # part of that leaves tests running against stale binaries or failing outright.
 #
 # The `static` label is excluded because `make static` already ran those without needing a build.
-test: static
+test: static check-test-host
 	cmake --preset $(TEST_PRESET) -B $(TEST_DIR) -DBUILD_TESTING=ON
 	cmake --build $(TEST_DIR) --config $(TEST_CONFIG) -j$(JOBS)
 	ctest --test-dir $(TEST_DIR) -C $(TEST_CONFIG) --output-on-failure --no-tests=error --label-exclude static --parallel $(JOBS)
@@ -148,3 +160,15 @@ test: static
 static:
 	cmake -S tests/static -B out/static-checks
 	ctest --test-dir out/static-checks -C Release --parallel $(JOBS) --output-on-failure --no-tests=error
+
+# What the presets need beyond a compiler, checked before a configure fails halfway in.
+check-test-host:
+	@if [ -z "$(TEST_PRESET)" ]; then \
+		echo "make test: no CMake preset for $(UNAME_S)/$(UNAME_M). Configure a build directory" >&2; \
+		echo "           yourself (docs/build/README.md) and run ctest in it." >&2; \
+		exit 1; \
+	fi
+	@command -v ninja >/dev/null || { \
+		echo "make test: the $(TEST_PRESET) preset generates Ninja Multi-Config; install ninja." >&2; \
+		exit 1; \
+	}
