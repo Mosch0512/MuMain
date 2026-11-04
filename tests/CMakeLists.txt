@@ -58,6 +58,9 @@ function(mu_add_test)
         list(APPEND MAT_LINK_LIBS mu_test_winmain)
     endif()
     add_executable(${MAT_NAME} ${MAT_SOURCES})
+    # Collected for the MuTests aggregate target below: `make test` and IDEs build the test
+    # binaries without also building Main and the editor.
+    set_property(GLOBAL APPEND PROPERTY MU_TEST_TARGETS ${MAT_NAME})
     target_link_libraries(${MAT_NAME} PRIVATE mu_test_main ${MAT_LINK_LIBS})
     target_include_directories(${MAT_NAME} PRIVATE
         ${CMAKE_SOURCE_DIR}/src/source
@@ -98,3 +101,11 @@ add_subdirectory(core)
 add_subdirectory(data)
 
 add_subdirectory(gamelogic)
+
+# One target that builds every test binary registered through mu_add_test(). The static checks
+# need no build, so they are not part of it.
+get_property(mu_test_targets GLOBAL PROPERTY MU_TEST_TARGETS)
+add_custom_target(MuTests)
+if(mu_test_targets)
+    add_dependencies(MuTests ${mu_test_targets})
+endif()
