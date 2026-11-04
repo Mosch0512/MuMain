@@ -187,3 +187,10 @@ bool Core::Text::IsValidUtf8(std::string_view text)
     }
     return true;
 }
+
+// Probe for the CI rule that no warning comes back (fork PR only, never merged): one path returns nothing.
+int ProbeWarningsRule(int value)
+{
+    if (value > 0)
+        return value; // cppcheck-suppress missingReturn
+}
