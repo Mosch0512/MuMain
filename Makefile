@@ -172,8 +172,12 @@ test: static check-test-host
 
 # Source-only architecture guards and contracts — what CI's Quality Gates and the pre-push hook
 # run first. No build and no game data needed.
+# Git's hook-local variables are cleared first, as .githooks/pre-push does: inside a hook,
+# GIT_DIR and GIT_INDEX_FILE would leak into the throwaway repositories the check scripts build
+# and let them touch the real one.
 static:
-	cmake -S tests/static -B out/static-checks
+	@unset $$(git rev-parse --local-env-vars) 2>/dev/null; \
+	cmake -S tests/static -B out/static-checks && \
 	ctest --test-dir out/static-checks -C Release --parallel $(JOBS) --output-on-failure --no-tests=error
 
 # What the presets need beyond a compiler, checked before a configure fails halfway in.
