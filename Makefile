@@ -1,8 +1,14 @@
 # Developer convenience targets for code quality tooling.
 # Usage: make <target> from the MuMain/ directory.
 
-# nproc is Linux-only; stock macOS has sysctl instead.
-JOBS := $(shell nproc 2>/dev/null || sysctl -n hw.ncpu)
+# nproc is Linux-only, sysctl is the macOS spelling, and getconf covers the rest. The literal
+# fallback matters: an empty value leaves `cppcheck -j` and `ctest --parallel` without a number,
+# and ctest before 3.29 then reads the next flag as the level.
+JOBS := $(shell nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)
+
+# What CI runs ctest with. Higher levels make the two `dotnet run` self-checks exceed their 30 s
+# timeout while the SDK warms up.
+TEST_PARALLEL := 4
 
 # The host's native preset, so the local test build matches CI's: both pick up the toolchain
 # file, whose -march=x86-64 baseline the bit-for-bit animation test depends on.
@@ -42,6 +48,15 @@ TEST_CONFIG := Release
 #     Sharing a directory between configurations makes `ctest -C Debug` run Release binaries
 #     whenever that config is already up to date.
 TEST_DIR := out/build/test-$(TEST_CONFIG)
+
+# What the native CI jobs pass on top of the preset. MU_COPY_RUNTIME_ASSETS=OFF skips staging
+# the ~760 MB of src/bin on every build; the tests read their fixtures from the source tree.
+# Homebrew's OpenSSL is not in a default search path, and find_package(OpenSSL REQUIRED) fails
+# without the hint.
+TEST_CONFIGURE_FLAGS := -DBUILD_TESTING=ON -DMU_COPY_RUNTIME_ASSETS=OFF
+ifeq ($(UNAME_S),Darwin)
+TEST_CONFIGURE_FLAGS += -DOPENSSL_ROOT_DIR=$(shell brew --prefix openssl@3 2>/dev/null)
+endif
 
 SOURCES := $(shell find src/source -name '*.cpp' -o -name '*.h' -o -name '*.hpp' | grep -v ThirdParty/ | grep -v 'src/source/Dotnet/')
 
@@ -151,9 +166,9 @@ hooks:
 #
 # The `static` label is excluded because `make static` already ran those without needing a build.
 test: static check-test-host
-	cmake --preset $(TEST_PRESET) -B $(TEST_DIR) -DBUILD_TESTING=ON
+	cmake --preset $(TEST_PRESET) -B $(TEST_DIR) $(TEST_CONFIGURE_FLAGS)
 	cmake --build $(TEST_DIR) --config $(TEST_CONFIG) -j$(JOBS)
-	ctest --test-dir $(TEST_DIR) -C $(TEST_CONFIG) --output-on-failure --no-tests=error --label-exclude static --parallel $(JOBS)
+	ctest --test-dir $(TEST_DIR) -C $(TEST_CONFIG) --output-on-failure --no-tests=error --label-exclude static --parallel $(TEST_PARALLEL)
 
 # Source-only architecture guards and contracts — what CI's Quality Gates and the pre-push hook
 # run first. No build and no game data needed.
