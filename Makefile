@@ -33,31 +33,50 @@ TEST_PARALLEL ?= 4
 #
 # Architecture is part of the match, not just the OS: linux-x64.cmake's -march=x86-64 fails the
 # compiler check on aarch64, and macos-arm64.cmake's CMAKE_OSX_ARCHITECTURES=arm64 produces
-# binaries an x86_64 Mac cannot run during test discovery. An unrecognized host gets no preset,
-# and the host check below says so rather than configuring something that cannot work.
+# binaries an x86_64 Mac cannot run during test discovery. A host that matches nothing gets no
+# preset and is never guessed at; it can still be tested from a hand-configured directory.
+#
+# TEST_HOST_NOTE carries the one case where the host is recognized and the answer is still not a
+# preset, so the message can say what to do instead of only what is missing.
 UNAME_S := $(shell uname -s)
 UNAME_M := $(shell uname -m)
 
-# Apple Silicon under Rosetta reports x86_64, so ask the kernel instead of believing uname.
-ifeq ($(UNAME_S),Darwin)
-MACOS_IS_ARM64 := $(shell sysctl -n hw.optional.arm64 2>/dev/null)
-endif
-
 TEST_PRESET :=
+TEST_HOST_NOTE :=
+
 ifeq ($(UNAME_S),Linux)
-ifneq (,$(filter x86_64 amd64,$(UNAME_M)))
+ifeq ($(UNAME_M),x86_64)
 TEST_PRESET := linux-x64
 endif
 endif
+
 ifeq ($(UNAME_S),Darwin)
-ifneq (,$(filter arm64 aarch64,$(UNAME_M))$(filter 1,$(MACOS_IS_ARM64)))
+# uname says x86_64 in a Rosetta shell, so ask the kernel what the machine is. A Rosetta shell
+# must not map to macos-arm64: /usr/local Homebrew would hand the arm64 build x86_64 curl,
+# brotli, cryptopp and openssl, and the link fails with "building for macOS-arm64 but attempting
+# to link with file built for macOS-x86_64". Running natively is the fix, so ask for that.
+MACOS_IS_ARM64 := $(shell sysctl -n hw.optional.arm64 2>/dev/null)
+ifeq ($(UNAME_M),arm64)
 TEST_PRESET := macos-arm64
+else ifeq ($(MACOS_IS_ARM64),1)
+# No backticks in the note: the host check echoes it inside double quotes, and the shell would
+# run it as a command substitution.
+TEST_HOST_NOTE := this is an arm64 Mac in a Rosetta x86_64 shell; run: arch -arm64 make test
 endif
 endif
-# Git Bash and MSYS run the native cmake.exe, which reports hostSystemName Windows, so the
-# windows presets enable there — the same setup .githooks/pre-push already supports.
-ifneq (,$(filter MINGW% MSYS%,$(UNAME_S)))
+
+# Git Bash and the MSYS2 MINGW64, UCRT64 and CLANG64 shells run the native cmake.exe, which
+# reports hostSystemName Windows, so windows-base's condition holds there — the setup
+# .githooks/pre-push already supports. Excluded on purpose:
+#
+#   - the MSYS shell, whose /usr/bin/cmake reports hostSystemName MSYS and so disables the
+#     windows presets, with a message about no preset matching rather than about the shell;
+#   - arm64 and 32-bit hosts, because only windows-x86 and windows-x64 exist and the x86 one
+#     needs its own vcpkg triplet; those get the hand-configured path.
+ifneq (,$(filter MINGW%,$(UNAME_S)))
+ifeq ($(UNAME_M),x86_64)
 TEST_PRESET := windows-x64
+endif
 endif
 # Release, because that is what every native CI job builds and tests. The configuration is not
 # cosmetic: MuClient's PUBLIC definitions differ between the two (_DEBUG/_FOREIGN_DEBUG vs
@@ -231,8 +250,22 @@ check-test-host:
 	@if [ -f "$(TEST_DIR)/CMakeCache.txt" ]; then exit 0; fi; \
 	if [ -z "$(TEST_PRESET)" ]; then \
 		echo "make test: no CMake preset for $(UNAME_S)/$(UNAME_M). Configure $(TEST_DIR)" >&2; \
-		echo "           yourself (docs/build/README.md); make test then uses it as it is." >&2; \
+		echo "           yourself (docs/build/reference-tests.md); make test then uses it." >&2; \
+		if [ -n "$(TEST_HOST_NOTE)" ]; then echo "           Note: $(TEST_HOST_NOTE)" >&2; fi; \
 		exit 1; \
+	fi; \
+	if [ "$(TEST_PRESET)" = "windows-x64" ]; then \
+		if [ -z "$${VCPKG_ROOT:-}" ]; then \
+			echo "make test: windows-x64 reads its toolchain from VCPKG_ROOT, which is unset." >&2; \
+			echo "           docs/build/windows has the vcpkg setup." >&2; \
+			exit 1; \
+		fi; \
+		if [ -z "$${VCINSTALLDIR:-}$${VSCMD_ARG_TGT_ARCH:-}" ]; then \
+			echo "make test: windows-x64 sets architecture strategy external, so it needs an" >&2; \
+			echo "           active MSVC environment. Start the shell from an x64 Native Tools" >&2; \
+			echo "           prompt, or run vcvarsall.bat x64 first." >&2; \
+			exit 1; \
+		fi; \
 	fi; \
 	for generator in ninja ninja-build samu; do \
 		command -v "$$generator" >/dev/null && exit 0; \
