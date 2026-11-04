@@ -1,15 +1,18 @@
 # Developer convenience targets for code quality tooling.
 # Usage: make <target> from the MuMain/ directory.
 
-# Run from a git hook (.githooks/pre-push), GIT_DIR and GIT_INDEX_FILE point at the real
-# repository. Every recipe here runs git one way or another — the static checks build throwaway
-# repositories, a configure clones FetchContent dependencies, applies patches and updates
-# submodules — and those variables would redirect all of it at the real repository. The hook
-# unsets them for its own commands; make has to keep them out of the ones it starts.
-GIT_LOCAL_ENV_VARS := $(shell git rev-parse --local-env-vars 2>/dev/null)
-ifneq (,$(GIT_LOCAL_ENV_VARS))
-unexport $(GIT_LOCAL_ENV_VARS)
-endif
+# Run from a git hook or any other context that sets them, these three point at the repository
+# git is working on, and every recipe here runs git one way or another: the static checks build
+# throwaway repositories, a configure clones FetchContent dependencies, applies patches and
+# updates submodules. Unexporting an unset variable does nothing, so this needs no guard.
+#
+# Only these three. `git rev-parse --local-env-vars` also lists GIT_CONFIG_COUNT and
+# GIT_CONFIG_PARAMETERS, which is how an environment supplies an insteadOf mirror, a proxy or an
+# auth header — dropping those makes the FetchContent clones fail on exactly the setups that
+# need them.
+unexport GIT_DIR
+unexport GIT_WORK_TREE
+unexport GIT_INDEX_FILE
 
 # nproc is Linux-only, sysctl is the macOS spelling, and getconf covers the rest. The literal
 # fallback matters: an empty value leaves `cppcheck -j` and `ctest --parallel` without a number,
