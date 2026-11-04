@@ -37,7 +37,7 @@ jobs:
     outputs:
       linux: ${{ steps.plan.outputs.linux }}
       macos: ${{ steps.plan.outputs.macos }}
-      windows: ${{ steps.plan.outputs.windows }}
+      windows: ${{ github.event_name == 'pull_request' && 'true' || steps.plan.outputs.windows }}
       release: ${{ steps.plan.outputs.release }}
 
     steps:
