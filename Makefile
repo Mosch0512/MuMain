@@ -25,12 +25,16 @@ TEST_PARALLEL := 4
 #
 # Architecture is part of the match, not just the OS: linux-x64.cmake's -march=x86-64 fails the
 # compiler check on aarch64, and macos-arm64.cmake's CMAKE_OSX_ARCHITECTURES=arm64 produces
-# binaries an x86_64 Mac cannot run during test discovery. An unrecognized host gets no preset
-# and `make test` says so, rather than configuring something that cannot work. The Windows
-# presets stay out: their condition only enables them on a Windows host, so they cannot be
-# reached from MSYS or Cygwin, where this Makefile runs.
+# binaries an x86_64 Mac cannot run during test discovery. An unrecognized host gets no preset,
+# and the host check below says so rather than configuring something that cannot work.
 UNAME_S := $(shell uname -s)
 UNAME_M := $(shell uname -m)
+
+# Apple Silicon under Rosetta reports x86_64, so ask the kernel instead of believing uname.
+ifeq ($(UNAME_S),Darwin)
+MACOS_IS_ARM64 := $(shell sysctl -n hw.optional.arm64 2>/dev/null)
+endif
+
 TEST_PRESET :=
 ifeq ($(UNAME_S),Linux)
 ifneq (,$(filter x86_64 amd64,$(UNAME_M)))
@@ -38,9 +42,14 @@ TEST_PRESET := linux-x64
 endif
 endif
 ifeq ($(UNAME_S),Darwin)
-ifneq (,$(filter arm64 aarch64,$(UNAME_M)))
+ifneq (,$(filter arm64 aarch64,$(UNAME_M))$(filter 1,$(MACOS_IS_ARM64)))
 TEST_PRESET := macos-arm64
 endif
+endif
+# Git Bash and MSYS run the native cmake.exe, which reports hostSystemName Windows, so the
+# windows presets enable there — the same setup .githooks/pre-push already supports.
+ifneq (,$(filter MINGW% MSYS%,$(UNAME_S)))
+TEST_PRESET := windows-x64
 endif
 # Release, because that is what every native CI job builds and tests. The configuration is not
 # cosmetic: MuClient's PUBLIC definitions differ between the two (_DEBUG/_FOREIGN_DEBUG vs
@@ -186,14 +195,19 @@ static:
 	cmake -S tests/static -B out/static-checks
 	ctest --test-dir out/static-checks -C Release --parallel $(JOBS) --output-on-failure --no-tests=error
 
-# What the presets need beyond a compiler, checked before a configure fails halfway in.
+# What the presets need beyond a compiler, checked before a configure fails halfway in. An
+# already configured directory is taken as-is: it names its own CMAKE_MAKE_PROGRAM, and a host
+# this Makefile has no preset for can still have been configured by hand.
 check-test-host:
-	@if [ -z "$(TEST_PRESET)" ]; then \
-		echo "make test: no CMake preset for $(UNAME_S)/$(UNAME_M). Configure a build directory" >&2; \
-		echo "           yourself (docs/build/README.md) and run ctest in it." >&2; \
+	@if [ -f "$(TEST_DIR)/CMakeCache.txt" ]; then exit 0; fi; \
+	if [ -z "$(TEST_PRESET)" ]; then \
+		echo "make test: no CMake preset for $(UNAME_S)/$(UNAME_M). Configure $(TEST_DIR)" >&2; \
+		echo "           yourself (docs/build/README.md); make test then uses it as it is." >&2; \
 		exit 1; \
-	fi
-	@command -v ninja >/dev/null || { \
-		echo "make test: the $(TEST_PRESET) preset generates Ninja Multi-Config; install ninja." >&2; \
-		exit 1; \
-	}
+	fi; \
+	for generator in ninja ninja-build samu; do \
+		command -v "$$generator" >/dev/null && exit 0; \
+	done; \
+	echo "make test: the $(TEST_PRESET) preset generates Ninja Multi-Config, and none of" >&2; \
+	echo "           ninja, ninja-build or samu is on PATH." >&2; \
+	exit 1
