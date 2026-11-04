@@ -100,6 +100,10 @@ src/bin/Data/Audio/**/*.tmp
 # Local build outputs
 /out/
 /build_validation/
+# What `make test` configured until this directory moved under /out/. Clones that ran it still
+# have one, full of FetchContent's _deps/*-src checkouts that `git add -A` would stage as
+# embedded repositories.
+/build-test/
 /build-test-upstream-sync/
 src/graphify-out/
 
