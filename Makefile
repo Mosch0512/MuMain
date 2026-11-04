@@ -1,6 +1,24 @@
 # Developer convenience targets for code quality tooling.
 # Usage: make <target> from the MuMain/ directory.
 
+# nproc is Linux-only; stock macOS has sysctl instead.
+JOBS := $(shell nproc 2>/dev/null || sysctl -n hw.ncpu)
+
+# The host's native preset, so the local test build matches CI's: both pick up the toolchain
+# file, whose -march=x86-64 baseline the bit-for-bit animation test depends on.
+UNAME_S := $(shell uname -s)
+TEST_PRESET := linux-x64
+ifeq ($(UNAME_S),Darwin)
+TEST_PRESET := macos-arm64
+endif
+ifneq (,$(filter MINGW% MSYS% CYGWIN%,$(UNAME_S)))
+TEST_PRESET := windows-x64
+endif
+# Every preset uses Ninja Multi-Config, so the configuration is chosen per build and per ctest
+# run, not at configure time.
+TEST_DIR := build-test
+TEST_CONFIG := Debug
+
 SOURCES := $(shell find src/source -name '*.cpp' -o -name '*.h' -o -name '*.hpp' | grep -v ThirdParty/ | grep -v 'src/source/Dotnet/')
 
 .PHONY: format format-check lint tidy tidy-gate hooks test static
@@ -42,7 +60,7 @@ format-check:
 lint:
 	@echo "Running cppcheck..."
 	@echo $(SOURCES) | xargs cppcheck \
-		-j$$(nproc) \
+		-j$(JOBS) \
 		--error-exitcode=1 \
 		--enable=warning,performance,portability \
 		--std=c++20 \
@@ -100,14 +118,21 @@ tidy-gate:
 hooks:
 	@bash scripts/install-hooks.sh
 
-# Build and run the unit tests (MuTests builds the test binaries, not Main or the editor).
-# Static checks need no build; `make static` runs those on their own.
-test:
-	cmake -S . -B build-test -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug
-	cmake --build build-test --target MuTests -j$$(nproc)
-	ctest --test-dir build-test --output-on-failure --no-tests=error --label-exclude static --parallel $$(nproc)
+# Build everything and run the unit tests, the way the native CI jobs do.
+#
+# The default target is the one that works: besides the doctest binaries from mu_add_test(),
+# tests/ defines standalone fixtures (rml_text_layout_tests, texture_failure_fixture, ...) and
+# tests that read $<TARGET_OBJECTS:Main> or an OBJECT-library fixture. A target that covers only
+# part of that leaves tests running against stale binaries or failing outright.
+#
+# The `static` label is excluded because `make static` already ran those without needing a build.
+test: static
+	cmake --preset $(TEST_PRESET) -B $(TEST_DIR) -DBUILD_TESTING=ON
+	cmake --build $(TEST_DIR) --config $(TEST_CONFIG) -j$(JOBS)
+	ctest --test-dir $(TEST_DIR) -C $(TEST_CONFIG) --output-on-failure --no-tests=error --label-exclude static --parallel $(JOBS)
 
-# Source-only architecture guards and contracts — the first thing CI's Quality Gates runs.
+# Source-only architecture guards and contracts — what CI's Quality Gates and the pre-push hook
+# run first. No build and no game data needed.
 static:
 	cmake -S tests/static -B out/static-checks
-	ctest --test-dir out/static-checks -C Release --parallel $$(nproc) --output-on-failure --no-tests=error
+	ctest --test-dir out/static-checks -C Release --parallel $(JOBS) --output-on-failure --no-tests=error
