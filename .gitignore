@@ -96,6 +96,7 @@ src/bin/Data/Monsters/**/*.tmp
 # Local build outputs
 /out/
 /build_validation/
+/build-test/
 /build-test-upstream-sync/
 src/graphify-out/
 
