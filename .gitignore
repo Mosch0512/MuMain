@@ -101,6 +101,7 @@ src/graphify-out/
 
 # Local agent/tool state
 .claude/
+CLAUDE.local.md
 .paw/
 .remember/
 .superpowers/
