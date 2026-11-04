@@ -55,6 +55,9 @@ endif
 # cosmetic: MuClient's PUBLIC definitions differ between the two (_DEBUG/_FOREIGN_DEBUG vs
 # NDEBUG/_FOREIGN_NDEBUG/LDS_PATCH_GLOBAL_100520), and Debug's -O0 hides the fused multiply-add
 # differences the toolchain's -march baseline exists to pin down.
+#
+# `make test TEST_CONFIG=Debug` builds the other one, in its own directory, for the assert()s
+# and the _DEBUG code paths Release never compiles.
 TEST_CONFIG := Release
 
 # Out of tree, under the already ignored /out/, and one directory per configuration:
@@ -70,11 +73,15 @@ TEST_DIR := out/build/test-$(TEST_CONFIG)
 
 # What the native CI jobs pass on top of the preset. MU_COPY_RUNTIME_ASSETS=OFF skips staging
 # the ~760 MB of src/bin on every build; the tests read their fixtures from the source tree.
-# Homebrew's OpenSSL is not in a default search path, and find_package(OpenSSL REQUIRED) fails
-# without the hint.
-TEST_CONFIGURE_FLAGS := -DBUILD_TESTING=ON -DMU_COPY_RUNTIME_ASSETS=OFF
+# BUILD_TESTING stays explicit even though linux-base and macos-base set it: windows-base does
+# not, and Git Bash hosts configure through windows-x64.
+#
+# Recursively expanded, so `brew --prefix` runs when a configure needs it rather than on every
+# make invocation, including `make format`. Homebrew's OpenSSL is not in a default search path
+# and find_package(OpenSSL REQUIRED) fails without the hint.
+TEST_CONFIGURE_FLAGS = -DBUILD_TESTING=ON -DMU_COPY_RUNTIME_ASSETS=OFF $(TEST_OPENSSL_FLAG)
 ifeq ($(UNAME_S),Darwin)
-TEST_CONFIGURE_FLAGS += -DOPENSSL_ROOT_DIR=$(shell brew --prefix openssl@3 2>/dev/null)
+TEST_OPENSSL_FLAG = -DOPENSSL_ROOT_DIR=$(shell brew --prefix openssl@3 2>/dev/null)
 endif
 
 SOURCES := $(shell find src/source -name '*.cpp' -o -name '*.h' -o -name '*.hpp' | grep -v ThirdParty/ | grep -v 'src/source/Dotnet/')
