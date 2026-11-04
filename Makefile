@@ -79,7 +79,7 @@ endif
 
 SOURCES := $(shell find src/source -name '*.cpp' -o -name '*.h' -o -name '*.hpp' | grep -v ThirdParty/ | grep -v 'src/source/Dotnet/')
 
-.PHONY: format format-check lint tidy tidy-gate hooks test static check-test-host
+.PHONY: format format-check lint tidy tidy-gate hooks test unit static check-test-host
 
 # Format all C++ source files in-place
 format:
@@ -183,8 +183,21 @@ hooks:
 # tests that read $<TARGET_OBJECTS:Main> or an OBJECT-library fixture. A target that covers only
 # part of that leaves tests running against stale binaries or failing outright.
 #
-# The `static` label is excluded because `make static` already ran those without needing a build.
-test: static check-test-host
+# The `static` label is excluded here because `make static` covers those without needing a
+# build; `make test` runs both.
+#
+# Sub-makes rather than prerequisites, so the three stages stay in this order under `make -j`
+# instead of a quick static failure waiting behind a long first configure. The host check comes
+# first: on a host without a preset there is no point running the static suite for two minutes
+# before saying so.
+test:
+	@$(MAKE) --no-print-directory check-test-host
+	@$(MAKE) --no-print-directory static
+	@$(MAKE) --no-print-directory unit
+
+# The unit tests alone. Useful while a static check is failing for an unrelated reason, and the
+# inner loop when iterating on one test.
+unit: check-test-host
 	cmake --preset $(TEST_PRESET) -B $(TEST_DIR) $(TEST_CONFIGURE_FLAGS)
 	cmake --build $(TEST_DIR) --config $(TEST_CONFIG) -j$(JOBS)
 	ctest --test-dir $(TEST_DIR) -C $(TEST_CONFIG) --output-on-failure --no-tests=error --label-exclude static --parallel $(TEST_PARALLEL)
