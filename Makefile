@@ -115,6 +115,13 @@ ifeq ($(UNAME_S),Darwin)
 TEST_OPENSSL_FLAG = $(shell prefix=$$(brew --prefix openssl@3 2>/dev/null); test -n "$$prefix" && echo -DOPENSSL_ROOT_DIR="$$prefix")
 endif
 
+# Ninja Multi-Config itself documents no minimum ninja version, so this is deliberately the
+# conservative floor: 1.10 is the oldest release CMake documents as having the features its
+# Ninja generators need. It also settles samurai, whose --version reports its own release
+# number (1.2) rather than the ninja language level it implements — unverifiable, so not
+# trusted. A samurai host can still use the hand-configured directory path.
+NINJA_MIN := 1.10
+
 # Ninja Multi-Config writes one build file per configuration, and only once the generate
 # step has succeeded, which makes it the stamp this Makefile needs: a configure that failed
 # leaves none, so the next run tries again, and a configure that succeeded is not repeated on
@@ -320,9 +327,21 @@ check-test-host:
 			exit 1; \
 		fi; \
 	fi; \
+	found=""; \
 	for generator in ninja ninja-build samu; do \
-		command -v "$$generator" >/dev/null && exit 0; \
+		command -v "$$generator" >/dev/null 2>&1 || continue; \
+		version=$$("$$generator" --version 2>/dev/null \
+			| sed -n 's/^[^0-9]*\([0-9][0-9.]*\).*/\1/p' | head -n 1); \
+		found="$${found}$$generator $${version:-unknown}, "; \
+		[ -n "$$version" ] || continue; \
+		if [ "$$(printf '%s\n$(NINJA_MIN)\n' "$$version" | sort -V | head -n 1)" \
+			= "$(NINJA_MIN)" ]; then exit 0; fi; \
 	done; \
-	echo "make test: the $(TEST_PRESET) preset generates Ninja Multi-Config, and none of" >&2; \
-	echo "           ninja, ninja-build or samu is on PATH." >&2; \
+	if [ -n "$$found" ]; then \
+		echo "make test: the $(TEST_PRESET) preset generates Ninja Multi-Config, which needs" >&2; \
+		echo "           ninja $(NINJA_MIN) or newer. Found: $${found%, }." >&2; \
+	else \
+		echo "make test: the $(TEST_PRESET) preset generates Ninja Multi-Config, and none of" >&2; \
+		echo "           ninja, ninja-build or samu is on PATH." >&2; \
+	fi; \
 	exit 1
