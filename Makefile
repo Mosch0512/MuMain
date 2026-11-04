@@ -14,10 +14,22 @@ endif
 ifneq (,$(filter MINGW% MSYS% CYGWIN%,$(UNAME_S)))
 TEST_PRESET := windows-x64
 endif
-# Every preset uses Ninja Multi-Config, so the configuration is chosen per build and per ctest
-# run, not at configure time.
-TEST_DIR := build-test
-TEST_CONFIG := Debug
+# Release, because that is what every native CI job builds and tests. The configuration is not
+# cosmetic: MuClient's PUBLIC definitions differ between the two (_DEBUG/_FOREIGN_DEBUG vs
+# NDEBUG/_FOREIGN_NDEBUG/LDS_PATCH_GLOBAL_100520), and Debug's -O0 hides the fused multiply-add
+# differences the toolchain's -march baseline exists to pin down.
+TEST_CONFIG := Release
+
+# Out of tree, under the already ignored /out/, and one directory per configuration:
+#
+#   - A directory the old recipe configured with Unix Makefiles cannot be reused by a preset
+#     ("generator does not match"), and CMake never re-applies a toolchain file to an existing
+#     cache, so -march would silently stay off.
+#   - `make tidy-gate` looks for compile_commands.json under out/build/*/.
+#   - doctest writes one discovered-tests file per target, naming the config that was built last.
+#     Sharing a directory between configurations makes `ctest -C Debug` run Release binaries
+#     whenever that config is already up to date.
+TEST_DIR := out/build/test-$(TEST_CONFIG)
 
 SOURCES := $(shell find src/source -name '*.cpp' -o -name '*.h' -o -name '*.hpp' | grep -v ThirdParty/ | grep -v 'src/source/Dotnet/')
 
