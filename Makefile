@@ -109,7 +109,10 @@ TEST_DIR := out/build/test-$(TEST_CONFIG)
 # and find_package(OpenSSL REQUIRED) fails without the hint.
 TEST_CONFIGURE_FLAGS = -DBUILD_TESTING=ON -DMU_COPY_RUNTIME_ASSETS=OFF $(TEST_OPENSSL_FLAG)
 ifeq ($(UNAME_S),Darwin)
-TEST_OPENSSL_FLAG = -DOPENSSL_ROOT_DIR=$(shell brew --prefix openssl@3 2>/dev/null)
+# Nothing at all when brew is not on PATH, which happens in an IDE, a non-login shell, or a
+# MacPorts setup. An unconditional flag would expand to a bare -DOPENSSL_ROOT_DIR= and, since
+# every configure re-applies it, keep resetting a value set by hand or by the cache to empty.
+TEST_OPENSSL_FLAG = $(shell prefix=$$(brew --prefix openssl@3 2>/dev/null); test -n "$$prefix" && echo -DOPENSSL_ROOT_DIR="$$prefix")
 endif
 
 SOURCES := $(shell find src/source -name '*.cpp' -o -name '*.h' -o -name '*.hpp' | grep -v ThirdParty/ | grep -v 'src/source/Dotnet/')
