@@ -3,7 +3,7 @@
 
 SOURCES := $(shell find src/source -name '*.cpp' -o -name '*.h' -o -name '*.hpp' | grep -v ThirdParty/ | grep -v 'src/source/Dotnet/')
 
-.PHONY: format format-check lint tidy hooks test
+.PHONY: format format-check lint tidy tidy-gate hooks test static
 
 # Format all C++ source files in-place
 format:
@@ -100,8 +100,14 @@ tidy-gate:
 hooks:
 	@bash scripts/install-hooks.sh
 
-# Build and run unit tests
+# Build and run the unit tests (MuTests builds the test binaries, not Main or the editor).
+# Static checks need no build; `make static` runs those on their own.
 test:
 	cmake -S . -B build-test -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug
 	cmake --build build-test --target MuTests -j$$(nproc)
-	ctest --test-dir build-test --output-on-failure
+	ctest --test-dir build-test --output-on-failure --no-tests=error --label-exclude static --parallel $$(nproc)
+
+# Source-only architecture guards and contracts — the first thing CI's Quality Gates runs.
+static:
+	cmake -S tests/static -B out/static-checks
+	ctest --test-dir out/static-checks -C Release --parallel $$(nproc) --output-on-failure --no-tests=error
