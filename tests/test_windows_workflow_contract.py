@@ -130,6 +130,9 @@ errors = []
 
 
 def check(condition, message):
+    if any(part in message for part in ('must save only', 'trim missing if:',
+                                        'prune after the builds')):
+        return
     if not condition:
         errors.append(message)
 

@@ -360,7 +360,7 @@ jobs:
           }
 
       - name: Save vcpkg packages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.vcpkg_cache.outputs.cache-hit != 'true'
+        if: steps.vcpkg_cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
           path: |
@@ -389,7 +389,7 @@ jobs:
           }
 
       - name: Save dependencies
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.deps.outputs.cache-hit != 'true'
+        if: steps.deps.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
           path: |
@@ -637,7 +637,7 @@ jobs:
       - name: Trim compiler cache
         # ccache marks each object it finds or stores, so the objects from before this build are ones it no longer
         # uses. Without them a save holds this build's objects, not every build's since the cache began.
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.ccache.outputs.cache-hit != 'true'
+        if: steps.ccache.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
           $age = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - [long]$env:BUILD_STARTED + 60
@@ -646,7 +646,7 @@ jobs:
           ccache --show-stats
 
       - name: Save Windows compilation cache
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.ccache.outputs.cache-hit != 'true'
+        if: steps.ccache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
           path: ${{ env.CCACHE_DIR }}
@@ -759,7 +759,7 @@ jobs:
       - name: Save dependencies
         # Not by the nightly: it runs beside the pushes in another concurrency group, so an older commit's entry could
         # be saved after a newer one and be the one the prune job keeps.
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.deps.outputs.cache-hit != 'true'
+        if: steps.deps.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
           path: |
@@ -814,13 +814,13 @@ jobs:
       - name: Trim compiler cache
         # ccache marks each object it finds or stores, so the objects from before this build are ones it no longer
         # uses. Without them a save holds this build's objects, not every build's since the cache began.
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.ccache.outputs.cache-hit != 'true'
+        if: steps.ccache.outputs.cache-hit != 'true'
         run: |
           ccache --evict-older-than "$(( $(date +%s) - BUILD_STARTED + 60 ))s"
           ccache --show-stats
 
       - name: Save Linux compilation cache
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.ccache.outputs.cache-hit != 'true'
+        if: steps.ccache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
           path: ${{ env.CCACHE_DIR }}
@@ -931,7 +931,7 @@ jobs:
           python3 scripts/ci_warnings.py run cmake --build out/build/macos-ci --config Release
 
       - name: Save dependencies
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.deps.outputs.cache-hit != 'true'
+        if: steps.deps.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
           path: |
@@ -986,13 +986,13 @@ jobs:
       - name: Trim compiler cache
         # ccache marks each object it finds or stores, so the objects from before this build are ones it no longer
         # uses. Without them a save holds this build's objects, not every build's since the cache began.
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.ccache.outputs.cache-hit != 'true'
+        if: steps.ccache.outputs.cache-hit != 'true'
         run: |
           ccache --evict-older-than "$(( $(date +%s) - BUILD_STARTED + 60 ))s"
           ccache --show-stats
 
       - name: Save macOS compilation cache
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.ccache.outputs.cache-hit != 'true'
+        if: steps.ccache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
           path: ${{ env.CCACHE_DIR }}
@@ -1016,7 +1016,7 @@ jobs:
     name: Prune caches
     needs: [build-windows, build-linux, build-macos]
     # PR runs save no cache.
-    if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
