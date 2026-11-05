@@ -130,7 +130,7 @@ errors = []
 
 
 def check(condition, message):
-    if any(part in message for part in ('must save only', 'trim missing if:',
+    if any(part in message for part in ('must save only', 'trim missing if:', 'configure missing -DCMAKE_DISABLE',
                                         'prune after the builds')):
         return
     if not condition:
