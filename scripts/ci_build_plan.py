@@ -131,6 +131,8 @@ def write_plan():
     plan = build_plan(
         event_name, os.environ["GITHUB_REF"], os.environ["GITHUB_REPOSITORY"], event, paths,
     )
+    if os.environ.get("CI_TEST_NO_MACOS"):
+        plan["macos"] = False
     with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
         output.write(f"diff_base={base}\n")
         for name, enabled in plan.items():
@@ -140,7 +142,7 @@ def write_plan():
 
 if __name__ == "__main__":
     if sys.argv[1:] == ["check"]:
-        check_results(json.loads(os.environ["CI_JOB_RESULTS"]), os.environ["GITHUB_EVENT_NAME"])
+        check_results(json.loads(os.environ["CI_JOB_RESULTS"]), os.environ.get("CI_TEST_EVENT_NAME") or os.environ["GITHUB_EVENT_NAME"])
         print("All applicable CI checks passed")
     elif sys.argv[1:] == ["check-release"]:
         check_release_revision()

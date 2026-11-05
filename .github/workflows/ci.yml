@@ -66,6 +66,8 @@ jobs:
 
       - name: Select native builds
         id: plan
+        env:
+          CI_TEST_NO_MACOS: '1'
         run: python3 scripts/ci_build_plan.py
 
       # Architecture guards and contracts that only read the source; native jobs skip the `static` label.
@@ -628,7 +630,7 @@ jobs:
             out/build/linux-ci/_deps/*-src
             out/build/linux-ci/_deps/*-subbuild
             .nuget
-          key: linux-x64-release-dep-sources-${{ steps.dotnet.outputs.dotnet-version }}-${{ hashFiles('CMakeLists.txt', 'cmake/patches/**', 'cmake/ApplyGitPatch.cmake', 'ClientLibrary/**/*.csproj', 'ClientLibrary/**/*.props') }}
+          key: linux-x64-release-dep-sources-${{ steps.dotnet.outputs.dotnet-version }}-${{ hashFiles('CMakeLists.txt', 'cmake/patches/**', 'cmake/ApplyGitPatch.cmake', 'ClientLibrary/**/*.csproj', 'ClientLibrary/**/*.props') }}-test${{ github.run_id }}
           restore-keys: linux-x64-release-dep-sources-
 
       # As on Windows: no warning may come back (docs/build/README.md).
@@ -652,7 +654,7 @@ jobs:
       - name: Save dependencies
         # Not by the nightly: it runs beside the pushes in another concurrency group, so an older commit's entry could
         # be saved after a newer one and be the one the prune job keeps.
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.deps.outputs.cache-hit != 'true'
+        if: steps.deps.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
           path: |
@@ -705,7 +707,7 @@ jobs:
           done
 
       - name: Save Linux compilation cache
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.ccache.outputs.cache-hit != 'true'
+        if: steps.ccache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
           path: ${{ env.CCACHE_DIR }}
@@ -883,7 +885,7 @@ jobs:
     name: Prune caches
     needs: [build-windows, build-linux, build-macos]
     # PR runs save no cache.
-    if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
@@ -922,6 +924,7 @@ jobs:
       - name: Verify applicable checks
         env:
           CI_JOB_RESULTS: ${{ toJSON(needs) }}
+          CI_TEST_EVENT_NAME: push
         run: python3 scripts/ci_build_plan.py check
 
       # GitHub's own warnings count too, e.g. that an action targets a deprecated Node.js version.
