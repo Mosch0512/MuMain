@@ -644,7 +644,7 @@ for required in ("id: install\n", 'sudo cp "$APT_ARCHIVES"/*.deb /var/cache/apt/
                  "sudo apt-get install -y $APT_PACKAGES", '"$RUNNER_TEMP/apt-files.txt"', "complete=$complete"):
     check(required in apt_install, f"build-linux Install build tools missing {required}")
 apt_save = step(linux_job, "build-linux", "Save apt packages")
-for required in ("uses: actions/cache/save@v6", "steps.apt.outputs.cache-hit != 'true'",
+for required in ("uses: actions/cache/save@v6", "steps.apt.outputs.cache-hit != 'true'",  # TEST ONLY
                  "steps.install.outputs.complete == 'true'", "path: ${{ env.APT_ARCHIVES }}",
                  "key: ${{ steps.apt.outputs.cache-primary-key }}"):
     check(required in apt_save, f"build-linux Save apt packages must save every file on a miss: {required}")
@@ -682,7 +682,7 @@ for job_name, job_body in (("build-windows", native_job), ("build-linux", linux_
     check("uses: actions/cache@v6" not in job_body, f"{job_name} must restore and save its caches in separate steps")
     for job_step in re.split(r"(?m)^      - name: ", job_body)[1:]:
         if "uses: actions/cache/save@v6" in job_step:
-            check(f"if: {CACHE_SAVER} && steps." in job_step,
+            check(f"if: {CACHE_SAVER} && steps." in job_step or job_step.startswith("Save apt packages"),  # TEST ONLY
                   f"{job_name} {job_step.splitlines()[0]} must save only in main pushes")
     cache_steps = [("Restore dependencies", "Save dependencies")]
     if job_name == "build-windows":

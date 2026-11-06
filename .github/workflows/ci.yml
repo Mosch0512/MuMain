@@ -149,7 +149,7 @@ jobs:
   build-windows:
     name: Windows Native Build (x64, Release, editor OFF)
     needs: quality
-    if: needs.quality.outputs.windows == 'true'
+    if: needs.quality.outputs.windows == 'true' && false  # TEST ONLY
     # By name, as Quality Gates: another image brings another MSVC, and GitHub warns in every job while it moves
     # windows-latest to a new one.
     runs-on: windows-2025-vs2026
@@ -741,11 +741,19 @@ jobs:
 
       - name: Save apt packages
         # Not without every file: an entry under this key would leave the missing ones to be fetched in every run.
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.apt.outputs.cache-hit != 'true' && steps.install.outputs.complete == 'true'
+        if: steps.apt.outputs.cache-hit != 'true' && steps.install.outputs.complete == 'true'  # TEST ONLY
         uses: actions/cache/save@v6
         with:
           path: ${{ env.APT_ARCHIVES }}
           key: ${{ steps.apt.outputs.cache-primary-key }}
+
+      - name: End the test here  # TEST ONLY
+        run: |
+          echo "cache-hit=${{ steps.apt.outputs.cache-hit }} matched=${{ steps.apt.outputs.cache-matched-key }} complete=${{ steps.install.outputs.complete }}"
+          wc -l < "$RUNNER_TEMP/apt-files.txt"
+          du -sh "$APT_ARCHIVES"
+          apt-config dump | grep -iE 'Keep-Downloaded|Post-Invoke|Clean' || true
+          exit 1
 
       - name: Identify compiler cache
         id: compiler
@@ -884,7 +892,7 @@ jobs:
   build-macos:
     name: macOS Native Build (arm64, Release, editor OFF)
     needs: quality
-    if: needs.quality.outputs.macos == 'true'
+    if: needs.quality.outputs.macos == 'true' && false  # TEST ONLY
     # By name: the build's minimum macOS is the image's (cmake/toolchains/macos-arm64.cmake), so it changes only
     # with this line, not when GitHub moves macos-latest to a newer macOS.
     runs-on: macos-26
