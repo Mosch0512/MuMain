@@ -5,6 +5,7 @@
 #include "Data/GameData/ItemData/ItemDefinition.h"
 #include "Data/GameData/ItemData/ItemGroundLabels.h"
 #include "Data/GameData/ItemData/ItemModelDefinition.h"
+#include "Data/GameData/ItemData/ItemNameCases.h"
 #include "Data/GameData/ItemData/ItemStatFile.h"
 #include "Data/GameData/ItemData/ItemTooltipLayouts.h"
 #include "Data/GameData/ItemData/SharedItemModel.h"
@@ -91,6 +92,18 @@ std::filesystem::path GetGroundLabelsFile();
 
 GroundLabelsLoadResult LoadGroundLabelsFile(const std::filesystem::path& file);
 
+struct ItemNameCasesLoadResult
+{
+    ItemNameCases cases;
+    std::vector<ItemDataIssue> issues;
+};
+
+// Data/Items/Tooltips/NameCases.json, relative to the client folder: the cases each language declines item names in,
+// see ItemNameCases.h. Next to the tooltip file; a client without it declines no names.
+std::filesystem::path GetItemNameCasesFile();
+
+ItemNameCasesLoadResult LoadItemNameCasesFile(const std::filesystem::path& file);
+
 struct GlowColorsLoadResult
 {
     std::vector<Effects::GlowColor> colors;
@@ -154,6 +167,10 @@ struct ItemModelSave
     std::filesystem::path groundLabelsFile;
     const GroundLabelFile* groundLabels = nullptr;
     bool groundLabelsChanged = false;
+    // Written to nameCasesFile (GetItemNameCasesFile) when nameCasesChanged.
+    std::filesystem::path nameCasesFile;
+    const ItemNameCases* nameCases = nullptr;
+    bool nameCasesChanged = false;
 #endif
 };
 

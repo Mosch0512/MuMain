@@ -4,7 +4,9 @@
 
 #include "Core/Text/Utf8.h"
 #include "Data/GameData/ItemData/ItemDatabase.h"
+#include "Data/GameData/ItemData/ItemReferenceNames.h"
 #include "Data/GameData/ItemData/ItemStatProfiles.h"
+#include "Data/Translation/ItemReference.h"
 #include "Engine/Object/ItemTooltipValues.h"
 #include "Engine/Object/ZzzInfomation.h"
 #include "GameLogic/Items/ItemNameParts.h"
@@ -30,6 +32,7 @@ struct Key
     const void* bound = nullptr;
     const void* definition = nullptr;
     std::array<char, 16> language{};
+    bool englishNames = false;
 
     bool operator==(const Key& other) const = default;
 };
@@ -42,13 +45,16 @@ struct KeyHash
         hash ^= std::hash<const void*>()(key.bound) + 0x9E3779B9 + (hash << 6) + (hash >> 2);
         hash ^= std::hash<const void*>()(key.definition) + 0x9E3779B9 + (hash << 6) + (hash >> 2);
         hash ^= std::hash<std::string_view>()(std::string_view(key.language.data())) + (hash << 6) + (hash >> 2);
+        hash ^= static_cast<size_t>(key.englishNames);
         return hash;
     }
 };
 
-// The compiled texts, for the item data of `cacheVersion`. The tooltip draws on the main thread only.
+// The compiled texts, for the item data of `cacheVersion` and the item names of `cacheNameVersion` (the texts that
+// name items show the names). The tooltip draws on the main thread only.
 std::unordered_map<Key, Compiled, KeyHash> cache;
 int cacheVersion = -1;
+int cacheNameVersion = -1;
 
 std::wstring Wide(std::string_view text)
 {
@@ -118,10 +124,35 @@ bool Resolve(std::string_view name, std::span<const std::pair<std::string, std::
     return false;
 }
 
-Compiled CompileText(std::string_view text, std::span<const std::pair<std::string, std::string>> bound,
-                     const Data::Items::ItemDefinition* definition, std::string_view language)
+// The text with its item references ({item:14,25}) replaced by the items' names in the item name language, so the item
+// names follow "Translate item names" while the rest of the text stays in the UI language; an English text shown for a
+// language without a translation of its own names them in English, as the UI texts do. A reference to no item stays as
+// written, and so then does the rest of the text (FindPlaceholders refuses it).
+std::string WithItemNames(std::string_view text, bool englishNames)
+{
+    const std::string_view nameLocale =
+        englishNames ? Data::LocalizedString::NeutralLocale : std::string_view(g_ItemDatabase.GetDisplayLocale());
+    std::string named;
+    size_t position = 0;
+    for (const Data::Translation::ItemReferenceMatch& match : Data::Translation::FindItemReferences(text))
+    {
+        named.append(text.substr(position, match.position - position));
+        const Data::Items::ReferencedName name =
+            match.reference ? Data::Items::ResolveReferencedName(g_ItemDatabase, *match.reference, nameLocale)
+                            : Data::Items::ReferencedName{};
+        named.append(name.text.empty() ? text.substr(match.position, match.length) : std::string_view(name.text));
+        position = match.position + match.length;
+    }
+    named.append(text.substr(position));
+    return named;
+}
+
+Compiled CompileText(std::string_view written, std::span<const std::pair<std::string, std::string>> bound,
+                     const Data::Items::ItemDefinition* definition, std::string_view language, bool englishNames)
 {
     Compiled compiled;
+    const std::string named = WithItemNames(written, englishNames);
+    const std::string_view text = named;
     const Data::Items::PlaceholderSpans found = Data::Items::FindPlaceholders(text);
     size_t position = 0;
     for (const Data::Items::PlaceholderSpan& span : found.spans)
@@ -164,20 +195,23 @@ void AppendNumber(int number, wchar_t* out, size_t capacity, size_t& length)
 } // namespace
 
 const Compiled& Compile(std::string_view text, std::span<const std::pair<std::string, std::string>> bound,
-                        const Data::Items::ItemDefinition* definition, std::string_view language)
+                        const Data::Items::ItemDefinition* definition, std::string_view language,
+                        std::string_view textLanguage)
 {
-    if (cacheVersion != g_ItemDatabase.GetVersion())
+    if (cacheVersion != g_ItemDatabase.GetVersion() || cacheNameVersion != g_ItemDatabase.GetNameVersion())
     {
         cache.clear();
         cacheVersion = g_ItemDatabase.GetVersion();
+        cacheNameVersion = g_ItemDatabase.GetNameVersion();
     }
     Key key{text.data(), text.size(), bound.data(), definition};
     std::copy_n(language.data(), std::min(language.size(), key.language.size() - 1), key.language.data());
+    key.englishNames = (textLanguage.empty() ? language : textLanguage) == Data::LocalizedString::NeutralLocale;
     // No text is compared: the item data, the stat file and the tooltip file change only by raising the version.
     const auto found = cache.find(key);
     if (found == cache.end())
     {
-        return cache.emplace(key, CompileText(text, bound, definition, language)).first->second;
+        return cache.emplace(key, CompileText(text, bound, definition, language, key.englishNames)).first->second;
     }
     return found->second;
 }
