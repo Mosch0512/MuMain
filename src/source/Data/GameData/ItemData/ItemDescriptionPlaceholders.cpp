@@ -4,6 +4,7 @@
 
 #include "Data/GameData/ItemData/ItemJsonCommon.h"
 #include "Data/GameData/ItemData/ItemStatProfiles.h"
+#include "Data/Translation/ItemReference.h"
 
 #include <algorithm>
 #include <functional>
@@ -47,6 +48,18 @@ Placeholder ReadPlaceholder(std::string_view text, size_t open)
     if (name.empty())
     {
         return {{}, std::string_view::npos, "has an empty placeholder \"{}\""};
+    }
+    if (name.starts_with("item:"))
+    {
+        if (IsItemReferencePlaceholder(name))
+        {
+            return {name, close + 1, {}};
+        }
+        return {{},
+                std::string_view::npos,
+                "has \"{" + std::string(name) +
+                    "}\": an item is named {item:group,number}, with \"+level\" for a level and \":case\" (gen, dat, "
+                    "acc, ins or loc) for a form of its name"};
     }
     const std::string_view table = GetPlaceholderTable(name);
     if (!Json::IsName(table.empty() ? name : table))
@@ -200,6 +213,29 @@ std::optional<GameDataValue> ReadGameDataValue(std::string_view name)
         return value < entry.limit ? std::optional<GameDataValue>(GameDataValue{entry.kind, value}) : std::nullopt;
     }
     return std::nullopt;
+}
+
+bool IsItemReferencePlaceholder(std::string_view name)
+{
+    return Data::Translation::ParseItemReferenceName(name).has_value();
+}
+
+std::set<std::string> ToParityPlaceholders(std::span<const std::string> names)
+{
+    std::set<std::string> parity;
+    for (const std::string& name : names)
+    {
+        std::optional<Data::Translation::ItemReference> reference = Data::Translation::ParseItemReferenceName(name);
+        if (!reference)
+        {
+            parity.insert(name);
+            continue;
+        }
+        reference->form.clear();
+        const std::string written = Data::Translation::FormatItemReference(*reference);
+        parity.insert(written.substr(1, written.size() - 2));
+    }
+    return parity;
 }
 
 bool IsBuiltInPlaceholder(std::string_view name)

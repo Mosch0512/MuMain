@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <optional>
+#include <set>
 #include <span>
 #include <string>
 #include <string_view>
@@ -73,6 +74,14 @@ enum class TooltipValue : unsigned char
 // The built-in value of that name, or nothing for another name.
 std::optional<TooltipValue> FindBuiltInPlaceholder(std::string_view name);
 std::string_view GetBuiltInPlaceholderName(TooltipValue value);
+
+// "item:<group>,<number>" (with "+<level>" and ":<case>") names an item, whose name the text shows: the item reference
+// of the UI texts (Data/Translation/ItemReference.h, docs/translation-system.md), written without its braces.
+bool IsItemReferencePlaceholder(std::string_view name);
+
+// The placeholders a translation must have for the English text's `names`: each once, and an item reference without
+// its case, which a translation may add or change ({item:14,25} in English, {item:14,25:acc} in Polish).
+std::set<std::string> ToParityPlaceholders(std::span<const std::string> names);
 
 // "table:<name>" names a level bonus table.
 inline constexpr std::string_view TablePlaceholderPrefix = "table:";

@@ -346,7 +346,7 @@ void ItemTooltipReader::CheckPlaceholders(const LocalizedString& text, const std
         AddFatal(field, english.error);
         return;
     }
-    const std::set<std::string> englishNames(english.names.begin(), english.names.end());
+    const std::set<std::string> englishNames = ToParityPlaceholders(english.names);
     for (const auto& [locale, translation] : text.GetTranslations())
     {
         const PlaceholderScan scan = ScanPlaceholders(translation);
@@ -355,7 +355,7 @@ void ItemTooltipReader::CheckPlaceholders(const LocalizedString& text, const std
             AddFatal(field + "." + locale, scan.error);
             continue;
         }
-        const std::set<std::string> names(scan.names.begin(), scan.names.end());
+        const std::set<std::string> names = ToParityPlaceholders(scan.names);
         if (names != englishNames)
         {
             AddFatal(field + "." + locale,
@@ -483,7 +483,8 @@ void ItemTooltipReader::CheckLinePlaceholders(const TooltipLayoutLine& line, con
     std::set<std::string> reported;
     for (const std::string& name : scan.names)
     {
-        if (std::find(known.begin(), known.end(), name) != known.end() || !reported.insert(name).second)
+        if (std::find(known.begin(), known.end(), name) != known.end() || IsItemReferencePlaceholder(name) ||
+            !reported.insert(name).second)
         {
             continue;
         }
