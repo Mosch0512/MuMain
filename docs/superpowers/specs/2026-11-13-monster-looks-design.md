@@ -61,6 +61,8 @@ answered.
 
 | # | Topic | Decision |
 |---|---|---|
+| ML1 | Where a monster names its looks (Q-ML1a, 2026-11-13) | **The model names its usual looks, a monster can name others.** A model entry in `Models.json` names the looks every monster of that model gets, as an item model entry names its render style; a monster entry, or one of its numbers (D61), can name another look in its place. So the 17 monsters that today get a variant on a shared model through the `ExtraMon` number (Metal Balrog on the Balrog model, Great Drakan on the Drakan model, …) name their own, and the others name nothing. Monster Setup shows the model's look in its dropdown ("(model: balrogRedChrome)") until a monster picks another. Rejected: looks only on the monster entries (monsters sharing a model and a look repeat the name), and one look per monster holding all its parts (an item's render style could not be put on a monster as it is, D25, and every variant would be a copy). |
+| ML2 | The kinds of looks (Q-ML1b, 2026-11-13) | **Two kinds, as for the items, and an effect's parts say when they run.** A **render style** draws (L13); an **effect** spawns, in the update (ADR 0003). Each part of an effect has a **when**: always (every frame or by its own timing, what an item effect does), at an attack (an attack animation and tick, Q-ML3), at death. So an item effect is an effect whose parts are all "always", and a monster names at most one render style and one effect, on its model or itself (ML1). The kind "item effect" is called **effect** for items too (L15 left the name to this design): the Style Editor's root and the Data Checks area become Effects; whether the file and the items' field `itemEffect` are renamed with it is settled in the target design. Rejected: four kinds by moment (alive, attack, death effects as kinds and fields of their own: up to four names per monster and four roots), and monsters reusing the item kinds as they are with attack and death effects on the monster entry (they could not be shared as looks). |
 
 ## Current state
 
@@ -215,7 +217,8 @@ answered here as decisions.
 
 | # | Question |
 |---|---|
-| Q-ML1 | **Where a monster names its looks, and which kinds.** On the monster entry, on its model entry with the monster able to override, or both; the item kinds (render style, item effect) reused, or kinds of their own (body, every frame, attack, death). |
+| Q-ML1a | *Answered: ML1.* Where a monster names its looks. |
+| Q-ML1b | *Answered: ML2.* Which kinds of looks. |
 | Q-ML2 | **Conditions.** How a look says "only on Crywolf", "only while dying", "only from frame 2.5 of attack 2", "only with SubType 1", "only with the freeze buff", "only during the siege". |
 | Q-ML3 | **Attack effects.** Where they live (in the look, or on the entry's `attacks` of MN2), and how "at tick 14 of attack 1 with the boss skill, create 36 spirit joints around the monster" is written. |
 | Q-ML4 | **Things on bones.** The format for sprites, particles, effects, joints and trails on bones, shared with looks pull request 4 for the items. |
