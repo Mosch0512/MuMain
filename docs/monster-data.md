@@ -212,6 +212,7 @@ any character.
 | `outline` | The thickness of its outline when pointed at |
 | `subType` | Its skin |
 | `lookLevel` | Its render tier (the glow of higher levels), 0 to 65535 |
+| `renderStyle`, `effect` | The looks it is drawn with, in place of its model's ([Looks](#looks)): a render style of `Data/Effects/RenderStyles.json` and an effect of `Data/Effects/Effects.json` by name, or `"none"` for none where its model names one |
 | `glowMesh`, `glowLight` | The mesh that glows, and its light |
 | `hiddenMesh` | A mesh that is not drawn (-2: none drawn) |
 | `shadow` | `false`: no shadow |
@@ -411,6 +412,7 @@ without a model (the glow, marks and message only in the game).
 | `headBone` | The bone the head turns with; without it as the file has it |
 | `streamMesh` | The mesh drawn as a stream; without it as the file has it |
 | `noneBlendMeshes` | Meshes drawn without blending |
+| `renderStyle`, `effect` | The looks every monster of the model is drawn with ([Looks](#looks)); a monster can name others |
 | `cues` | Named points of its animations that [sound events](#sound-events) play on: `name` (unique in the model), `animation`, and `frames`, from the first to below the second (the game checks the frame each game frame): where Raymond's feet land in the walk |
 | `timers` | Up to 4 timers of its animations (Q-MN91): `name` (unique in the model), `animation`, and `everyMs`, 1 to 60000; one ticks while the character is in the animation, each time more than `everyMs` passed since its last tick. The map's code for the model may ask for one by name (Twintail's `hair swing`, which swings its hair) and sound events play on it (`timers`), on the same tick. The timers the code asks for are listed in `CodeModelTimers` (`MonsterModelDefinition.h`): a model without its timer is an error of the model list |
 | `namedBones` | Names for bones that the game's code finds by name, registered in this order when one of its monsters appears (Q-MN37): `{"Rabbit_1": 3, "Rabbit_2": 16}`. The Lunar Rabbit's lights, the Golden Stone Golem's arms and Twin Tail's hair use theirs |
@@ -429,6 +431,25 @@ Square 2. OpenMU sends the extended client the stage with the map
 Square keeps its stage); a number names all of its stages, and with another
 server every stage is 0. The lists' older names (`worldTextureFolders`,
 `worlds`) are fatal problems that name the new ones.
+
+### Looks
+
+What a monster looks like beyond its model, size and equipment is a look of
+`Data/Effects`, the same looks the items have ([item-data.md](item-data.md#render-styles-and-effects)):
+a **render style** draws it in layers (chrome, glow, a scrolling texture, a
+pulse, by mesh), an **effect** sets values before it is drawn (its glow mesh,
+hidden mesh, scroll) and puts a light on its object. A model entry names the
+looks of all its monsters (`"renderStyle": "balrogBlueChrome"`); a monster
+entry, one of its numbers, a map variant or a state variant names another in
+their place, the most specific one winning: state variant, map variant,
+number, entry, model. `"none"` draws a monster without the look its model
+names. The names are found when the monster appears, and again when the looks
+change.
+
+A look name that no look file has is an Error in Data Checks (areas Monsters
+and Monster models), and the monster is drawn without it. Monster Setup and
+Monster Model pick the looks from their lists, with Open in Style Editor; an
+unset look of Monster Setup shows the model's, "(model: balrogBlueChrome)".
 
 ### The map picker
 

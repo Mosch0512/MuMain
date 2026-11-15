@@ -157,6 +157,7 @@ mu_add_test(
         test_monster_item_references.cpp
         test_monster_json.cpp
         test_monster_list_model.cpp
+        test_monster_looks_json.cpp
         test_monster_model_files.cpp
         test_monster_model_values.cpp
         test_monster_models_json.cpp

@@ -2,6 +2,10 @@
 
 #include "Data/GameData/ItemData/ItemDataIssue.h"
 #include "Data/GameData/MonsterData/MonsterDefinition.h"
+#include "Data/GameData/MonsterData/MonsterModelDefinition.h"
+
+#include <functional>
+#include <string_view>
 
 #include <span>
 #include <vector>
@@ -40,4 +44,17 @@ void ValidateMonsterTalkSteps(std::span<const MonsterDefinition* const> monsters
 void ValidateMonsterTalkTexts(std::span<const MonsterDefinition* const> monsters, const MonsterTalkTexts& talkTexts,
                               std::span<const char* const> uiLocales, const std::string& source,
                               std::vector<Items::ItemDataIssue>& issues);
+// Whether a look file has a look of that name (a render style, or an effect).
+using LookExists = std::function<bool(std::string_view name)>;
+
+// The looks the monsters name (MN8, ML1): a render style or an effect no look
+// file has is an error, the monster is drawn without it; "none" names none.
+// On the entry, its map variants and the state variants of both.
+void ValidateMonsterLooks(std::span<const MonsterDefinition* const> monsters, const LookExists& renderStyleExists,
+                          const LookExists& effectExists, const std::string& source,
+                          std::vector<Items::ItemDataIssue>& issues);
+// The same for the looks the models name for their monsters.
+void ValidateMonsterModelLooks(std::span<const MonsterModelDefinition* const> models,
+                               const LookExists& renderStyleExists, const LookExists& effectExists,
+                               const std::string& source, std::vector<Items::ItemDataIssue>& issues);
 } // namespace Data::Monsters

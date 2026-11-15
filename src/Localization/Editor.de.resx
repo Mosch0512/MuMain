@@ -1120,6 +1120,9 @@
   <data name="Effect Browser" xml:space="preserve">
     <value>Effekt-Browser</value>
   </data>
+  <data name="Model look {0}" xml:space="preserve">
+    <value>(Modell: {0})</value>
+  </data>
   <data name="Effect types" xml:space="preserve">
     <value>Effekttypen</value>
   </data>
@@ -3423,6 +3426,15 @@
   </data>
   <data name="Step model" xml:space="preserve">
     <value>{0}: {1}</value>
+  </data>
+  <data name="Step what looks" xml:space="preserve">
+    <value>Looks</value>
+  </data>
+  <data name="Monster looks" xml:space="preserve">
+    <value>Looks</value>
+  </data>
+  <data name="Model looks note" xml:space="preserve">
+    <value>Der Darstellungsstil und der Effekt, mit denen jedes Monster des Modells gezeichnet wird; ein Monster kann in Monster Setup andere nennen.</value>
   </data>
   <data name="Step what file" xml:space="preserve">
     <value>Datei</value>

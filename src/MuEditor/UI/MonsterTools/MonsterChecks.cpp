@@ -10,10 +10,13 @@
 #include "Data/DataHandler/MonsterData/MonsterDataHandler.h"
 #include "I18N/All.h"
 #include "Data/DataHandler/MonsterData/MonsterJsonStorage.h"
+#include "Data/DataHandler/MonsterData/MonsterModelJsonStorage.h"
 #include "Data/GameData/ItemData/ItemDatabase.h"
+#include "Data/GameData/LookData/LookStore.h"
 #include "Data/GameData/MonsterData/MonsterDataValidation.h"
 #include "Data/GameData/MonsterData/MonsterDatabase.h"
 #include "Data/GameData/MonsterData/MonsterItemReferences.h"
+#include "Data/GameData/MonsterData/MonsterModelDatabase.h"
 
 namespace MuEditor::Monsters::MonsterChecks
 {
@@ -38,6 +41,17 @@ void ValidateItems(std::vector<Data::Items::ItemDataIssue>& issues)
         monsters, [](int itemType) { return g_ItemDatabase.FindEntry(itemType) != nullptr; },
         Data::Monsters::GetMonstersFile().generic_string(), issues);
 }
+
+// The looks the game has (MN8): a monster or model names one by its name.
+bool RenderStyleExists(std::string_view name)
+{
+    return Data::Looks::g_LookStore.FindRenderStyle(name) != nullptr;
+}
+
+bool EffectExists(std::string_view name)
+{
+    return Data::Looks::g_LookStore.FindEffect(name) != nullptr;
+}
 } // namespace
 
 void RunMonsters(std::vector<Data::Items::ItemDataIssue>& issues)
@@ -48,6 +62,8 @@ void RunMonsters(std::vector<Data::Items::ItemDataIssue>& issues)
     AttackChecks::Validate(issues);
     GroupChecks::Validate(issues);
     ValidateItems(issues);
+    Data::Monsters::ValidateMonsterLooks(AllMonsters(), RenderStyleExists, EffectExists,
+                                         Data::Monsters::GetMonstersFile().generic_string(), issues);
     Data::Monsters::ValidateMonsterSetups(AllMonsters(), Data::Monsters::GetMonstersFile().generic_string(), issues);
     Data::Monsters::ValidateMonsterTalkSteps(AllMonsters(), g_MonsterDatabase.GetTalkTexts(),
                                              Data::Monsters::GetMonstersFile().generic_string(), issues);
@@ -59,6 +75,8 @@ void RunMonsters(std::vector<Data::Items::ItemDataIssue>& issues)
 void RunModels(std::vector<Data::Items::ItemDataIssue>& issues)
 {
     g_MonsterDataHandler.ValidateModels(issues);
+    Data::Monsters::ValidateMonsterModelLooks(g_MonsterModelDatabase.GetAll(), RenderStyleExists, EffectExists,
+                                              Data::Monsters::GetMonsterModelsFile().generic_string(), issues);
 }
 
 void RunSounds(std::vector<Data::Items::ItemDataIssue>& issues)
