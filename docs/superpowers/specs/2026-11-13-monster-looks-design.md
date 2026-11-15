@@ -375,12 +375,12 @@ in-game before and after.
 
 Proposed (Q-ML11), each as a fork pull request for CI and an upstream one
 for sven-n (the fork one closed after the upstream merge), each after the one
-before is merged:
+before is merged. This design has no pull request of its own: it goes in
+with PR 1, the first one that changes code.
 
 | PR | Contents | Waits for |
 |---|---|---|
-| 0 | This design. | – |
-| 1 | The machinery: monsters name looks (section 2) and `ExtraMon` goes; the rename to Effects; `onlyWhen`'s monster conditions; the Style Editor's monster preview and the two dropdowns; the draw-time looks that need only layers and conditions (about 90 rows: chrome, glow, scroll, pulse, per mesh). | 0 |
+| 1 | This design, and the machinery: monsters name looks (section 2) and `ExtraMon` goes; the rename to Effects; `onlyWhen`'s monster conditions; the Style Editor's monster preview and the two dropdowns; the draw-time looks that need only layers and conditions (about 90 rows: chrome, glow, scroll, pulse, per mesh). | – |
 | 2 | The other draw-time blocks: blends, `alsoDraw`, decals, shadow, texture frames; the map variants of ML7 and the map checks gone. | 1 |
 | 3 | Things on bones: the parts of section 3 with "always", the recipes, the per-frame rows (about 170) and the always-on trails. | 2 and looks PR 4 (FX1.7c and the items' things on bones, the same parts) |
 | 4 | Attacks: attack parts with tick and frame (ML4), the frame ruler, presets, the attack trails, `AttackEffect` and its map hooks (about 80 rows) and the traps. | 3 |
