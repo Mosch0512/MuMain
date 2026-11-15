@@ -9,9 +9,12 @@
 #include "Data/GameData/ItemData/ItemDataIssue.h"
 #include "Data/GameData/LookData/LookStore.h"
 #include "Data/GameData/MonsterData/MonsterAnimations.h"
+#include "Engine/Object/ObjectPose.h"
 #include "Engine/Object/ZzzCharacter.h"
 #include "Render/Items/LookDrawing.h"
 #include "Render/Models/ZzzBMD.h"
+#include "Render/Textures/ZzzOpenglUtil.h"
+#include "Render/Textures/ZzzTexture.h"
 
 #include "doctest.h"
 
@@ -20,6 +23,8 @@
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
+#include <string>
+#include <string_view>
 #include <vector>
 
 extern double WorldTime;
@@ -46,6 +51,22 @@ constexpr const char* BaselineHeader =
     "# (tests/data/LookRecorder.h). Written from the old code before each look moved (MU_MONSTER_LOOK_WRITE=1), so a\n"
     "# moved look still draws as its code did.\n";
 
+// The textures OpenBasicData loads at their indices before the looks find theirs, which the monsters' looks in code
+// name.
+struct BasicTexture
+{
+    const wchar_t* file;
+    GLuint index;
+    GLuint wrap;
+};
+constexpr BasicTexture BasicTextures[] = {
+    {L"Effect\\Chrome01.jpg", BITMAP_CHROME, GL_REPEAT},
+    {L"Monster\\King11.jpg", BITMAP_WHITE_WIZARD, GL_CLAMP_TO_EDGE},
+    {L"Monster\\Kni000.jpg", BITMAP_DEST_ORC_WAR0, GL_CLAMP_TO_EDGE},
+    {L"Monster\\Kni011.jpg", BITMAP_DEST_ORC_WAR1, GL_CLAMP_TO_EDGE},
+    {L"Monster\\Kni022.jpg", BITMAP_DEST_ORC_WAR2, GL_CLAMP_TO_EDGE},
+};
+
 std::string Number(double value)
 {
     char text[32];
@@ -56,8 +77,10 @@ std::string Number(double value)
 
 std::string DrawSituation::Describe() const
 {
-    std::string text = Data::Monsters::GetMonsterAnimationName(action) + " at frame " + Number(frame) + ", " +
-                       Number(worldTime) + " ms";
+    char time[32];
+    std::snprintf(time, sizeof(time), "%.2f", worldTime);
+    std::string text =
+        Data::Monsters::GetMonsterAnimationName(action) + " at frame " + Number(frame) + ", " + time + " ms";
     if (alpha < 1.f)
         text += ", alpha " + Number(alpha);
     if (buff)
@@ -85,7 +108,16 @@ LookRecorder::Record RecordMonster(CHARACTER& character, const DrawSituation& si
 {
     OBJECT& object = character.Object;
     BMD& model = Models[object.Type];
-    const OBJECT keptObject = object;
+    // The fields a drawing is set up with, restored afterwards (the object keeps its own bones).
+    const unsigned short keptAction = object.CurrentAction;
+    const unsigned short keptPriorAction = object.PriorAction;
+    const float keptFrame = object.AnimationFrame;
+    const float keptPriorFrame = object.PriorAnimationFrame;
+    const float keptAlpha = object.Alpha;
+    const bool keptVisible = object.Visible;
+    vec3_t keptLight;
+    VectorCopy(object.Light, keptLight);
+    const Buff keptBuffs = object.m_BuffMap;
     const char keptStreamMesh = model.StreamMesh;
     vec3_t keptBodyLight;
     VectorCopy(model.BodyLight, keptBodyLight);
@@ -101,14 +133,50 @@ LookRecorder::Record RecordMonster(CHARACTER& character, const DrawSituation& si
     object.PriorAnimationFrame = situation.frame;
     object.Alpha = situation.alpha;
     object.Visible = true;
+    // The light the scene puts on it: the tests have no terrain light, and a look that tints the light it is handed
+    // must show it.
+    object.Light[0] = 0.55f;
+    object.Light[1] = 0.45f;
+    object.Light[2] = 0.35f;
     object.m_BuffMap.ClearBuff();
     if (situation.buff)
         object.m_BuffMap.RegisterBuff(static_cast<eBuffState>(*situation.buff));
 
+    // As the update poses a character before its draws (AnimateCharacterBones): every pass draws its own pose.
+    AnimateCharacterBones(&object);
     LookRecorder::Record record = LookRecorder::RecordDrawing(model, [&] { RenderCharacter(&character, &object, 0); });
+    // The render state left after the whole character is no part of its look: each model draw sets its own, and a
+    // monster's render style draws its glow passes with its body, before its shadow and weapons, where the code drew
+    // them last.
+    std::erase_if(record.gpuCalls, [](const std::string& call) { return call.starts_with("final "); });
+    // Each draw of a monster sets its model's light and lighting first: only the scrolling mesh it leaves lasts.
+    std::erase_if(record.modelAfter,
+                  [](const LookRecorder::Field& field) { return std::string_view(field.first) != "streamMesh"; });
+    // The model drawing never reads the mark of a monster's hands, which the monsters' glow passes in code carried.
+    for (auto& draw : record.meshDraws)
+    {
+        for (auto& [name, value] : draw)
+        {
+            if (std::string_view(name) == "flags")
+            {
+                char text[16];
+                std::snprintf(text, sizeof(text), "0x%x",
+                              static_cast<unsigned>(std::stoul(value, nullptr, 16) & ~unsigned{RENDER_EXTRA}));
+                value = text;
+            }
+        }
+    }
 
     WorldTime = previousWorldTime;
-    object = keptObject;
+    object.CurrentAction = keptAction;
+    object.PriorAction = keptPriorAction;
+    object.AnimationFrame = keptFrame;
+    object.PriorAnimationFrame = keptPriorFrame;
+    object.Alpha = keptAlpha;
+    object.Visible = keptVisible;
+    VectorCopy(keptLight, object.Light);
+    object.m_BuffMap = keptBuffs;
+    Engine::Object::Pose::Invalidate(&object);
     model.StreamMesh = keptStreamMesh;
     VectorCopy(keptBodyLight, model.BodyLight);
     model.LightEnable = keptLightEnable;
@@ -133,6 +201,13 @@ ShippedLooks::ShippedLooks() : m_state(new State)
         REQUIRE_FALSE(Data::Items::HasFatal(shipped.issues));
         g_LookStore.SetLooks(kind, std::move(shipped.looks));
     }
+    static const bool basicTexturesLoaded = []
+    {
+        for (const BasicTexture& texture : BasicTextures)
+            LoadBitmap(texture.file, texture.index, GL_LINEAR, texture.wrap);
+        return true;
+    }();
+    (void)basicTexturesLoaded;
     Render::Items::Looks::PrepareTextures();
 }
 
