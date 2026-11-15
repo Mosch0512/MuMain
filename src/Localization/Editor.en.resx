@@ -1117,6 +1117,21 @@
   <data name="Model look {0}" xml:space="preserve">
     <value>(model: {0})</value>
   </data>
+  <data name="Glow only" xml:space="preserve">
+    <value>Glow only</value>
+  </data>
+  <data name="At most" xml:space="preserve">
+    <value>At most</value>
+  </data>
+  <data name="At most tooltip" xml:space="preserve">
+    <value>The value never goes above this: the top of a wave cut off.</value>
+  </data>
+  <data name="A color times the opacity" xml:space="preserve">
+    <value>A color times the opacity</value>
+  </data>
+  <data name="Tinting debuff" xml:space="preserve">
+    <value>Tinting debuff (poison, freeze, Blow of Destruction)</value>
+  </data>
   <data name="Effect types" xml:space="preserve">
     <value>Effect types</value>
   </data>

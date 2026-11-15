@@ -69,6 +69,10 @@ int LayerFlags(const Layer& layer, int renderType)
     {
         return renderType;
     }
+    if (layer.kind == LayerKind::GlowOnly)
+    {
+        return RENDER_BRIGHT;
+    }
     const int flags = layer.kind == LayerKind::Texture     ? RENDER_TEXTURE
                       : layer.kind == LayerKind::FlatColor ? RENDER_COLOR
                                                            : MotionFlag(layer.motion);
@@ -80,6 +84,8 @@ struct Moment
 {
     const OBJECT* object = nullptr;
     std::uint32_t salt = 0;
+    // The drawing's opacity, which a light times the opacity reads.
+    float alpha = 1.f;
 };
 
 // The angle at the clock `time` (milliseconds) of a sine that turns `radiansPerCycle` in `seconds`, as the looks in
@@ -96,7 +102,7 @@ double Milliseconds(double seconds)
     return std::round(seconds * 1.0e6) / 1.0e3;
 }
 
-float ValueAt(const Shape& shape, Moment& moment)
+float RawValueAt(const Shape& shape, Moment& moment)
 {
     const double from = shape.from;
     const double to = shape.to;
@@ -130,9 +136,25 @@ float ValueAt(const Shape& shape, Moment& moment)
     return static_cast<float>(from);
 }
 
+// A shape's value, never above its top (atMost).
+float ValueAt(const Shape& shape, Moment& moment)
+{
+    const float value = RawValueAt(shape, moment);
+    return shape.atMost ? std::min(value, static_cast<float>(*shape.atMost)) : value;
+}
+
+float UncappedAtClock(const Shape& shape, double time);
 } // namespace
 
 float ShapeAtClock(const Shape& shape, double time)
+{
+    const float value = UncappedAtClock(shape, time);
+    return shape.atMost ? std::min(value, static_cast<float>(*shape.atMost)) : value;
+}
+
+namespace
+{
+float UncappedAtClock(const Shape& shape, double time)
 {
     const double from = shape.from;
     const double to = shape.to;
@@ -185,8 +207,6 @@ float ShapeAtClock(const Shape& shape, double time)
     return static_cast<float>(from);
 }
 
-namespace
-{
 float NumberAt(const Number& number, Moment& moment)
 {
     if (const Shape* shape = std::get_if<Shape>(&number))
@@ -375,6 +395,9 @@ bool HasBuff(LookBuff buff, const OBJECT* o)
     {
     case LookBuff::InfinityArrow:
         return o != nullptr && g_isCharacterBuff(o, eBuff_InfinityArrow);
+    case LookBuff::TintingDebuff:
+        return o != nullptr && (g_isCharacterBuff(o, eDeBuff_Poison) || g_isCharacterBuff(o, eDeBuff_Freeze) ||
+                                g_isCharacterBuff(o, eDeBuff_BlowOfDestruction));
     }
     return false;
 }
@@ -437,7 +460,7 @@ std::array<float, 3> LightOf(const LayerLight& light, const vec3_t modelLight, M
     for (int channel = 0; channel < 3; ++channel)
     {
         const float value = NumberAt(light.color[channel], moment);
-        color[channel] = light.tint ? value * modelLight[channel] : value;
+        color[channel] = light.tint ? value * modelLight[channel] : light.timesOpacity ? value * moment.alpha : value;
     }
     return color;
 }
@@ -635,7 +658,7 @@ bool DrawRenderStyle(const LookDefinition& style, BMD* b, const OBJECT* o, DrawL
     {
         renderType &= ~RENDER_EXTRA;
     }
-    Moment moment{.object = o};
+    Moment moment{.object = o, .alpha = alpha};
     vec3_t modelLight;
     VectorCopy(b->BodyLight, modelLight);
     const bool meshByMesh =

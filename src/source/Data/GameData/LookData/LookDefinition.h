@@ -31,6 +31,9 @@ enum class LayerKind
     Reflection,
     // The mesh in the light alone, without a texture (RENDER_COLOR): a flat color, as a dark backing.
     FlatColor,
+    // The mesh's texture added as glow alone (RENDER_BRIGHT without the texture's flag), as the monsters' glow passes
+    // draw: a mesh whose texture has an alpha channel, or that is the glow mesh, is not drawn (MN8).
+    GlowOnly,
 };
 
 // How a reflection moves: the chrome variants of the model drawing.
@@ -114,6 +117,8 @@ struct Shape
     // As a layer's value: the item's value times the shape (design L16), as the Phoenix Soul items pulse their own
     // opacity and glow strength. A number of a light or of item values reads the shape alone.
     bool timesItem = false;
+    // The shape's value is never above this (MN8): a wave the code cut off at a top, as the Gigas Golem's light.
+    std::optional<double> atMost;
 
     bool operator==(const Shape&) const = default;
 };
@@ -156,6 +161,8 @@ struct LayerLight
     // The model's light at this brightness instead (design L16): scaled so its brightest channel is this, a grey of it
     // for a black light; `tint` and `color` are not read then.
     std::optional<Number> brightness;
+    // `color` times the drawing's opacity (MN8): the monsters' glow passes dim their light as they fade.
+    bool timesOpacity = false;
 
     bool operator==(const LayerLight&) const = default;
 };
@@ -188,6 +195,8 @@ enum class Place
 enum class LookBuff
 {
     InfinityArrow,
+    // A debuff that tints a monster's body (poison, freeze, Blow of Destruction; MN8).
+    TintingDebuff,
 };
 
 // When a layer draws (design L11): each part that is set must hold, otherwise the layer is skipped.

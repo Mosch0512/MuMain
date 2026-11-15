@@ -143,7 +143,8 @@ const Names<LayerKind>& KindNames()
 {
     static const Names<LayerKind> names{{LayerKind::Texture, &I18N::Editor::Texture},
                                         {LayerKind::Reflection, &I18N::Editor::Reflection},
-                                        {LayerKind::FlatColor, &I18N::Editor::FlatColor}};
+                                        {LayerKind::FlatColor, &I18N::Editor::FlatColor},
+                                        {LayerKind::GlowOnly, &I18N::Editor::GlowOnly}};
     return names;
 }
 
@@ -372,6 +373,18 @@ bool ShapeFields(Shape& shape, bool item)
     {
         changed |= ImGui::Checkbox(I18N::Editor::TimesTheItemValue, &shape.timesItem);
         Tip(I18N::Editor::TimesTheItemValueTooltip);
+    }
+    bool capped = shape.atMost.has_value();
+    if (ImGui::Checkbox(I18N::Editor::AtMost, &capped))
+    {
+        shape.atMost = capped ? std::optional<double>(std::max(shape.from, shape.to)) : std::nullopt;
+        changed = true;
+    }
+    Tip(I18N::Editor::AtMostTooltip);
+    if (shape.atMost)
+    {
+        ImGui::SameLine();
+        changed |= DragNumber("##AtMost", *shape.atMost, ValueSpeed, I18N::Editor::AtMostTooltip);
     }
     RenderCurve(shape);
     ImGui::Unindent();
@@ -790,19 +803,22 @@ enum class LightChoice
     Color,
     Tint,
     Brightness,
+    TimesOpacity,
 };
 
 bool LightField(std::optional<LayerLight>& light)
 {
     ImGui::PushID("Light");
-    LightChoice choice = !light              ? LightChoice::Before
-                         : light->brightness ? LightChoice::Brightness
-                         : light->tint       ? LightChoice::Tint
-                                             : LightChoice::Color;
+    LightChoice choice = !light                ? LightChoice::Before
+                         : light->brightness   ? LightChoice::Brightness
+                         : light->tint         ? LightChoice::Tint
+                         : light->timesOpacity ? LightChoice::TimesOpacity
+                                               : LightChoice::Color;
     static const Names<LightChoice> names{{LightChoice::Before, &I18N::Editor::TheLightBefore},
                                           {LightChoice::Color, &I18N::Editor::AColor},
                                           {LightChoice::Tint, &I18N::Editor::TintOfTheItemLight},
-                                          {LightChoice::Brightness, &I18N::Editor::TheItemLightAtABrightness}};
+                                          {LightChoice::Brightness, &I18N::Editor::TheItemLightAtABrightness},
+                                          {LightChoice::TimesOpacity, &I18N::Editor::AColorTimesTheOpacity}};
     bool changed = false;
     if (Choice(I18N::Editor::Light, choice, names, I18N::Editor::LayerLightTooltip))
     {
@@ -817,7 +833,9 @@ bool LightField(std::optional<LayerLight>& light)
         else
         {
             const LayerLight kept = light.value_or(LayerLight{});
-            light = LayerLight{.tint = choice == LightChoice::Tint, .color = kept.color};
+            light = LayerLight{.tint = choice == LightChoice::Tint,
+                               .color = kept.color,
+                               .timesOpacity = choice == LightChoice::TimesOpacity};
         }
         changed = true;
     }
@@ -1119,7 +1137,8 @@ const Names<Place>& PlaceNames()
 
 const Names<LookBuff>& BuffNames()
 {
-    static const Names<LookBuff> names{{LookBuff::InfinityArrow, &I18N::Editor::InfinityArrow}};
+    static const Names<LookBuff> names{{LookBuff::InfinityArrow, &I18N::Editor::InfinityArrow},
+                                       {LookBuff::TintingDebuff, &I18N::Editor::TintingDebuff}};
     return names;
 }
 

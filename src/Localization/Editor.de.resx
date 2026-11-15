@@ -1123,6 +1123,21 @@
   <data name="Model look {0}" xml:space="preserve">
     <value>(Modell: {0})</value>
   </data>
+  <data name="Glow only" xml:space="preserve">
+    <value>Nur Leuchten</value>
+  </data>
+  <data name="At most" xml:space="preserve">
+    <value>Höchstens</value>
+  </data>
+  <data name="At most tooltip" xml:space="preserve">
+    <value>Der Wert steigt nie über diesen: die Spitze einer Welle abgeschnitten.</value>
+  </data>
+  <data name="A color times the opacity" xml:space="preserve">
+    <value>Eine Farbe mal die Deckkraft</value>
+  </data>
+  <data name="Tinting debuff" xml:space="preserve">
+    <value>Färbender Debuff (Gift, Frost, Blow of Destruction)</value>
+  </data>
   <data name="Effect types" xml:space="preserve">
     <value>Effekttypen</value>
   </data>

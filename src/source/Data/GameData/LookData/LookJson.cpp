@@ -59,6 +59,8 @@ constexpr const char* Step = "step";
 constexpr const char* Count = "count";
 constexpr const char* SecondsEach = "secondsEach";
 constexpr const char* TimesItem = "timesItem";
+constexpr const char* AtMost = "atMost";
+constexpr const char* TimesOpacity = "timesOpacity";
 constexpr const char* NotFor = "notFor";
 constexpr const char* OnlyWhen = "onlyWhen";
 constexpr const char* Place = "place";
@@ -84,10 +86,11 @@ constexpr const char* Drawing = "drawing";
 constexpr const char* None = "none";
 constexpr const char* All = "all";
 
-constexpr std::array<std::pair<LayerKind, const char*>, 3> LayerKindNames{{
+constexpr std::array<std::pair<LayerKind, const char*>, 4> LayerKindNames{{
     {LayerKind::Texture, "texture"},
     {LayerKind::Reflection, "reflection"},
     {LayerKind::FlatColor, "flatColor"},
+    {LayerKind::GlowOnly, "glowOnly"},
 }};
 
 constexpr std::array<std::pair<Motion, const char*>, 9> MotionNames{{
@@ -143,8 +146,9 @@ constexpr std::array<std::pair<Place, const char*>, 4> PlaceNames{{
     {Place::Ground, "ground"},
 }};
 
-constexpr std::array<std::pair<LookBuff, const char*>, 1> BuffNames{{
+constexpr std::array<std::pair<LookBuff, const char*>, 2> BuffNames{{
     {LookBuff::InfinityArrow, "infinityArrow"},
+    {LookBuff::TintingDebuff, "tintingDebuff"},
 }};
 
 // The highest item level, for a layer's level condition.
@@ -816,7 +820,19 @@ bool LookReader::ReadShape(const OrderedJson& json, const std::string& field, Sh
     }
     const std::string kind = NameOf(ShapeNames, shape.kind);
     bool valid = true;
-    Items::Json::KeySet known{Keys::Shape, Keys::TimesItem};
+    Items::Json::KeySet known{Keys::Shape, Keys::TimesItem, Keys::AtMost};
+    if (const auto atMost = json.find(Keys::AtMost); atMost != json.end())
+    {
+        if (!atMost->is_number())
+        {
+            AddFatal(field + "." + Keys::AtMost, "must be a number");
+            valid = false;
+        }
+        else
+        {
+            shape.atMost = atMost->get<double>();
+        }
+    }
     if (const auto times = json.find(Keys::TimesItem); times != json.end())
     {
         if (!times->is_boolean())
@@ -926,15 +942,17 @@ void LookReader::ReadLight(const OrderedJson& json, const std::string& field, st
     if (entry->is_object())
     {
         const auto tint = entry->find(Keys::Tint);
-        if (tint == entry->end() || entry->size() != 1)
+        const auto timesOpacity = entry->find(Keys::TimesOpacity);
+        if (entry->size() != 1 || (tint == entry->end() && timesOpacity == entry->end()))
         {
-            AddFatal(lightField,
-                     "must be [red, green, blue], {\"tint\": [red, green, blue]} or {\"brightness\": a number}");
+            AddFatal(lightField, "must be [red, green, blue], {\"tint\": [red, green, blue]}, {\"timesOpacity\": "
+                                 "[red, green, blue]} or {\"brightness\": a number}");
             return;
         }
-        read.tint = true;
-        color = &*tint;
-        colorField += std::string(".") + Keys::Tint;
+        read.tint = tint != entry->end();
+        read.timesOpacity = !read.tint;
+        color = read.tint ? &*tint : &*timesOpacity;
+        colorField += std::string(".") + (read.tint ? Keys::Tint : Keys::TimesOpacity);
     }
     if (!color->is_array() || color->size() != 3)
     {
@@ -1050,6 +1068,10 @@ OrderedJson WriteShape(Shape shape)
     if (shape.timesItem)
     {
         json[Keys::TimesItem] = true;
+    }
+    if (shape.atMost)
+    {
+        json[Keys::AtMost] = WriteDouble(*shape.atMost);
     }
     return json;
 }
@@ -1177,6 +1199,10 @@ OrderedJson WriteLight(const LayerLight& light)
     for (const Number& channel : light.color)
     {
         color.push_back(WriteNumber(channel));
+    }
+    if (light.timesOpacity)
+    {
+        return OrderedJson{{Keys::TimesOpacity, std::move(color)}};
     }
     return light.tint ? OrderedJson{{Keys::Tint, std::move(color)}} : color;
 }
