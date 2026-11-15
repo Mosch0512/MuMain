@@ -689,10 +689,6 @@ bool M31HuntingGround::RenderHuntingGroundMonsterObjectMesh(const OBJECT* pObjec
     {
         pModel->BeginRender(1.f);
         vec3_t LightBackup;
-        if (ExtraMon)
-        {
-            Vector(1.f, 1.f, 1.f, pModel->BodyLight);
-        }
         VectorCopy(pModel->BodyLight, LightBackup); //. backup
         float Luminosity = sinf(WorldTime * 0.0012f) * 0.8f + 1.3f;
         if (Luminosity > 1.3f)
@@ -706,14 +702,8 @@ bool M31HuntingGround::RenderHuntingGroundMonsterObjectMesh(const OBJECT* pObjec
         pModel->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight,
                            (int)WorldTime % 10000 * 0.0002f, (int)WorldTime % 10000 * 0.0002f);
 
-        if (ExtraMon)
-        {
-            pModel->RenderMesh(1, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                               look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-        }
-        else
-            pModel->RenderMesh(1, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                               look.blendMeshU, look.blendMeshV);
+        pModel->RenderMesh(1, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
+                           look.blendMeshU, look.blendMeshV);
 
         pModel->StreamMesh = -1;
 
@@ -721,18 +711,8 @@ bool M31HuntingGround::RenderHuntingGroundMonsterObjectMesh(const OBJECT* pObjec
 
         pModel->RenderMesh(0, RENDER_TEXTURE, sinf(WorldTime * 0.0012f) * 0.2f + 0.8f, look.blendMesh,
                            look.blendMeshLight, look.blendMeshU, look.blendMeshV);
-        if (ExtraMon)
-        {
-            pModel->RenderMesh(0, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                               look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-        }
         pModel->StreamMesh = 2;
         pModel->RenderMesh(2, RENDER_TEXTURE, look.alpha, 2, 0.5f, look.blendMeshU, look.blendMeshV);
-        if (ExtraMon)
-        {
-            pModel->RenderMesh(2, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                               look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-        }
         pModel->StreamMesh = -1;
         pModel->EndRender();
         return true;
@@ -742,10 +722,6 @@ bool M31HuntingGround::RenderHuntingGroundMonsterObjectMesh(const OBJECT* pObjec
     {
         pModel->BeginRender(1.f);
         vec3_t LightBackup;
-        if (ExtraMon)
-        {
-            Vector(1.f, 1.f, 1.f, pModel->BodyLight);
-        }
         VectorCopy(pModel->BodyLight, LightBackup); //. backup
         pModel->BodyLight[0] *= 0.5f;
         pModel->BodyLight[1] *= 0.6f;
@@ -753,17 +729,9 @@ bool M31HuntingGround::RenderHuntingGroundMonsterObjectMesh(const OBJECT* pObjec
         pModel->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
                            look.blendMeshV);
 
-        if (ExtraMon)
-            pModel->RenderMesh(0, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                               look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-
         Vector(0.5f, 0.8f, 0.6f, pModel->BodyLight);
         pModel->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
                            look.blendMeshV);
-
-        if (ExtraMon)
-            pModel->RenderMesh(1, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                               look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
 
         VectorCopy(LightBackup, pModel->BodyLight); //. restore
         pModel->EndRender();

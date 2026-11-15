@@ -25,11 +25,13 @@ struct RenderStyleCheckInput
     // The number of meshes of an item's model (by item type); 0 when the model is not loaded, which skips its mesh
     // checks.
     std::function<int(int itemType)> meshCount;
+    // Whether a monster or monster model names the look of that name and kind (MN8); none: no monster does.
+    std::function<bool(const std::string& name, LookKind kind)> monsterUses;
 };
 
 // Appends the problems of `looks`, the looks of `source` as read without a fatal problem (so looks[i] is the file's
 // look i): a texture that is no .jpg or .tga file or is not found (error: the game skips the layer), a mesh number an
-// item's model doesn't have (warning, about that item), a look no item uses (warning).
+// item's model doesn't have (warning, about that item), a look no item or monster uses (warning).
 void CheckRenderStyles(std::span<const LookDefinition> looks, const std::string& source,
                        const RenderStyleCheckInput& input, std::vector<Items::ItemDataIssue>& issues);
 

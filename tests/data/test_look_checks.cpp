@@ -7,6 +7,9 @@
 #include "Data/GameData/ItemData/ItemType.h"
 #include "Data/GameData/LookData/LookChecks.h"
 #include "Data/GameData/LookData/LookJson.h"
+#include "Data/DataHandler/MonsterData/MonsterJsonStorage.h"
+#include "Data/GameData/MonsterData/MonsterDataValidation.h"
+#include "Data/GameData/MonsterData/MonsterModelsJson.h"
 
 #ifndef _WIN32
 #include "Core/Platform/PathResolve.h"
@@ -14,6 +17,8 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <fstream>
+#include <iterator>
 #include <set>
 #include <string>
 #include <vector>
@@ -195,7 +200,8 @@ TEST_CASE("The names of a file's looks in file order name what a problem is abou
     CHECK(ReadLookNames(R"({"looks": {}})").empty());
 }
 
-TEST_CASE("The shipped render styles name textures that exist, and items use each of them [looks][checks]")
+TEST_CASE("The shipped render styles name textures that exist, and items or monsters use each of them "
+          "[looks][checks]")
 {
     // The textures as the game finds them in the client folder and the shipped item models; the meshes are checked
     // in the editor, which has the models loaded.
@@ -205,6 +211,22 @@ TEST_CASE("The shipped render styles name textures that exist, and items use eac
     const Data::Items::ItemModelDataLoadResult models =
         Data::Items::LoadItemModelDataDirectory(data / "Items" / "Models");
     REQUIRE_FALSE(Data::Items::HasFatal(models.issues));
+    // The looks the shipped monsters and monster models name (MN8).
+    const Data::Monsters::MonsterDataLoadResult monsters =
+        Data::Monsters::LoadMonstersFile(data / "Monsters" / "Monsters.json");
+    REQUIRE_FALSE(Data::Items::HasFatal(monsters.issues));
+    std::vector<Data::Monsters::MonsterModelDefinition> monsterModels;
+    std::vector<ItemDataIssue> modelIssues;
+    std::ifstream modelsFile(data / "Monsters" / "Models.json", std::ios::binary);
+    const std::string modelsText((std::istreambuf_iterator<char>(modelsFile)), std::istreambuf_iterator<char>());
+    Data::Monsters::ReadMonsterModelsJson(modelsText, "Models.json", monsterModels, modelIssues);
+    REQUIRE_FALSE(Data::Items::HasFatal(modelIssues));
+    std::vector<const Data::Monsters::MonsterDefinition*> monsterEntries;
+    for (const Data::Monsters::MonsterDefinition& monster : monsters.monsters)
+        monsterEntries.push_back(&monster);
+    std::vector<const Data::Monsters::MonsterModelDefinition*> modelEntries;
+    for (const Data::Monsters::MonsterModelDefinition& model : monsterModels)
+        modelEntries.push_back(&model);
     std::vector<ItemDataIssue> issues;
     const RenderStyleCheckInput input{.models = models.models,
                                       .partModels = models.partModels,
@@ -218,7 +240,14 @@ TEST_CASE("The shipped render styles name textures that exist, and items use eac
 #endif
                                           return std::filesystem::exists(file);
                                       },
-                                      .meshCount = [](int) { return 0; }};
+                                      .meshCount = [](int) { return 0; },
+                                      .monsterUses =
+                                          [&](const std::string& name, LookKind kind)
+                                      {
+                                          return Data::Monsters::CollectMonsterLookNames(monsterEntries, modelEntries,
+                                                                                         kind == LookKind::Effect)
+                                              .contains(name);
+                                      }};
     CheckRenderStyles(shipped.looks, Source, input, issues);
     INFO(Describe(issues));
     CHECK(issues.empty());
@@ -263,4 +292,28 @@ TEST_CASE("The shipped effects are used by items [looks][checks]")
     CheckItemEffects(shipped.looks, Source, input, issues);
     INFO(Describe(issues));
     CHECK(issues.empty());
+}
+
+TEST_CASE("A look a monster or monster model names is used, one nobody names is a warning (MN8) [looks][checks]")
+{
+    const LookDefinition look{"monsterGlow", {Layer{}}, {}};
+    const LookDefinition looks[] = {look};
+    for (const bool named : {true, false})
+    {
+        CAPTURE(named);
+        std::vector<ItemDataIssue> issues;
+        const RenderStyleCheckInput input{.meshCount = [](int) { return 0; },
+                                          .monsterUses = [&](const std::string& name, LookKind kind)
+                                          { return named && name == "monsterGlow" && kind == LookKind::RenderStyle; }};
+        CheckRenderStyles(looks, Source, input, issues);
+        if (named)
+        {
+            CHECK(issues.empty());
+        }
+        else
+        {
+            REQUIRE(issues.size() == 1);
+            CHECK(issues[0].message == "no item or monster uses \"monsterGlow\"");
+        }
+    }
 }

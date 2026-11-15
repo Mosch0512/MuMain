@@ -17,6 +17,9 @@
 #include "Data/GameData/ItemData/ItemModelSlots.h"
 #include "Data/GameData/ItemData/ItemType.h"
 #include "Data/GameData/LookData/LookJson.h"
+#include "Data/GameData/MonsterData/MonsterDataValidation.h"
+#include "Data/GameData/MonsterData/MonsterDatabase.h"
+#include "Data/GameData/MonsterData/MonsterModelDatabase.h"
 #include "I18N/All.h"
 #include "Render/Models/ZzzBMD.h"
 #include "imgui.h"
@@ -167,6 +170,19 @@ private:
     // The names of the checked looks in their order, at the last check.
     std::vector<std::string> m_lookNames;
 };
+// Whether a monster or monster model names the look (MN8), as the monster tools have them.
+bool MonsterUses(const std::string& name, Data::Looks::LookKind kind)
+{
+    std::vector<const Data::Monsters::MonsterDefinition*> monsters;
+    for (int number = 0; number < Data::Monsters::MonsterNumberCount; ++number)
+    {
+        if (const Data::Monsters::MonsterDefinition* monster = g_MonsterDatabase.Find(number))
+            monsters.push_back(monster);
+    }
+    return Data::Monsters::CollectMonsterLookNames(monsters, g_MonsterModelDatabase.GetAll(),
+                                                   kind == Data::Looks::LookKind::Effect)
+        .contains(name);
+}
 } // namespace
 
 Data::Looks::RenderStyleCheckInput MakeEditorCheckInput()
@@ -174,7 +190,8 @@ Data::Looks::RenderStyleCheckInput MakeEditorCheckInput()
     return {.models = g_ItemModelDatabase.GetAllSlots(),
             .partModels = g_ItemModelDatabase.GetPartModels(),
             .textureExists = TextureFileExists,
-            .meshCount = MeshCount};
+            .meshCount = MeshCount,
+            .monsterUses = MonsterUses};
 }
 
 std::unique_ptr<DataChecks::DataCheckArea> CreateRenderStyleCheckArea()

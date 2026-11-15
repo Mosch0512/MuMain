@@ -9825,36 +9825,18 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
         }
     }
 
-    // A monster with a render style (MN8) is drawn by it alone: no variant of its model's code, and none of the passes
-    // below that draw over its body.
+    // A monster with a render style (MN8) is drawn by it alone: none of the passes below that draw over its body, and
+    // no afterimage of the code's.
     const bool styled = Render::Monsters::Looks::RenderStyleOf(*o) != nullptr;
     if (byRender == CHARACTER_RENDER_OBJ)
     {
-        if (styled)
+        if (!styled && c->MonsterIndex == MONSTER_DREADFEAR && o->CurrentAction == MONSTER01_ATTACK2)
         {
-            RenderObject(o, Translate, Select, 0);
-        }
-        else if (MONSTER_METAL_BALROG == c->MonsterIndex || MONSTER_ALPHA_CRUST == c->MonsterIndex ||
-            MONSTER_GREAT_DRAKAN == c->MonsterIndex || MONSTER_WHITE_WIZARD == c->MonsterIndex ||
-            MONSTER_ORC_SOLDIER_OF_DOOM == c->MonsterIndex || MONSTER_ORC_ARCHER_OF_DOOM == c->MonsterIndex ||
-            MONSTER_MUTANT_HERO == c->MonsterIndex || MONSTER_OMEGA_WING == c->MonsterIndex ||
-            MONSTER_AXE_HERO == c->MonsterIndex || MONSTER_GIGAS_GOLEM == c->MonsterIndex ||
-            MONSTER_SCOUTHERO == c->MonsterIndex || MONSTER_WEREWOLFHERO == c->MonsterIndex ||
-            MONSTER_VALAM == c->MonsterIndex || MONSTER_SOLAM == c->MonsterIndex || MONSTER_SCOUT == c->MonsterIndex ||
-            319 == c->MonsterIndex)
-        {
-            RenderObject(o, Translate, Select, c->MonsterIndex);
+            RenderObject_AfterImage(o, Translate, Select, 0);
         }
         else
         {
-            if ((c->MonsterIndex == MONSTER_DREADFEAR && o->CurrentAction == MONSTER01_ATTACK2))
-            {
-                RenderObject_AfterImage(o, Translate, Select, 0);
-            }
-            else
-            {
-                RenderObject(o, Translate, Select, 0);
-            }
+            RenderObject(o, Translate, Select, 0);
         }
     }
 
@@ -9893,12 +9875,10 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
         }
     }
 
-    if (!styled &&
-        (c->MonsterIndex == MONSTER_BALROG || c->MonsterIndex == MONSTER_GOLDEN_BUDGE_DRAGON ||
-         c->MonsterIndex == MONSTER_SILVER_VALKYRIE || c->MonsterIndex == MONSTER_ZAIKAN ||
-         c->MonsterIndex == MONSTER_METAL_BALROG ||
-         (78 <= c->MonsterIndex && c->MonsterIndex <= MONSTER_GOLDEN_WHEEL) ||
-         (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT && c->MonsterIndex <= MONSTER_GOLDEN_RABBIT)))
+    if (!styled && (c->MonsterIndex == MONSTER_BALROG || c->MonsterIndex == MONSTER_GOLDEN_BUDGE_DRAGON ||
+                    c->MonsterIndex == MONSTER_SILVER_VALKYRIE || c->MonsterIndex == MONSTER_ZAIKAN ||
+                    (78 <= c->MonsterIndex && c->MonsterIndex <= MONSTER_GOLDEN_WHEEL) ||
+                    (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT && c->MonsterIndex <= MONSTER_GOLDEN_RABBIT)))
     {
         vec3_t vBackupBodyLight;
 
@@ -9923,15 +9903,7 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
             RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_METAL | RENDER_BRIGHT, Bright);
         }
 
-        if (c->MonsterIndex == MONSTER_METAL_BALROG)
-        {
-            RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha,
-                                      RENDER_CHROME | RENDER_BRIGHT | RENDER_EXTRA, Bright);
-        }
-        else
-        {
-            RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_CHROME | RENDER_BRIGHT, Bright);
-        }
+        RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_CHROME | RENDER_BRIGHT, Bright);
 
         if (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT && c->MonsterIndex <= MONSTER_GOLDEN_RABBIT)
         {
@@ -9952,21 +9924,13 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
             pCloth[0].Render();
         }
     }
-    else if (!styled && (c->MonsterIndex == MONSTER_DRAKAN || c->MonsterIndex == MONSTER_GREAT_DRAKAN))
+    else if (!styled && c->MonsterIndex == MONSTER_DRAKAN)
     {
         // Tints the body light below.
-        if (c->MonsterIndex == MONSTER_DRAKAN)
-            Vector(0.1f, 0.1f, 1.f, Light);
-
-        int RenderType = (c->MonsterIndex == MONSTER_DRAKAN) ? 0 : RENDER_EXTRA;
-        RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_CHROME | RENDER_BRIGHT | RenderType,
-                                  1.f);
-
-        if (c->MonsterIndex == MONSTER_DRAKAN)
-        {
-            RenderPartObjectBodyColor2(&Models[o->Type], o, o->Type, o->Alpha,
-                                       RENDER_CHROME2 | RENDER_LIGHTMAP | RENDER_BRIGHT, 1.f);
-        }
+        Vector(0.1f, 0.1f, 1.f, Light);
+        RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_CHROME | RENDER_BRIGHT, 1.f);
+        RenderPartObjectBodyColor2(&Models[o->Type], o, o->Type, o->Alpha,
+                                   RENDER_CHROME2 | RENDER_LIGHTMAP | RENDER_BRIGHT, 1.f);
     }
     else if (c->MonsterIndex == MONSTER_DARK_PHOENIX)
     {
@@ -9999,10 +9963,6 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
 
     if (RendersWingCarriedModels(c))
         RenderWingCarriedModels(c, Translate);
-    else if (!styled && c->MonsterIndex == MONSTER_WHITE_WIZARD)
-    {
-        RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_BRIGHT | RENDER_EXTRA, 1.0f);
-    }
 
     if (o->Type == MODEL_NPC_CHERRYBLOSSOM)
     {

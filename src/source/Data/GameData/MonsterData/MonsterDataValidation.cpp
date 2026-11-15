@@ -259,6 +259,36 @@ void ValidateMonsterLooks(std::span<const MonsterDefinition* const> monsters, co
     }
 }
 
+std::set<std::string> CollectMonsterLookNames(std::span<const MonsterDefinition* const> monsters,
+                                              std::span<const MonsterModelDefinition* const> models, bool effects)
+{
+    std::set<std::string> names;
+    const auto add = [&](const std::optional<std::string>& name)
+    {
+        if (name && *name != NoneLook)
+            names.insert(*name);
+    };
+    const auto addStates = [&](const MonsterSetup& setup)
+    {
+        add(effects ? setup.effect : setup.renderStyle);
+        for (const MonsterStateVariant& state : setup.stateVariants)
+            add(effects ? state.setup.effect : state.setup.renderStyle);
+    };
+    for (const MonsterDefinition* monster : monsters)
+    {
+        addStates(monster->setup);
+        for (const MonsterMapVariant& variant : monster->mapVariants)
+            addStates(variant.setup);
+    }
+    for (const MonsterModelDefinition* model : models)
+    {
+        const std::string& name = effects ? model->effect : model->renderStyle;
+        if (!name.empty())
+            names.insert(name);
+    }
+    return names;
+}
+
 void ValidateMonsterModelLooks(std::span<const MonsterModelDefinition* const> models,
                                const LookExists& renderStyleExists, const LookExists& effectExists,
                                const std::string& source, std::vector<ItemDataIssue>& issues)

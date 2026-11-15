@@ -654,36 +654,8 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b, int ExtraMon)
                                 else
                                     if (o->Type == MODEL_MUTANT)
                                     {
-                                        if (ExtraMon)
-                                        {
-                                            Vector(1.f, 1.f, 1.f, b->BodyLight);
-                                            b->BeginRender(look.alpha);
-                                            b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          look.blendMeshLight, look.blendMeshU,
-                                                          look.blendMeshV);
-                                            b->RenderMesh(0, RENDER_CHROME | RENDER_BRIGHT, look.alpha,
-                                                          look.blendMesh, look.blendMeshLight,
-                                                          look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-                                            b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          look.blendMeshLight, look.blendMeshU,
-                                                          look.blendMeshV);
-                                            b->RenderMesh(1, RENDER_CHROME | RENDER_BRIGHT, look.alpha,
-                                                          look.blendMesh, look.blendMeshLight,
-                                                          look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-                                            b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          look.blendMeshLight, look.blendMeshU,
-                                                          look.blendMeshV);
-                                            b->RenderMesh(2, RENDER_CHROME | RENDER_BRIGHT, look.alpha,
-                                                          look.blendMesh, look.blendMeshLight,
-                                                          look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-                                            b->EndRender();
-                                        }
-                                        else
-                                        {
-                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          look.blendMeshLight, look.blendMeshU,
-                                                          look.blendMeshV, look.hiddenMesh);
-                                        }
+                                        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight,
+                                                      look.blendMeshU, look.blendMeshV, look.hiddenMesh);
                                     }
                                     else
                                         if (o->Type == MODEL_TANTALLOS && o->SubType == 1)
@@ -724,134 +696,47 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b, int ExtraMon)
                                         }
                                         else if (o->Type == MODEL_DRAKAN)
                                         {
-                                            if (ExtraMon)
-                                            {
-                                                Vector(.1f, 0.1f, 0.1f, b->BodyLight);
-                                                b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU,
-                                                              look.blendMeshV, 1);
-                                                Vector(1.0f, 0.1f, 0.1f, b->BodyLight);
-                                                b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU,
-                                                              look.blendMeshV);
-                                            }
-                                            else
-                                            {
-                                                b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU,
-                                                              look.blendMeshV, look.hiddenMesh);
-                                            }
+                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
+                                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV,
+                                                          look.hiddenMesh);
                                         }
                                         else if (o->Type == MODEL_ORC_ARCHER)
                                         {
-                                            if (ExtraMon)
-                                            {
-                                                Vector(1.0f, 1.0f, 1.0f, b->BodyLight);
-                                                b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU,
-                                                              look.blendMeshV, BITMAP_DEST_ORC_WAR0);
-                                                //					b->RenderMesh(1,RENDER_TEXTURE,look.alpha,look.blendMesh,look.blendMeshLight,look.blendMeshU,look.blendMeshV,BITMAP_DEST_ORC_WAR1);
-                                                b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU,
-                                                              look.blendMeshV, BITMAP_DEST_ORC_WAR2);
-                                            }
-                                            else
-                                            {
-                                                b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU,
-                                                              look.blendMeshV, look.hiddenMesh);
-                                            }
+                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
+                                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV,
+                                                          look.hiddenMesh);
                                         }
                                         else if (o->Type == MODEL_ORC)
                                         {
-                                            if (ExtraMon)
-                                            {
-                                                Vector(1.0f, 1.0f, 1.0f, b->BodyLight);
-                                                b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU,
-                                                              look.blendMeshV, BITMAP_DEST_ORC_WAR1);
-                                                b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU,
-                                                              look.blendMeshV, BITMAP_DEST_ORC_WAR0);
-                                                // b->RenderMesh(2,RENDER_TEXTURE,look.alpha,look.blendMesh,look.blendMeshLight,look.blendMeshU,look.blendMeshV,BITMAP_DEST_ORC_WAR2);
-                                            }
-                                            else
-                                            {
-                                                b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU,
-                                                              look.blendMeshV, look.hiddenMesh);
-                                            }
+                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
+                                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV,
+                                                          look.hiddenMesh);
                                         }
                                         else if (o->Type == MODEL_CURSED_KING)
                                         {
-                                            if (ExtraMon)
-                                            {
-                                                Vector(1.0f, 1.0f, 1.0f, b->BodyLight);
-                                                b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU,
-                                                              look.blendMeshV, 1, BITMAP_WHITE_WIZARD);
-                                            }
-                                            else
-                                            {
-                                                b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU,
-                                                              look.blendMeshV, look.hiddenMesh);
-                                            }
+                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
+                                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV,
+                                                          look.hiddenMesh);
                                         }
                                         else if (o->Type == MODEL_CRUST)
                                         {
-                                            if (ExtraMon == 0)
+                                            float Luminosity = sinf(WorldTime * 0.002f) * 0.3f + 0.5f;
+                                            Vector(Luminosity + 0.5f, 0.3f - Luminosity * 0.5f,
+                                                   -Luminosity * 0.5f + 0.5f, b->BodyLight);
+                                            // Vector(1.f,1.f,1.f,b->BodyLight);
+                                            // if ( c->Dead == 0)
                                             {
-                                                float Luminosity = sinf(WorldTime * 0.002f) * 0.3f + 0.5f;
-                                                Vector(Luminosity + 0.5f, 0.3f - Luminosity * 0.5f, -Luminosity * 0.5f + 0.5f, b->BodyLight);
-                                                //Vector(1.f,1.f,1.f,b->BodyLight);
-                                                //if ( c->Dead == 0)
-                                                {
-                                                    b->StreamMesh = 0;
-                                                    Vector(.4f, .3f, .5f, b->BodyLight);
-                                                    b->RenderBody(RENDER_TEXTURE, look.alpha,
-                                                                  look.blendMesh, look.blendMeshLight,
-                                                                  look.blendMeshU, look.blendMeshV,
-                                                                  look.hiddenMesh, BITMAP_JANUSEXT);
-                                                    Vector(.5f, .5f, .5f, b->BodyLight);
-                                                    b->StreamMesh = -1;
-                                                }
+                                                b->StreamMesh = 0;
+                                                Vector(.4f, .3f, .5f, b->BodyLight);
                                                 b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU,
-                                                              look.blendMeshV, look.hiddenMesh);
+                                                              look.blendMeshLight, look.blendMeshU, look.blendMeshV,
+                                                              look.hiddenMesh, BITMAP_JANUSEXT);
+                                                Vector(.5f, .5f, .5f, b->BodyLight);
+                                                b->StreamMesh = -1;
                                             }
-                                            else
-                                                if (ExtraMon == 301)
-                                                {
-                                                    //					b->BodyScale     = o->Scale + (o->Scale/1.0f);
-                                                    //					Vector(0.7f,0.5f,0.8f,b->BodyLight);
-                                                    Vector(1.f, 1.f, 1.f, b->BodyLight);
-                                                    b->BeginRender(look.alpha);
-                                                    b->RenderMesh(0, RENDER_TEXTURE, look.alpha,
-                                                                  look.blendMesh, look.blendMeshLight,
-                                                                  look.blendMeshU, look.blendMeshV);
-                                                    b->RenderMesh(0, RENDER_CHROME | RENDER_BRIGHT,
-                                                                  look.alpha, look.blendMesh,
-                                                                  look.blendMeshLight, look.blendMeshU,
-                                                                  look.blendMeshV, BITMAP_CHROME);
-                                                    b->RenderMesh(1, RENDER_TEXTURE, look.alpha,
-                                                                  look.blendMesh, look.blendMeshLight,
-                                                                  look.blendMeshU, look.blendMeshV);
-                                                    b->RenderMesh(1, RENDER_CHROME | RENDER_BRIGHT,
-                                                                  look.alpha, look.blendMesh,
-                                                                  look.blendMeshLight, look.blendMeshU,
-                                                                  look.blendMeshV, BITMAP_CHROME);
-                                                    b->EndRender();
-                                                }
-                                                else
-                                                {
-                                                    Vector(0.1f, 1.0f, .8f, b->BodyLight);
-                                                    b->RenderBody(RENDER_TEXTURE, look.alpha,
-                                                                  look.blendMesh, look.blendMeshLight,
-                                                                  look.blendMeshU, look.blendMeshV,
-                                                                  look.hiddenMesh);
-                                                    //Vector( 0.1f, sinf(WorldTime*0.002f)*0.5f+0.5f, sinf(WorldTime*0.00173f)*0.5f+0.5f,b->BodyLight);
-                                                }
+                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
+                                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV,
+                                                          look.hiddenMesh);
                                         }
                                         else if (o->Type == MODEL_PHANTOM_KNIGHT)
                                         {
@@ -1556,10 +1441,6 @@ void Draw_RenderObject(const OBJECT* o, bool Translate, int Select, int ExtraMon
             {
                 Vector(0.0f, 0.3f, 1.0f, b->BodyLight);
             }
-        }
-        if (ExtraMon && o->Type == MODEL_BALROG)
-        {
-            Vector(0.0f, 0.0f, 1.0f, b->BodyLight);
         }
 
         // A monster with a render style (MN8) is drawn with it, in place of the maps' and the models' code, in the
@@ -7065,16 +6946,7 @@ void RenderPartObjectBodyColor(BMD* b, const OBJECT* o, DrawLook& look, int Type
     }
     else if (Type == MODEL_DRAKAN)
     {
-        if (RenderType & RENDER_EXTRA)
-        {
-            RenderType -= RENDER_EXTRA;
-            Vector(1.f, 0.1f, 0.1f, b->BodyLight);
-        }
-        else
-        {
-            Vector(0.2f, 0.2f, 0.8f, b->BodyLight);
-            //Vector(1.0f,0.5f,0.0f,b->BodyLight);
-        }
+        Vector(0.2f, 0.2f, 0.8f, b->BodyLight);
     }
     else if (iMonsterIndex >= 493 && iMonsterIndex <= 502)
     {

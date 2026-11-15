@@ -446,6 +446,12 @@ number, entry, model. `"none"` draws a monster without the look its model
 names. The names are found when the monster appears, and again when the looks
 change.
 
+The monsters that were drawn as variants of a shared model name their own
+render style: Metal Balrog (`metalBalrog`), Alpha Crust, Great Drakan, the
+White Wizard, the Orc Soldier and Archer of Doom, Hero Mutant, Omega Wing,
+Axl Hero, Gigas Golem, Scout (Hero) and Werewolf (Hero). A monster drawn with a
+render style is drawn by it alone: no pass of the code draws over its body.
+
 A look name that no look file has is an Error in Data Checks (areas Monsters
 and Monster models), and the monster is drawn without it. Monster Setup and
 Monster Model pick the looks from their lists, with Open in Style Editor; an

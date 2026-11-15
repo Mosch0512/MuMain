@@ -1428,43 +1428,15 @@ bool M34CryWolf1st::RenderCryWolf1stMonsterObjectMesh(const OBJECT* o, DrawLook&
     break;
     case MODEL_SCOUT:
     {
-        if (ExtraMon)
-        {
-            Vector(0.5f, 0.5f, 0.6f, b->BodyLight);
-            b->BeginRender(look.alpha);
-            for (int i = 0; i < Models[o->Type].NumMeshs; i++)
-            {
-                b->RenderMesh(i, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                              look.blendMeshV);
-                b->RenderMesh(i, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                              look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-            }
-            b->EndRender();
-        }
-        else
-            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                          look.blendMeshV, 5);
+        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
+                      5);
         return true;
     }
     break;
     case MODEL_WEREWOLF_HERO:
     {
-        if (ExtraMon)
-        {
-            Vector(0.5f, 0.5f, 0.8f, b->BodyLight);
-            b->BeginRender(look.alpha);
-            for (int i = 0; i < Models[o->Type].NumMeshs; i++)
-            {
-                b->RenderMesh(i, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                              look.blendMeshV);
-                b->RenderMesh(i, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                              look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-            }
-            b->EndRender();
-        }
-        else
-            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                          look.blendMeshV, 5);
+        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
+                      5);
         return true;
     }
     break;

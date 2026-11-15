@@ -1301,6 +1301,7 @@
       "model": "MONSTER_MODEL_BALROG",
       "soundSet": "Balrog",
       "scale": 1.6,
+      "renderStyle": "metalBalrog",
       "equipment": {
         "weapons": [
           {
@@ -1407,6 +1408,7 @@
       "model": "MONSTER_MODEL_CRUST",
       "soundSet": "Mega Crust",
       "scale": 1.3,
+      "renderStyle": "alphaCrust",
       "glowMesh": 1,
       "equipment": {
         "weapons": [
@@ -1432,6 +1434,7 @@
       "model": "MONSTER_MODEL_DRAKAN",
       "soundSet": "Drakan",
       "scale": 1,
+      "renderStyle": "greatDrakan",
       "noTurnOnHit": true,
       "numbers": [
         {"number": 75, "maps": [10]}
@@ -1849,6 +1852,7 @@
       "model": "MONSTER_MODEL_CURSED_KING",
       "soundSet": "Cursed king",
       "scale": 1.7,
+      "renderStyle": "whiteWizard",
       "numbers": [
         {"number": 135}
       ]
@@ -1859,6 +1863,7 @@
       "model": "MONSTER_MODEL_ORC",
       "soundSet": "Elite Ogre",
       "scale": 1.3,
+      "renderStyle": "orcSoldierOfDoom",
       "hiddenMesh": 2,
       "numbers": [
         {"number": 136}
@@ -1870,6 +1875,7 @@
       "model": "MONSTER_MODEL_ORC_ARCHER",
       "soundSet": "Ogre archer",
       "scale": 1.2,
+      "renderStyle": "orcArcherOfDoom",
       "hiddenMesh": 1,
       "equipment": {
         "weapons": [
@@ -3643,6 +3649,7 @@
       "model": "MONSTER_MODEL_MUTANT",
       "soundSet": "Mutant",
       "scale": 1.5,
+      "renderStyle": "mutantHero",
       "spawnEffects": [
         {
           "joint": "BITMAP_JOINT_ENERGY",
@@ -3665,6 +3672,7 @@
       "model": "MONSTER_MODEL_CRUST",
       "soundSet": "Mega Crust",
       "scale": 1.3,
+      "renderStyle": "omegaWing",
       "glowMesh": 1,
       "equipment": {
         "weapons": [
@@ -3689,6 +3697,7 @@
       "kind": "monster",
       "model": "MONSTER_MODEL_AXE_HERO",
       "scale": 0.7,
+      "renderStyle": "axeHero",
       "numbers": [
         {"number": 302}
       ]
@@ -3698,6 +3707,7 @@
       "kind": "monster",
       "model": "MONSTER_MODEL_POISON_GOLEM",
       "scale": 1.4,
+      "renderStyle": "gigasGolem",
       "numbers": [
         {"number": 303}
       ]
@@ -3823,6 +3833,7 @@
       "kind": "monster",
       "model": "MONSTER_MODEL_SCOUT",
       "scale": 1.6,
+      "renderStyle": "scoutHero",
       "numbers": [
         {"number": 314, "maps": [34]}
       ]
@@ -3840,6 +3851,7 @@
       ],
       "scale": 1.65,
       "subType": 1,
+      "renderStyle": "werewolfHero",
       "numbers": [
         {"number": 315, "maps": [34]}
       ]

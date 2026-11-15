@@ -221,10 +221,12 @@ void CheckUsers(const LookDefinition& look, std::size_t index, const std::string
     }
     used = used || (!effect && std::ranges::any_of(input.partModels, [&](const Items::PartModel& part)
                                                    { return part.renderStyle == look.name; }));
+    used =
+        used || (input.monsterUses && input.monsterUses(look.name, effect ? LookKind::Effect : LookKind::RenderStyle));
     if (!used)
     {
         issues.push_back({ItemDataIssueSeverity::Warning, source, ItemDataIssue::NoItem, ItemDataIssue::NoItem,
-                          LookField(index) + ".name", "no item uses \"" + look.name + "\""});
+                          LookField(index) + ".name", "no item or monster uses \"" + look.name + "\""});
     }
 }
 } // namespace
