@@ -2,6 +2,7 @@
 
 #include "Data/GameData/LookData/LookDefinition.h"
 
+#include <functional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -17,6 +18,8 @@
 //
 // The world is pinned: WorldTime per situation, the key of Random::DrawRand, the model's scrolling mesh, and one
 // OBJECT for every drawing, set up by the game's ItemObjectAttribute.
+class BMD;
+
 namespace LookRecorder
 {
 // How an item is drawn.
@@ -105,7 +108,11 @@ std::string DescribeItem(int itemType);
 // Draws the item as the game draws it, in the situation, and records the drawing.
 Record RecordItem(int itemType, const Situation& situation);
 
-// Draws the item with the render style (or item effect) of its name taken from the code: the data look of that name
+// Records what `draw` draws with the game's drawing (each mesh draw, and the GPU calls), and what it left on `model`;
+// the monster looks' recorder draws a monster with it (tests/monsters/MonsterLookRecorder.h).
+Record RecordDrawing(const BMD& model, const std::function<void()>& draw);
+
+// Draws the item with the render style (or effect) of its name taken from the code: the data look of that name
 // and kind is left out of g_LookStore while it draws.
 Record RecordItemWithCode(int itemType, const Situation& situation, std::string_view renderStyle,
                           Data::Looks::LookKind kind = Data::Looks::LookKind::RenderStyle);

@@ -37,6 +37,7 @@
 #include <cstring>
 #include <iterator>
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <sstream>
@@ -580,24 +581,35 @@ Record RecordItem(int itemType, const Situation& situation)
     model.StreamMesh = -1;
     model.Animation(BoneTransform, 0.f, 0.f, 0, object.Angle, object.HeadAngle, false, false);
 
-    RecordingDrawer drawer;
-    Render::Drawing::DrawCallLog log;
-    Render::ModelDrawing::SetModelDrawer(&drawer);
-    mu::SetRendererOverride(&log);
-    Render::Drawing::ResetLegacyState();
-    log.calls.clear();
     const vec3_t light = {situation.light, situation.light, situation.light};
     std::optional<Render::Items::Looks::InventoryDrawing> inventory;
     if (situation.inInventory)
     {
         inventory.emplace();
     }
-    RenderPartObject(&object, slot, nullptr, light, situation.alpha, situation.level, situation.excellent ? 1 : 0, 0,
-                     true, situation.hideSkin, false, 0, situation.renderType);
+    Record record = RecordDrawing(model,
+                                  [&]
+                                  {
+                                      RenderPartObject(&object, slot, nullptr, light, situation.alpha, situation.level,
+                                                       situation.excellent ? 1 : 0, 0, true, situation.hideSkin, false,
+                                                       0, situation.renderType);
+                                  });
+    WorldTime = previousWorldTime;
+    return record;
+}
+
+Record RecordDrawing(const BMD& model, const std::function<void()>& draw)
+{
+    RecordingDrawer drawer;
+    Render::Drawing::DrawCallLog log;
+    Render::ModelDrawing::SetModelDrawer(&drawer);
+    mu::SetRendererOverride(&log);
+    Render::Drawing::ResetLegacyState();
+    log.calls.clear();
+    draw();
     log.NoteFinalState();
     mu::SetRendererOverride(nullptr);
     Render::ModelDrawing::SetModelDrawer(nullptr);
-    WorldTime = previousWorldTime;
 
     Record record;
     record.meshDraws = std::move(drawer.draws);

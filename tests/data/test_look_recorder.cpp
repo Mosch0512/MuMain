@@ -403,6 +403,11 @@ TEST_CASE("Render styles moved into data draw as their old code did (the baselin
     for (const ShippedLook& look : looks.looks)
     {
         CAPTURE(look.Key());
+        // A look no item names is a monster's: the monster looks' baseline has it (tests/monsters).
+        if (LookRecorder::ItemsUsing(look.name, look.kind).empty())
+        {
+            continue;
+        }
         CHECK(withLines.contains(look.Key()));
         for (const auto& [key, digest] : RecordLook(look))
         {
