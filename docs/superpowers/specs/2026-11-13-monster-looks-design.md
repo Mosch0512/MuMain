@@ -219,6 +219,177 @@ a question below decides otherwise.
 | ML-P15 | Uninitialised values: Alquamos' attack angle, Aticles Head's sprite offset. | `ZzzCharacter.cpp:2147`, `GMEmpireGuardian2.cpp` |
 | ML-P16 | The monsters design's P10 (`ZzzCharacter.cpp:10054`) is no longer at that line; it may be ML-P1. To check. | – |
 
+## Target design
+
+What the decisions ML1 to ML11 add up to. Field names are proposals the
+pull requests may refine; the decisions are not.
+
+### 1. The look files
+
+Two kinds, as for the items (ML2), in `Data/Effects/`, built as today
+(`formatVersion`, `kind`, `looks` sorted by name, folders as the Style Editor
+keeps them, L31):
+
+- `RenderStyles.json` (kind `renderStyle`): unchanged for items; gains the
+  monster blocks of section 3.
+- `Effects.json` (kind `effect`), today `ItemEffects.json` (kind
+  `itemEffect`): the file, the kind, the Data Checks area and the Style
+  Editor's root are renamed **Effects**, and the items' field `itemEffect`
+  becomes `effect` in the same commit, the item files rewritten by their
+  writer (the client ships its data, so no old name is read). An effect keeps
+  `itemValuesBefore` (renamed `valuesBefore`: they are the monster's values
+  too: glow mesh, glow strength, scroll, hidden mesh) and `objectLight`, and
+  gains `parts` (section 3).
+
+### 2. How a monster names its looks
+
+`renderStyle` and `effect` on (ML1, ML3, ML7):
+
+| Where | Means |
+|---|---|
+| a model entry in `Models.json` | the looks of every monster of that model |
+| a monster entry in `Monsters.json` | its own instead of the model's |
+| one of its `numbers` | that number's own (D61) |
+| a `mapVariants` entry | on those maps only, where a map changes the look on purpose (ML7) |
+| a `stateVariants` entry | while that named state holds (`castleSiegeRunning` exists; the Maya battle, Selupan's pattern and the Life Stone's build step become states) |
+
+They are resolved in the order the setup already uses for its other fields
+(MN4): state variant, map variant, number, entry, model. `"none"` draws
+plainly where the model has a look. Names are resolved when loading and at
+spawn (D26): the drawing and the update never look a name up, they hold the
+resolved looks on the character, as items hold theirs on `DrawLook`. The
+`ExtraMon` number that `RenderCharacter` passes into the drawing for 17
+monsters goes: those monsters name their own render style.
+
+### 3. What a look holds
+
+**Render style (draws).** The item layers as they are (L8 to L11), plus:
+
+| Block | For | Rows |
+|---|---|---|
+| `onlyWhen` gains `animation`, `notAnimation`, `frames` (from, to), `buff`, `notBuff` (the monster's buffs: poison, freeze, the Hellas defenses, …) and `opacityAbove` (ML3) | hidden while dying, glowing while attacking, blue while frozen | about 35 |
+| blends `dark` (subtract), `wave` (vertex wobble), `doppelganger`, and a layer field `depthTest: false` | Kundun's ghost, Queen Rainer, the Doppelgangers, the Zombie Fighters | 9 |
+| `alsoDraw`: another model (by model slot, at a bone, scale, in a frame range), copies of the model (offsets or bone scales), a shell (the model larger, chrome or flat colour), an afterimage (earlier frames at an opacity) | the Red Dragon's head and princess, Phoenix of Darkness, Spider Eggs, the outlines of Hellas, Dreadfear | about 12 |
+| `decals`: a texture on the ground or at a bone, size, colour, turning (L9 shapes) | the Archangel's ring, the Wolf Altars, the Maya battle rings, Santa's auroras | 10 |
+| `shadow`: `false`, or the meshes it leaves out | the shadow list (ML-P4), the Archangel's wings | about 15 |
+| `textureFrames`: a texture slot stepping by time | the Battle Castle shield | 1 |
+
+**Effect (spawns, in the update).** `valuesBefore`, `objectLight` and
+`parts`. A part is one thing, a `when`, and optionally an `onlyWhen`:
+
+- **when** (ML2, ML4): `"always"` (with its own timing: every frame, once per
+  reference frame, a chance of one in N, every N frames, a frame range of an
+  animation, once per loop, once per action), an attack
+  (`{"attack": "attack1" | "any", "skill": "boss", "tick": 11}` or
+  `"fromTick"`, `"everyTick"`, or `"frame": 6.4` instead of the tick), or
+  `"death"` (with a frame range).
+- **things** (ML5, with FX1 names): `sprite`, `particle`, `effect`,
+  `joint` (between two bones, from a point near a bone, from a bone to the
+  target), `trail` (between two bones, sampled between frames), `dust` (at a
+  random point within a radius), `terrainLight`, `decal`, each with bones
+  (numbers or names, lists, ranges, "all but", a random bone, the second
+  model's bones), offset, jitter, size, colour (fixed, random, from a list),
+  turning and pulsing (L9).
+- **where** for attack and death parts: the monster, a bone, a weapon bone,
+  the target, a line from a bone to the target, a ring of N copies, a random
+  point on the ground within a radius.
+- **presets** (ML6): `inferno` (the ring of eight bombs of `CreateInferno`)
+  and others the move finds used by several monsters; a preset is a named
+  list of parts the editor can open.
+- **values from the attack** (ML6): a size or light that follows the tick
+  (the Hydra laser).
+- **cloth** (ML8): bone (or the second model's), offset, shape (grid N × M
+  and size, cylinder, from a mesh), texture, feel, see-through edges,
+  collision spheres, lights from the cloth, and its `onlyWhen`.
+- **acting blocks** (ML6): `setAnimation`, `setFlag` and an `onlyWhen` on a
+  flag, `setBuff`, `setHeight`, `selectable`, `hideMesh`, `screenShake`,
+  `breakIntoMeshes`, `parts on death` that take over the body (the
+  `deathEffect` consumers).
+
+The two hooks left (ML6) are named in the monster entry's `hooks` as today
+(D49): `kanturuGatewayEnter` and the Maya battle's.
+
+### 4. Drawing and update
+
+- `RenderCharacter` and `Draw_RenderObject` draw a monster with its resolved
+  render style through `DrawRenderStyle` (`LookDrawing.cpp`), as items are
+  drawn; the monster cases of `Draw_RenderObject`, the map
+  `RenderObjectMesh` / `RenderMonsterObjectMesh` hooks and the
+  `Render*MonsterVisual` overlays lose each case as it moves.
+- `UpdateDrawnCharacterEffects` runs the resolved effect's "always" and
+  death parts (ADR 0003: spawns in the update); the attack parts run where
+  `AttackEffect` runs today, once per tick (`CheckAttackTime`) or at their
+  frame. The map `Update*MonsterEffects`, `MoveMonsterVisual`,
+  `MoveBlurEffect` and `AttackEffect*` hooks lose each case as it moves, and
+  their map checks go (ML7).
+- Cloth parts replace `UpdateCharacterCloth` and `CloakOf` for monsters.
+
+### 5. Sounds
+
+The visual code's sounds become events of the monster's sound set (ML9), in
+the format MNA and MNK use (`during`, `once`, cues, `chance`, `pick`), moved
+with the visuals of the same monster.
+
+### 6. Checks
+
+The three levels of L23, in the Data Checks areas Render styles and Effects
+and in Monsters:
+
+- **Fatal:** a part, `when`, blend, block or condition that does not exist;
+  a value of the wrong type; a tick outside 1 to 15; a cloth without a shape.
+- **Error:** a look name nobody defines; an FX1 name that does not exist; a
+  bone, mesh or animation the monster's model does not have; a preset that
+  does not exist.
+- **Warning:** an acting block on a monster without that animation; a flag
+  that is set and never read, or read and never set; an attack part on a
+  monster without attacks; a map variant that only names the monster's own
+  maps (ML7); a look no item or monster uses.
+
+### 7. The editor
+
+ML10: the Style Editor edits all looks. For monsters it adds the preview
+(model, animation, playing or stopped, the frame ruler with the attack parts,
+cloth, map variants), the recipes of ML5 (lights on bones, eye lights,
+thunder chain, fire on bones, walk dust, trail, cloth, inferno ring) and
+"used by" with monsters. Monster Setup and Monster Model show the two
+dropdowns with Edit. Monster Sounds gets the moved events (ML9).
+
+### 8. The move and its proof
+
+As D50 and L25: for each group of looks, a test draws, updates and attacks
+with every monster of the group on each map its numbers are placed on (D61's
+`maps`), with the old code and with the data in the same build, and compares:
+
+- the draws with the draw recorder of items phase 13 (`tests/data/LookRecorder`);
+- the spawned effects, particles, sprites and joints with FX1's effect
+  recorder (`tests/effects`), per animation, frame and attack tick;
+- what acting blocks and cloth change on the object (action, flags, height,
+  selectable, buffs) with the monster recorder (`tests/monsters`);
+- the sounds with the monster recorder's sound part.
+
+Then the old code goes. The fixes of ML11 follow in commits of their own,
+each with the recorder's expected difference, and the visible ones with an
+in-game before and after.
+
+### 9. Pull requests
+
+Proposed (Q-ML11), each as a fork pull request for CI and an upstream one
+for sven-n (the fork one closed after the upstream merge), each after the one
+before is merged:
+
+| PR | Contents | Waits for |
+|---|---|---|
+| 0 | This design. | – |
+| 1 | The machinery: monsters name looks (section 2) and `ExtraMon` goes; the rename to Effects; `onlyWhen`'s monster conditions; the Style Editor's monster preview and the two dropdowns; the draw-time looks that need only layers and conditions (about 90 rows: chrome, glow, scroll, pulse, per mesh). | 0 |
+| 2 | The other draw-time blocks: blends, `alsoDraw`, decals, shadow, texture frames; the map variants of ML7 and the map checks gone. | 1 |
+| 3 | Things on bones: the parts of section 3 with "always", the recipes, the per-frame rows (about 170) and the always-on trails. | 2 and looks PR 4 (FX1.7c and the items' things on bones, the same parts) |
+| 4 | Attacks: attack parts with tick and frame (ML4), the frame ruler, presets, the attack trails, `AttackEffect` and its map hooks (about 80 rows) and the traps. | 3 |
+| 5 | Death, cloth and the acting blocks: death parts and debris, the `deathEffect` consumers, the cloth part (ML8), the acting blocks and the two hooks (ML6). | 4 |
+| 6 | The sounds (ML9). | 5, or beside 3 to 5 |
+
+The fixes of ML11 go into the pull request that moves their look. MN9 (the
+monsters' cleanup) follows.
+
 ## Open questions
 
 Asked one at a time, each with a mockup of the data and the editor, and
@@ -237,15 +408,15 @@ answered here as decisions.
 | Q-ML8 | *Answered: ML9.* The sounds of the visual code. |
 | Q-ML9 | *Answered: ML10.* The editor. |
 | Q-ML10 | *Answered: ML11.* Which problems are fixed. |
-| Q-ML11 | **The pull requests.** How the move is cut, and in which order. |
+| Q-ML11 | **The pull requests.** Proposed in section 9 of the target design; the owner may merge or reorder steps in the review of this document. |
 
 ## Tasks
 
-1. Answer Q-ML1 to Q-ML11 and write the decisions.
-2. Write the target design: the format, the drawing, the checks, the editor,
-   the comparison, the pull requests.
-3. Link this document from the roadmap and the monsters design's MN8 row.
-4. The design as a docs pull request, reviewed before code (as the looks
-   design was).
-5. Last: what stays true into `docs/monster-data.md` and
+1. ~~Answer Q-ML1 to Q-ML10 and write the decisions~~ (ML1 to ML11).
+2. ~~Write the target design~~ (sections 1 to 9).
+3. ~~Link this document from the roadmap and the monsters design's MN8 row.~~
+4. The design as a docs pull request, reviewed before code (pull request 0),
+   with Q-ML11 settled in its review.
+5. Pull requests 1 to 6.
+6. Last: what stays true into `docs/monster-data.md` and
    `docs/effect-data.md`; this document deleted.
