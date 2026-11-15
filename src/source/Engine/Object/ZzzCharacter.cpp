@@ -71,6 +71,7 @@
 #include "GameLogic/Items/ItemCategories.h"
 #include "Render/Items/ItemDisplay.h"
 #include "Render/Items/ItemRenderStyles.h"
+#include "Render/Monsters/MonsterLooks.h"
 #include "Data/GameData/ItemData/ItemModelSlots.h"
 #include "Data/GameData/ItemData/ItemType.h"
 #include "Data/GameData/MonsterData/MonsterDatabase.h"
@@ -9824,9 +9825,16 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
         }
     }
 
+    // A monster with a render style (MN8) is drawn by it alone: no variant of its model's code, and none of the passes
+    // below that draw over its body.
+    const bool styled = Render::Monsters::Looks::RenderStyleOf(*o) != nullptr;
     if (byRender == CHARACTER_RENDER_OBJ)
     {
-        if (MONSTER_METAL_BALROG == c->MonsterIndex || MONSTER_ALPHA_CRUST == c->MonsterIndex ||
+        if (styled)
+        {
+            RenderObject(o, Translate, Select, 0);
+        }
+        else if (MONSTER_METAL_BALROG == c->MonsterIndex || MONSTER_ALPHA_CRUST == c->MonsterIndex ||
             MONSTER_GREAT_DRAKAN == c->MonsterIndex || MONSTER_WHITE_WIZARD == c->MonsterIndex ||
             MONSTER_ORC_SOLDIER_OF_DOOM == c->MonsterIndex || MONSTER_ORC_ARCHER_OF_DOOM == c->MonsterIndex ||
             MONSTER_MUTANT_HERO == c->MonsterIndex || MONSTER_OMEGA_WING == c->MonsterIndex ||
@@ -9885,10 +9893,12 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
         }
     }
 
-    if (c->MonsterIndex == MONSTER_BALROG || c->MonsterIndex == MONSTER_GOLDEN_BUDGE_DRAGON ||
-        c->MonsterIndex == MONSTER_SILVER_VALKYRIE || c->MonsterIndex == MONSTER_ZAIKAN ||
-        c->MonsterIndex == MONSTER_METAL_BALROG || (78 <= c->MonsterIndex && c->MonsterIndex <= MONSTER_GOLDEN_WHEEL) ||
-        (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT && c->MonsterIndex <= MONSTER_GOLDEN_RABBIT))
+    if (!styled &&
+        (c->MonsterIndex == MONSTER_BALROG || c->MonsterIndex == MONSTER_GOLDEN_BUDGE_DRAGON ||
+         c->MonsterIndex == MONSTER_SILVER_VALKYRIE || c->MonsterIndex == MONSTER_ZAIKAN ||
+         c->MonsterIndex == MONSTER_METAL_BALROG ||
+         (78 <= c->MonsterIndex && c->MonsterIndex <= MONSTER_GOLDEN_WHEEL) ||
+         (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT && c->MonsterIndex <= MONSTER_GOLDEN_RABBIT)))
     {
         vec3_t vBackupBodyLight;
 
@@ -9942,7 +9952,7 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
             pCloth[0].Render();
         }
     }
-    else if (c->MonsterIndex == MONSTER_DRAKAN || c->MonsterIndex == MONSTER_GREAT_DRAKAN)
+    else if (!styled && (c->MonsterIndex == MONSTER_DRAKAN || c->MonsterIndex == MONSTER_GREAT_DRAKAN))
     {
         // Tints the body light below.
         if (c->MonsterIndex == MONSTER_DRAKAN)
@@ -9981,7 +9991,7 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
         }
     }
 
-    if (c->MonsterIndex == MONSTER_GOLDEN_TITAN || c->MonsterIndex == MONSTER_GOLDEN_SOLDIER)
+    if (!styled && (c->MonsterIndex == MONSTER_GOLDEN_TITAN || c->MonsterIndex == MONSTER_GOLDEN_SOLDIER))
     {
         RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_METAL | RENDER_BRIGHT, 1.f,
                                   BITMAP_SHINY + 1);
@@ -9989,7 +9999,7 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
 
     if (RendersWingCarriedModels(c))
         RenderWingCarriedModels(c, Translate);
-    else if (c->MonsterIndex == MONSTER_WHITE_WIZARD)
+    else if (!styled && c->MonsterIndex == MONSTER_WHITE_WIZARD)
     {
         RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_BRIGHT | RENDER_EXTRA, 1.0f);
     }
@@ -12686,6 +12696,9 @@ void CreateCharacterPointer(CHARACTER* c, int Type, unsigned char PositionX, uns
     c->Run = 0;
     c->GuildMarkIndex = -1;
     c->PK = PVP_NEUTRAL;
+    // A monster's setup names its looks (MN8); others have none.
+    o->RenderStyleLook = 0;
+    o->EffectLook = 0;
     o->Type = Type;
     o->Scale = 0.9f;
     o->Timer = 0.f;

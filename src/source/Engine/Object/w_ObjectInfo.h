@@ -166,6 +166,10 @@ public:
     int           HiddenMesh;
     float           LifeTime;
     int           BlendMesh;
+    // The looks a monster's setup or model names (MN8, ML1): numbers of
+    // Render::Monsters::Looks, 0 for none.
+    unsigned short RenderStyleLook;
+    unsigned short EffectLook;
     int           AttackPoint[2];
     int           RenderType;
     int			  InitialSceneTime;
