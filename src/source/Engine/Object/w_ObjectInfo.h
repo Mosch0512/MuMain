@@ -214,7 +214,7 @@ public:
     vec3_t		  EyeRight2;
     vec3_t		  EyeLeft3;
     vec3_t		  EyeRight3;
-    // Where a +15 set's trails (joints 55 and 56) end; item effects keep the Eye* slots.
+    // Where a +15 set's trails (joints 55 and 56) end; effects keep the Eye* slots.
     vec3_t SetTrailLeft;
     vec3_t SetTrailRight;
 

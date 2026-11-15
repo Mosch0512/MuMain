@@ -527,7 +527,7 @@
     <value>Wird nie gezeichnet; die Vorschau kann es nicht allein zeigen.</value>
   </data>
   <data name="Mesh code looks note" xml:space="preserve">
-    <value>Der Stil-Editor zeigt, welche Teile der Darstellungsstil mit welchen Effekten zeichnet; der Gegenstandseffekt ist Zeichencode.</value>
+    <value>Der Stil-Editor zeigt, welche Teile der Darstellungsstil mit welchen Effekten zeichnet; der Effekt ist Zeichencode.</value>
   </data>
   <data name="Preview pick note" xml:space="preserve">
     <value>Ein Klick auf einen Teil findet sein Mesh in der Mesh-Liste.</value>
@@ -544,14 +544,11 @@
   <data name="Render style" xml:space="preserve">
     <value>Darstellungsstil</value>
   </data>
-  <data name="Item effect" xml:space="preserve">
-    <value>Gegenstandseffekt</value>
+  <data name="Effect" xml:space="preserve">
+    <value>Effekt</value>
   </data>
   <data name="Render styles" xml:space="preserve">
     <value>Darstellungsstile</value>
-  </data>
-  <data name="Item effects" xml:space="preserve">
-    <value>Gegenstandseffekte</value>
   </data>
   <data name="Style Editor" xml:space="preserve">
     <value>Stil-Editor</value>
@@ -566,7 +563,7 @@
     <value>Darstellungsstile stehen in Data/Effects/RenderStyles.json oder sind noch Zeichencode, markiert mit (Code); Im Stil-Editor öffnen zeigt den Look. Hier wird gewählt, welchen der Gegenstand nutzt.</value>
   </data>
   <data name="Style Editor tree note" xml:space="preserve">
-    <value>Darstellungsstile zeichnen einen Gegenstand in Ebenen; Gegenstandseffekte wirken, bevor er gezeichnet wird. Ordner sortieren die Looks nur: Ziehe einen Look oder einen Ordner auf einen Ordner oder auf seine Wurzel. Ein Look mit (Code) ist noch Zeichencode: Du siehst ihn und seine Gegenstände, kannst ihn aber nicht ändern.</value>
+    <value>Darstellungsstile zeichnen einen Gegenstand in Ebenen; Effekte wirken, bevor er gezeichnet wird. Ordner sortieren die Looks nur: Ziehe einen Look oder einen Ordner auf einen Ordner oder auf seine Wurzel. Ein Look mit (Code) ist noch Zeichencode: Du siehst ihn und seine Gegenstände, kannst ihn aber nicht ändern.</value>
   </data>
   <data name="New look" xml:space="preserve">
     <value>Neuer Look</value>
@@ -607,8 +604,8 @@
   <data name="A look name of letters and digits that no other render style has" xml:space="preserve">
     <value>Ein Name aus Buchstaben und Ziffern, den kein anderer Darstellungsstil hat, weder in der Datei noch im Code.</value>
   </data>
-  <data name="A look name of letters and digits that no other item effect has" xml:space="preserve">
-    <value>Ein Name aus Buchstaben und Ziffern, den kein anderer Item-Effekt hat</value>
+  <data name="A look name of letters and digits that no other effect has" xml:space="preserve">
+    <value>Ein Name aus Buchstaben und Ziffern, den kein anderer Effekt hat</value>
   </data>
   <data name="Only a look no item uses can be renamed or removed." xml:space="preserve">
     <value>Nur ein Look, den kein Gegenstand nutzt, kann umbenannt oder entfernt werden.</value>
@@ -616,8 +613,8 @@
   <data name="Code look note" xml:space="preserve">
     <value>Noch Zeichencode (Render/Items/ItemRenderStyles.cpp): Du siehst den Look und seine Gegenstände hier, kannst ihn aber nicht ändern. Er kommt in einem späteren Schritt in die Look-Datei.</value>
   </data>
-  <data name="Item effects root note" xml:space="preserve">
-    <value>Die Item-Effekte von {0} und die noch als Zeichencode vorhandenen, markiert mit (Code). Ein Item-Effekt setzt Item-Werte, bevor das Item gezeichnet wird, und kann ein Licht auf das Objekt des Items legen.</value>
+  <data name="Effects root note" xml:space="preserve">
+    <value>Die Effekte von {0} und die noch als Zeichencode vorhandenen, markiert mit (Code). Ein Effekt setzt Item-Werte, bevor das Item gezeichnet wird, und kann ein Licht auf das Objekt des Items legen.</value>
   </data>
   <data name="Render styles root note" xml:space="preserve">
     <value>Die Darstellungsstile aus {0} und die, die noch Zeichencode sind, markiert mit (Code).</value>
@@ -974,7 +971,7 @@
     <value>Nur auf diesen Stufen: die Stufe, wie die das Item leuchtet, von und bis, beide eingeschlossen.</value>
   </data>
   <data name="Only when hidden mesh tooltip" xml:space="preserve">
-    <value>Nur wenn das Item in dieser Zeichnung dieses Mesh verbirgt (sein verborgenes Mesh, das Item-Effekte setzen können) oder keines.</value>
+    <value>Nur wenn das Item in dieser Zeichnung dieses Mesh verbirgt (sein verborgenes Mesh, das Effekte setzen können) oder keines.</value>
   </data>
   <data name="No hidden mesh" xml:space="preserve">
     <value>Kein verborgenes Mesh</value>
@@ -1016,7 +1013,7 @@
     <value>Zeichnet allein</value>
   </data>
   <data name="Draws alone tooltip" xml:space="preserve">
-    <value>Direkt nach dem Item-Effekt des Items gezeichnet, im eigenen Licht des Objekts, ohne alles, was der Zeichencode danach tut: kein Stufenlicht ab +3, kein Stufenleuchten ab +7, kein Exzellent-Leuchten, keine Buff-Tönung.</value>
+    <value>Direkt nach dem Effekt des Items gezeichnet, im eigenen Licht des Objekts, ohne alles, was der Zeichencode danach tut: kein Stufenlicht ab +3, kein Stufenleuchten ab +7, kein Exzellent-Leuchten, keine Buff-Tönung.</value>
   </data>
   <data name="Before drawing" xml:space="preserve">
     <value>Vor dem Zeichnen</value>
@@ -1122,6 +1119,9 @@
   </data>
   <data name="Effect Browser" xml:space="preserve">
     <value>Effekt-Browser</value>
+  </data>
+  <data name="Effect types" xml:space="preserve">
+    <value>Effekttypen</value>
   </data>
   <data name="Effect types not loaded" xml:space="preserve">
     <value>Die Effekttypen sind noch nicht geladen; der Ladebildschirm lädt sie.</value>
@@ -3359,7 +3359,7 @@
     <value>Teilmodelle</value>
   </data>
   <data name="Part model note" xml:space="preserve">
-    <value>Ein Teilmodell: wird mit Items gezeichnet, dort, wo der Spielcode es hinsetzt (die Verzierungen der +15-Rüstungen, der Flügel des Phoenix Soul Star, die Phoenix-Soul-Rüstung im Inventar). Sein Eintrag in Data/Items/Models/PartModels.json enthält Datei, Texturordner und Darstellungsstil; es hat kein Inventar, keinen Boden, kein Leuchten und keinen Item-Effekt. Wähle ein Item, um wieder Items zu sehen.</value>
+    <value>Ein Teilmodell: wird mit Items gezeichnet, dort, wo der Spielcode es hinsetzt (die Verzierungen der +15-Rüstungen, der Flügel des Phoenix Soul Star, die Phoenix-Soul-Rüstung im Inventar). Sein Eintrag in Data/Items/Models/PartModels.json enthält Datei, Texturordner und Darstellungsstil; es hat kein Inventar, keinen Boden, kein Leuchten und keinen Effekt. Wähle ein Item, um wieder Items zu sehen.</value>
   </data>
   <data name="The part model {0} has no entry" xml:space="preserve">
     <value>Das Teilmodell {0} hat keinen Eintrag in PartModels.json.</value>

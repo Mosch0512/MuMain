@@ -224,36 +224,36 @@ TEST_CASE("The shipped render styles name textures that exist, and items use eac
     CHECK(issues.empty());
 }
 
-TEST_CASE("Item effects are checked against the items that name them: meshes, values, users (design L23) "
+TEST_CASE("Effects are checked against the items that name them: meshes, values, users (design L23) "
           "[looks][checks]")
 {
     LookDefinition effect{"pulse"};
-    effect.itemValuesBefore.push_back(
+    effect.valuesBefore.push_back(
         {.onlyWhen = {.hiddenMesh = 4}, .values = {.glowMesh = 3, .hiddenMesh = 1}, .glowsLikeLevel = 7});
     const LookDefinition unused{"quiet"};
     ItemModelDefinition model = Model(0, 5, "");
-    model.itemEffect = "pulse";
-    model.itemEffectValues = {{"color", "1"}};
+    model.effect = "pulse";
+    model.effectValues = {{"color", "1"}};
     const std::vector<ItemModelDefinition> models{model};
     std::vector<ItemDataIssue> issues;
     const RenderStyleCheckInput input{.models = models, .meshCount = [](int) { return 2; }};
     CheckItemEffects(std::vector{effect, unused}, Source, input, issues);
     INFO(Describe(issues));
     // Meshes 3 and 4 are not in the item's model of two meshes; mesh 1 is.
-    CHECK(Count(issues, ItemDataIssueSeverity::Warning, "looks[0].itemValuesBefore[0].glowMesh") == 1);
-    CHECK(Count(issues, ItemDataIssueSeverity::Warning, "looks[0].itemValuesBefore[0].onlyWhen.hiddenMesh") == 1);
-    CHECK(Count(issues, ItemDataIssueSeverity::Warning, "looks[0].itemValuesBefore[0].hiddenMesh") == 0);
+    CHECK(Count(issues, ItemDataIssueSeverity::Warning, "looks[0].valuesBefore[0].glowMesh") == 1);
+    CHECK(Count(issues, ItemDataIssueSeverity::Warning, "looks[0].valuesBefore[0].onlyWhen.hiddenMesh") == 1);
+    CHECK(Count(issues, ItemDataIssueSeverity::Warning, "looks[0].valuesBefore[0].hiddenMesh") == 0);
     // A value the effect doesn't let each item set, about the item.
-    CHECK(Count(issues, ItemDataIssueSeverity::Warning, "itemEffectValues.color") == 1);
+    CHECK(Count(issues, ItemDataIssueSeverity::Warning, "effectValues.color") == 1);
     // An effect no item uses; a render style of the item's doesn't count.
     CHECK(Count(issues, ItemDataIssueSeverity::Warning, "looks[1].name") == 1);
     CHECK(Count(issues, ItemDataIssueSeverity::Warning, "looks[0].name") == 0);
 }
 
-TEST_CASE("The shipped item effects are used by items [looks][checks]")
+TEST_CASE("The shipped effects are used by items [looks][checks]")
 {
     const std::filesystem::path data = MU_TEST_DATA_DIR;
-    RenderStylesLoadResult shipped = LoadLookFile(data / "Effects", LookKind::ItemEffect);
+    RenderStylesLoadResult shipped = LoadLookFile(data / "Effects", LookKind::Effect);
     REQUIRE_FALSE(Data::Items::HasFatal(shipped.issues));
     const Data::Items::ItemModelDataLoadResult models =
         Data::Items::LoadItemModelDataDirectory(data / "Items" / "Models");

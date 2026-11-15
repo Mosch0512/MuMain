@@ -144,12 +144,12 @@ void RenderPartObjectBodyColor2(BMD* b, const OBJECT* o, int Type, float Alpha, 
                                 int Texture = -1);
 void RenderPartObjectBody(BMD* b, const OBJECT* o, DrawLook& look, int Type, float Alpha, int RenderType);
 
-// Runs the item effect of the model before it is drawn: the one of its item's
+// Runs the effect of the model before it is drawn: the one of its item's
 // model entry, or for the event models of level variants theirs. It may
 // change the level the model glows like and the alpha it is drawn with.
 Render::Items::ItemEffects::Result ApplyPartObjectEffect(BMD* b, const OBJECT* o, DrawLook& look, int Type,
                                                          float& Alpha, int& Level, int ItemLevel);
-// Whether the item effect of the drawn model spawns sprites, particles or lightning; the update spawns them from the
+// Whether the effect of the drawn model spawns sprites, particles or lightning; the update spawns them from the
 // model's pose with SpawnPartObjectEffect, b placed where the model is drawn.
 bool PartObjectSpawns(const OBJECT* o, int Type);
 void SpawnPartObjectEffect(BMD* b, OBJECT* o, int Type, vec34_t* bones);

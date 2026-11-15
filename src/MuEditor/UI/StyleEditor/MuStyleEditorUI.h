@@ -19,7 +19,7 @@
 #include <vector>
 
 // The Style Editor (design L18 to L20, L24, L31, L35): Windows > Style Editor, built like the Colors window. A tree
-// with the roots Render styles and Item effects and the user's folders; each look with how many items use it, "(code)"
+// with the roots Render styles and Effects and the user's folders; each look with how many items use it, "(code)"
 // for one still in code, which can be looked at but not changed. The picked look of Data/Effects/RenderStyles.json
 // shows the parts of the item picked in the item tools, each with the effects on it, after a row for the look's base
 // (the item's own texture) and one for every part; a part is picked in the list or by a click on it in the preview, Add
@@ -53,8 +53,8 @@ public:
     void Render(bool* open);
     // Opens the window on the render style of that name, in the file or in code, and brings it to the front.
     void ShowRenderStyle(const std::string& name);
-    // The same for an item effect.
-    void ShowItemEffect(const std::string& name);
+    // The same for an effect.
+    void ShowEffect(const std::string& name);
     // Between frames: the preview's texture can only be released then.
     void BeforeFrame()
     {
@@ -126,7 +126,7 @@ private:
     void RenderNameDialog();
     void RenderPicked();
     void RenderRoot();
-    void RenderCodeLook(const std::string& name, bool itemEffect);
+    void RenderCodeLook(const std::string& name, bool effect);
     void RenderLook(const Data::Looks::LookDefinition& look);
     void RenderApply(const Data::Looks::LookDefinition& look);
     void OpenApply(const Data::Looks::LookDefinition& look);
@@ -136,9 +136,9 @@ private:
     [[nodiscard]] std::string UnusedLookName(const std::string& base) const;
     void RenderLayers();
     void RenderLayerToolbar();
-    // An item effect: its entries before the drawing in their order, then the object's light, and the picked line's
+    // An effect: its entries before the drawing in their order, then the object's light, and the picked line's
     // fields.
-    void RenderItemEffect();
+    void RenderEffect();
     void RenderParts();
     void RenderPartRow(const char* label, int part, const std::vector<std::size_t>& layers);
     void RenderEffectChip(std::size_t layer, int part);
@@ -147,8 +147,8 @@ private:
     // The part rows: the meshes of the item's model, and the others the look names.
     [[nodiscard]] std::vector<MuEditor::Looks::LookPart> PartRows() const;
     void RenderChecks();
-    // The items that use the look (an item effect's with `itemEffect`), looked for again when the item models change.
-    [[nodiscard]] const std::vector<int>& UsersOf(const std::string& name, bool itemEffect);
+    // The items that use the look (an effect's with `effect`), looked for again when the item models change.
+    [[nodiscard]] const std::vector<int>& UsersOf(const std::string& name, bool effect);
     void RenderUsers(const std::vector<int>& users);
     void RenderPreview(const Data::Looks::LookDefinition* look);
     // What stands above a view of the preview: the original item's dropdown, or the view's name.
@@ -172,7 +172,7 @@ private:
     void ApplyCopy(ApplyTo to, const std::string& copyName, int itemType, int newItemType, const std::string& itemName);
 
     MuEditor::Looks::LooksRoot m_renderStyles{Data::Looks::LookKind::RenderStyle};
-    MuEditor::Looks::LooksRoot m_itemEffects{Data::Looks::LookKind::ItemEffect};
+    MuEditor::Looks::LooksRoot m_effects{Data::Looks::LookKind::Effect};
     MuEditor::NamedTree m_tree;
     MuEditor::Items::CItemModelPreview m_preview;
 
@@ -195,7 +195,7 @@ private:
     struct LookUsers
     {
         std::string name;
-        bool itemEffect = false;
+        bool effect = false;
         int modelsVersion = -1;
         std::vector<int> items;
     };

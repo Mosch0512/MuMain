@@ -162,7 +162,7 @@ Record Moved(Record record, double delta)
 }
 
 // The baseline lines of a render style's items in every situation, as they draw now.
-// A look of the shipped files, by its kind and name; its baseline lines start with the name, and an item effect's
+// A look of the shipped files, by its kind and name; its baseline lines start with the name, and an effect's
 // with "effect <name>" (a name can be in both lists, design L13).
 struct ShippedLook
 {
@@ -171,16 +171,16 @@ struct ShippedLook
 
     [[nodiscard]] std::string Key() const
     {
-        return kind == LookKind::ItemEffect ? "effect " + name : name;
+        return kind == LookKind::Effect ? "effect " + name : name;
     }
 };
 
-// The render styles and item effects of the shipped files in g_LookStore while it lives; none afterwards.
+// The render styles and effects of the shipped files in g_LookStore while it lives; none afterwards.
 struct ShippedLooksScope
 {
     ShippedLooksScope()
     {
-        for (const LookKind kind : {LookKind::RenderStyle, LookKind::ItemEffect})
+        for (const LookKind kind : {LookKind::RenderStyle, LookKind::Effect})
         {
             RenderStylesLoadResult shipped = LoadLookFile(DataDirectory / "Effects", kind);
             REQUIRE_FALSE(Data::Items::HasFatal(shipped.issues));
@@ -194,7 +194,7 @@ struct ShippedLooksScope
     ~ShippedLooksScope()
     {
         g_LookStore.SetRenderStyles({});
-        g_LookStore.SetItemEffects({});
+        g_LookStore.SetEffects({});
     }
     ShippedLooksScope(const ShippedLooksScope&) = delete;
     ShippedLooksScope& operator=(const ShippedLooksScope&) = delete;
@@ -219,13 +219,13 @@ std::map<std::string, std::string> RecordLook(const ShippedLook& look)
     return lines;
 }
 
-// "effect:potion" names the item effect, any other name the render style.
+// "effect:potion" names the effect, any other name the render style.
 ShippedLook LookNamed(const std::string& name)
 {
     constexpr std::string_view Effect = "effect:";
     if (name.starts_with(Effect))
     {
-        return {LookKind::ItemEffect, name.substr(Effect.size())};
+        return {LookKind::Effect, name.substr(Effect.size())};
     }
     return {LookKind::RenderStyle, name};
 }
@@ -448,7 +448,7 @@ TEST_CASE("Each render style in the data draws as its code while the code still 
     const ShippedLooksScope looks;
     for (const ShippedLook& look : looks.looks)
     {
-        const bool inCode = look.kind == LookKind::ItemEffect ? Render::Items::ItemEffects::ExistsInCode(look.name)
+        const bool inCode = look.kind == LookKind::Effect ? Render::Items::ItemEffects::ExistsInCode(look.name)
                                                               : Render::Items::Styles::ExistsInCode(look.name);
         if (!inCode)
         {
@@ -470,7 +470,7 @@ TEST_CASE("Each render style in the data draws as its code while the code still 
     }
 }
 
-TEST_CASE("No render style or item effect is both in the data and in the code (design L14) [looks]")
+TEST_CASE("No render style or effect is both in the data and in the code (design L14) [looks]")
 {
     const RenderStylesLoadResult styles = LoadRenderStyleFile(DataDirectory / "Effects");
     for (const LookDefinition& look : styles.looks)
@@ -478,7 +478,7 @@ TEST_CASE("No render style or item effect is both in the data and in the code (d
         CAPTURE(look.name);
         CHECK_FALSE(Render::Items::Styles::ExistsInCode(look.name));
     }
-    const RenderStylesLoadResult effects = LoadLookFile(DataDirectory / "Effects", LookKind::ItemEffect);
+    const RenderStylesLoadResult effects = LoadLookFile(DataDirectory / "Effects", LookKind::Effect);
     REQUIRE_FALSE(Data::Items::HasFatal(effects.issues));
     for (const LookDefinition& look : effects.looks)
     {
@@ -491,13 +491,13 @@ TEST_CASE("The Devil's Eye puts the pulse of its code on its object in the updat
           "[looks][recorder]")
 {
     const ShippedLooksScope looks;
-    REQUIRE(g_LookStore.FindItemEffect("devilsEye") != nullptr);
+    REQUIRE(g_LookStore.FindEffect("devilsEye") != nullptr);
     ItemModelDatabaseScope database;
     Data::Items::ItemModelDefinition eye;
     eye.group = ITEM_DEVILS_EYE / MAX_ITEM_INDEX;
     eye.number = ITEM_DEVILS_EYE % MAX_ITEM_INDEX;
     eye.file = "Data/Item/devil_eye.bmd";
-    eye.itemEffect = "devilsEye";
+    eye.effect = "devilsEye";
     g_ItemModelDatabase.Build(std::span(&eye, 1), Data::Effects::GlowColorList{});
     const int slot = Data::Items::ToModelSlot(ITEM_DEVILS_EYE);
     REQUIRE(Render::Items::ItemEffects::Spawns(slot));

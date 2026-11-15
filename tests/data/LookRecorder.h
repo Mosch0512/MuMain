@@ -49,7 +49,7 @@ std::vector<Situation> Situations();
 
 // The situations the items of a render style are drawn in: those of every look, and the ones the conditions of the look
 // of that name in g_LookStore ask for (design L25): with the buff of a layer's condition, and the levels +1 to +6 for a
-// condition on the level or the hidden mesh, which item effects set by level. A look with a layer only for the
+// condition on the level or the hidden mesh, which effects set by level. A look with a layer only for the
 // inventory or the ground is drawn as the game draws there: worn and on the ground in a grey light, and in the
 // inventory, in white light, at +0, +1, +3 and +7.
 std::vector<Situation> SituationsFor(std::string_view renderStyle,
@@ -94,7 +94,7 @@ constexpr int PartModelDrawn(int modelSlot)
     return -1 - modelSlot;
 }
 
-// The item types whose shipped model entry names this render style (or item effect), in item type order, then the
+// The item types whose shipped model entry names this render style (or effect), in item type order, then the
 // part models whose shipped entry names the render style (PartModelDrawn), in the order of PartModelSlots.
 std::vector<int> ItemsUsing(std::string_view renderStyle,
                             Data::Looks::LookKind kind = Data::Looks::LookKind::RenderStyle);

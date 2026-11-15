@@ -76,7 +76,7 @@ std::unique_ptr<DataCheckArea> CreateServerListCheckArea()
 std::unique_ptr<DataCheckArea> CreateEffectCheckArea()
 {
     return std::make_unique<FileCheckArea>(
-        &I18N::Editor::Effects,
+        &I18N::Editor::EffectTypes,
         [] { return Data::Effects::LoadEffectTypeFiles(Data::Effects::GetEffectDataDirectory()).issues; },
         &ToolWindows::effectBrowser, WindowIds::EffectBrowser);
 }

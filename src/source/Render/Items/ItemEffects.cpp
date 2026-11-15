@@ -369,46 +369,46 @@ const ItemEffect* FindEffect(std::string_view name)
     return found != std::end(ItemEffects) ? found : nullptr;
 }
 
-// The item effect of an item: one still in code, or one that is data as the item has it.
+// The effect of an item: one still in code, or one that is data as the item has it.
 struct ItemEffectOf
 {
     const ItemEffect* code = nullptr;
     const Data::Looks::LookDefinition* data = nullptr;
 };
 
-// An item effect that is data as an item that sets values of it has it (design L12); those are made again with the
+// An effect that is data as an item that sets values of it has it (design L12); those are made again with the
 // effect table, after a change of the item models or of the looks.
 const Data::Looks::LookDefinition* DataEffectOfItem(const Data::Items::ItemModelDefinition& model,
                                                     const Data::Looks::LookDefinition& effect)
 {
-    if (model.itemEffectValues.empty() || !Data::Looks::SetsEachItem(effect))
+    if (model.effectValues.empty() || !Data::Looks::SetsEachItem(effect))
     {
         return &effect;
     }
-    static ItemLooks<Data::Looks::LookDefinition> itemEffects;
+    static ItemLooks<Data::Looks::LookDefinition> effects;
     // A value that can't be one keeps the look's; Data Checks names the problem.
     std::vector<Data::Items::ItemDataIssue> issues;
-    return itemEffects.Keep(
+    return effects.Keep(
         Data::Items::MakeItemType(model.group, model.number),
-        Data::Looks::ResolveForItem(effect, model.itemEffectValues, "", issues, Data::Looks::LookKind::ItemEffect));
+        Data::Looks::ResolveForItem(effect, model.effectValues, "", issues, Data::Looks::LookKind::Effect));
 }
 
 // The effect of every item type, taken from the item model database after
 // each build of it and after each change of the looks that are data.
 ItemModelTable<ItemEffectOf> g_itemEffects{[](const Data::Items::ItemModelDefinition& model) -> ItemEffectOf
                                            {
-                                               if (model.itemEffect.empty())
+                                               if (model.effect.empty())
                                                {
                                                    return {};
                                                }
                                                if (const Data::Looks::LookDefinition* data =
-                                                       Data::Looks::g_LookStore.FindItemEffect(model.itemEffect))
+                                                       Data::Looks::g_LookStore.FindEffect(model.effect))
                                                {
                                                    return {nullptr, DataEffectOfItem(model, *data)};
                                                }
                                                // Names that are not effects are drawn without one; the
                                                // model loader reports them.
-                                               return {FindEffect(model.itemEffect), nullptr};
+                                               return {FindEffect(model.effect), nullptr};
                                            },
                                            [] { return Data::Looks::g_LookStore.GetVersion(); }};
 
@@ -447,7 +447,7 @@ PreviewEffect::~PreviewEffect()
 
 bool Exists(std::string_view name)
 {
-    return Data::Looks::g_LookStore.FindItemEffect(name) != nullptr || FindEffect(name) != nullptr;
+    return Data::Looks::g_LookStore.FindEffect(name) != nullptr || FindEffect(name) != nullptr;
 }
 
 bool ExistsInCode(std::string_view name)
@@ -467,7 +467,7 @@ std::span<const std::string_view> GetNames()
         {
             names.emplace_back(effect.name);
         }
-        for (const Data::Looks::LookDefinition& look : Data::Looks::g_LookStore.GetItemEffects())
+        for (const Data::Looks::LookDefinition& look : Data::Looks::g_LookStore.GetEffects())
         {
             names.emplace_back(look.name);
         }

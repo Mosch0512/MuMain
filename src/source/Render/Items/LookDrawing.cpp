@@ -594,7 +594,7 @@ void PrepareTexture(const std::string& look, const std::string& texture, bool lo
 {
     const auto known = s_textures.find(texture);
     const bool missingBefore = known != s_textures.end() && known->second == BITMAP_UNKNOWN;
-    // A texture the game loaded already (an item effect texture) keeps its index.
+    // A texture the game loaded already (an effect texture) keeps its index.
     const std::wstring file = BitmapFileName(texture);
     const BITMAP_t* loaded = Bitmaps.FindTexture(file);
     const GLuint index = loaded != nullptr ? loaded->BitmapIndex : Bitmaps.LoadImage(file, GL_LINEAR, GL_REPEAT);
@@ -685,7 +685,7 @@ void ApplyItemEffect(const LookDefinition& effect, BMD* b, const OBJECT* o, Draw
     Moment moment{.object = o};
     vec3_t modelLight;
     VectorCopy(b->BodyLight, modelLight);
-    for (const ItemValuesBefore& entry : effect.itemValuesBefore)
+    for (const ValuesBefore& entry : effect.valuesBefore)
     {
         look.level = level;
         if (!Holds(entry.onlyWhen, b, o, look))

@@ -579,7 +579,7 @@ TEST_CASE("A character's mark spawns its sprite in the update, and its draw spaw
     FenrirScope::ClearSpawns();
 }
 
-TEST_CASE("A wing's item effect spawns its lights on the bones it is given, and its draw spawns none [effects]")
+TEST_CASE("A wing's effect spawns its lights on the bones it is given, and its draw spawns none [effects]")
 {
     FenrirScope scope;
     ItemModelDatabaseScope restoreModels;
@@ -587,7 +587,7 @@ TEST_CASE("A wing's item effect spawns its lights on the bones it is given, and 
     eternal.group = 12;
     eternal.number = 37;
     eternal.file = "Data/Item/Wing37.bmd";
-    eternal.itemEffect = "wingOfEternal";
+    eternal.effect = "wingOfEternal";
     g_ItemModelDatabase.Build(std::vector<Data::Items::ItemModelDefinition>{eternal}, Data::Effects::GlowColorList{});
     BMD* b = &Models[MODEL_WING_OF_ETERNAL];
     b->BodyScale = 1.f;
@@ -1042,7 +1042,7 @@ TEST_CASE("Drawing an item's effect or style again and again leaves the look on 
     eye.group = 14;
     eye.number = 17;
     eye.file = "Data/Item/EventBullCatEye.bmd";
-    eye.itemEffect = "devilsEye";
+    eye.effect = "devilsEye";
     Data::Items::ItemModelDefinition bone;
     bone.group = 13;
     bone.number = 17;

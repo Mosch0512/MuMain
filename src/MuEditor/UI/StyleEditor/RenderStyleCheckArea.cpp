@@ -64,7 +64,7 @@ public:
 
     const char* GetName() const override
     {
-        return m_kind == Data::Looks::LookKind::ItemEffect ? I18N::Editor::ItemEffects : I18N::Editor::RenderStyles;
+        return m_kind == Data::Looks::LookKind::Effect ? I18N::Editor::Effects : I18N::Editor::RenderStyles;
     }
 
     void Check(std::vector<ItemDataIssue>& issues) override
@@ -128,9 +128,9 @@ public:
         }
         if (const std::string look = LookOf(issue); !look.empty())
         {
-            if (m_kind == Data::Looks::LookKind::ItemEffect)
+            if (m_kind == Data::Looks::LookKind::Effect)
             {
-                g_MuStyleEditorUI.ShowItemEffect(look);
+                g_MuStyleEditorUI.ShowEffect(look);
             }
             else
             {
@@ -182,9 +182,9 @@ std::unique_ptr<DataChecks::DataCheckArea> CreateRenderStyleCheckArea()
     return std::make_unique<LookCheckArea>(Data::Looks::LookKind::RenderStyle);
 }
 
-std::unique_ptr<DataChecks::DataCheckArea> CreateItemEffectCheckArea()
+std::unique_ptr<DataChecks::DataCheckArea> CreateLookEffectCheckArea()
 {
-    return std::make_unique<LookCheckArea>(Data::Looks::LookKind::ItemEffect);
+    return std::make_unique<LookCheckArea>(Data::Looks::LookKind::Effect);
 }
 } // namespace MuEditor::Looks
 

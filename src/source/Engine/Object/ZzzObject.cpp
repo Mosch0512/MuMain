@@ -6094,7 +6094,7 @@ void ItemObjectAttribute(OBJECT* o)
     g_CharacterClearBuff(o);
     if (o->Type >= MODEL_SPEAR && o->Type <= MODEL_PLATINA_STAFF)
         o->Scale = 0.7f;
-    // The glow values of item types are their item effects (Data/Effects/ItemEffects.json, design L27).
+    // The glow values of item types are their effects (Data/Effects/Effects.json, design L27).
     switch (o->Type)
     {
     case MODEL_ETC:
@@ -7336,7 +7336,7 @@ static Render::Items::ItemEffects::Result ApplyEventModelEffect(BMD* b, const OB
     return Result::None;
 }
 
-// Items have the item effect of their model entry; the event models of level
+// Items have the effect of their model entry; the event models of level
 // variants have theirs in ApplyEventModelEffect.
 Render::Items::ItemEffects::Result ApplyPartObjectEffect(BMD* b, const OBJECT* o, DrawLook& look, int Type,
                                                          float& Alpha, int& Level, int ItemLevel)
@@ -7347,7 +7347,7 @@ Render::Items::ItemEffects::Result ApplyPartObjectEffect(BMD* b, const OBJECT* o
                : ApplyEventModelEffect(b, o, look, Type, Level, ItemLevel);
 }
 
-// The two event models that spark have no item effect of their own.
+// The two event models that spark have no effect of their own.
 static bool IsSparkingEventModel(const OBJECT* o)
 {
     return o->Type == MODEL_EVENT + 12 || o->Type == MODEL_EVENT + 13;
@@ -7408,7 +7408,7 @@ extern float g_Luminosity;
 void RenderPartObjectEffect(const OBJECT* o, int Type, const vec3_t Light, float Alpha, int ItemLevel,
                             int ExcellentFlags, int ancientDiscriminator, int Select, int RenderType)
 {
-    // The item effects and styles change the look for this draw; the object keeps its own.
+    // The effects and styles change the look for this draw; the object keeps its own.
     DrawLook look = DrawLook::Of(*o);
     int Level = ItemLevel;
     // Without the option window (headless, or before the UI exists) everything is drawn at the highest level.
@@ -7428,7 +7428,7 @@ void RenderPartObjectEffect(const OBJECT* o, int Type, const vec3_t Light, float
 
     if (DrawsShadow(o))
     {
-        // The item effect's values first, as the drawing has them (design L49): a mesh it hides stays out of the
+        // The effect's values first, as the drawing has them (design L49): a mesh it hides stays out of the
         // shadow.
         {
             float shadowAlpha = Alpha;
@@ -7489,7 +7489,7 @@ void RenderPartObjectEffect(const OBJECT* o, int Type, const vec3_t Light, float
     }
     // The level the look's conditions read.
     look.level = Level;
-    // A render style that draws alone draws here, as the item effects that drew the model did (design L47): in the
+    // A render style that draws alone draws here, as the effects that drew the model did (design L47): in the
     // object's own light, with nothing of the drawing below after it.
     if (Render::Items::Styles::DrawsAlone(Type) && Render::Items::Styles::Render(b, o, look, Type, Alpha, RenderType))
     {

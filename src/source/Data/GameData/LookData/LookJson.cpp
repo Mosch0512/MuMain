@@ -32,7 +32,7 @@ constexpr const char* LookFolders = "lookFolders";
 constexpr const char* Name = "name";
 constexpr const char* Layers = "layers";
 constexpr const char* ItemValuesAfter = "itemValuesAfter";
-constexpr const char* ItemValuesBefore = "itemValuesBefore";
+constexpr const char* ValuesBefore = "valuesBefore";
 constexpr const char* Motion = "motion";
 constexpr const char* Blend = "blend";
 constexpr const char* Where = "where";
@@ -74,11 +74,11 @@ constexpr const char* DrawsAlone = "drawsAlone";
 } // namespace Keys
 
 constexpr const char* RenderStyleKind = "renderStyle";
-constexpr const char* ItemEffectKind = "itemEffect";
+constexpr const char* EffectLookKind = "effect";
 
 const char* KindName(LookKind kind)
 {
-    return kind == LookKind::ItemEffect ? ItemEffectKind : RenderStyleKind;
+    return kind == LookKind::Effect ? EffectLookKind : RenderStyleKind;
 }
 constexpr const char* Drawing = "drawing";
 constexpr const char* None = "none";
@@ -261,8 +261,8 @@ private:
 
     bool ReadLook(const OrderedJson& json, const std::string& field, LookDefinition& look);
     void ReadRenderStyleParts(const OrderedJson& json, const std::string& field, LookDefinition& look);
-    void ReadItemEffectParts(const OrderedJson& json, const std::string& field, LookDefinition& look);
-    void ReadItemValuesBefore(const OrderedJson& json, const std::string& field, ItemValuesBefore& entry);
+    void ReadEffectParts(const OrderedJson& json, const std::string& field, LookDefinition& look);
+    void ReadValuesBefore(const OrderedJson& json, const std::string& field, ValuesBefore& entry);
     void ReadItemValueFields(const OrderedJson& json, const std::string& field, ItemValues& values);
     void ReadLayer(const OrderedJson& json, const std::string& field, Layer& layer);
     void ReadMeshes(const OrderedJson& json, const std::string& field, MeshSet& meshes);
@@ -346,9 +346,9 @@ bool LookReader::ReadLook(const OrderedJson& json, const std::string& field, Loo
         return false;
     }
     look.name = name->get<std::string>();
-    if (m_kind == LookKind::ItemEffect)
+    if (m_kind == LookKind::Effect)
     {
-        ReadItemEffectParts(json, field, look);
+        ReadEffectParts(json, field, look);
         return true;
     }
     const auto layers = json.find(Keys::Layers);
@@ -390,35 +390,35 @@ void LookReader::ReadRenderStyleParts(const OrderedJson& json, const std::string
     {
         ReadItemValues(*after, field + "." + Keys::ItemValuesAfter, look.itemValuesAfter);
     }
-    if (json.contains(Keys::ItemValuesBefore))
+    if (json.contains(Keys::ValuesBefore))
     {
-        AddFatal(field + "." + Keys::ItemValuesBefore,
-                 "is a part of item effects; a render style leaves its item values after drawing (itemValuesAfter)");
+        AddFatal(field + "." + Keys::ValuesBefore,
+                 "is a part of effects; a render style leaves its item values after drawing (itemValuesAfter)");
     }
     if (json.contains(Keys::ObjectLight))
     {
-        AddFatal(field + "." + Keys::ObjectLight, "is a part of item effects");
+        AddFatal(field + "." + Keys::ObjectLight, "is a part of effects");
     }
     WarnAboutUnknownKeys(json,
                          {Keys::Name, Keys::NotFor, Keys::DrawsAlone, Keys::Layers, Keys::ItemValuesAfter,
-                          Keys::ItemValuesBefore, Keys::ObjectLight},
+                          Keys::ValuesBefore, Keys::ObjectLight},
                          field);
 }
 
-// An item effect (design L13): the item values it sets before the drawing, and the light it puts on the object.
-void LookReader::ReadItemEffectParts(const OrderedJson& json, const std::string& field, LookDefinition& look)
+// An effect (design L13): the item values it sets before the drawing, and the light it puts on the object.
+void LookReader::ReadEffectParts(const OrderedJson& json, const std::string& field, LookDefinition& look)
 {
     for (const char* part : {Keys::Layers, Keys::NotFor, Keys::DrawsAlone, Keys::ItemValuesAfter})
     {
         if (json.contains(part))
         {
             AddFatal(field + "." + part,
-                     "is a part of render styles; an item effect does what comes before the drawing");
+                     "is a part of render styles; an effect does what comes before the drawing");
         }
     }
-    if (const auto before = json.find(Keys::ItemValuesBefore); before != json.end())
+    if (const auto before = json.find(Keys::ValuesBefore); before != json.end())
     {
-        const std::string beforeField = field + "." + Keys::ItemValuesBefore;
+        const std::string beforeField = field + "." + Keys::ValuesBefore;
         if (!before->is_array())
         {
             AddFatal(beforeField, "must be a list of item values, each with its Only when");
@@ -427,9 +427,9 @@ void LookReader::ReadItemEffectParts(const OrderedJson& json, const std::string&
         {
             for (std::size_t i = 0; i < before->size(); ++i)
             {
-                ItemValuesBefore entry;
-                ReadItemValuesBefore((*before)[i], beforeField + "[" + std::to_string(i) + "]", entry);
-                look.itemValuesBefore.push_back(std::move(entry));
+                ValuesBefore entry;
+                ReadValuesBefore((*before)[i], beforeField + "[" + std::to_string(i) + "]", entry);
+                look.valuesBefore.push_back(std::move(entry));
             }
         }
     }
@@ -451,18 +451,18 @@ void LookReader::ReadItemEffectParts(const OrderedJson& json, const std::string&
             look.objectLight = color;
         }
     }
-    if (look.itemValuesBefore.empty() && !look.objectLight)
+    if (look.valuesBefore.empty() && !look.objectLight)
     {
         AddIssue(ItemDataIssueSeverity::Warning, field,
                  "does nothing: no item values before the drawing, no object light");
     }
     WarnAboutUnknownKeys(json,
-                         {Keys::Name, Keys::ItemValuesBefore, Keys::ObjectLight, Keys::Layers, Keys::NotFor,
+                         {Keys::Name, Keys::ValuesBefore, Keys::ObjectLight, Keys::Layers, Keys::NotFor,
                           Keys::DrawsAlone, Keys::ItemValuesAfter},
                          field);
 }
 
-void LookReader::ReadItemValuesBefore(const OrderedJson& marked, const std::string& field, ItemValuesBefore& entry)
+void LookReader::ReadValuesBefore(const OrderedJson& marked, const std::string& field, ValuesBefore& entry)
 {
     if (!marked.is_object())
     {
@@ -1299,7 +1299,7 @@ OrderedJson WriteItemValues(const ItemValues& values)
     return json;
 }
 
-OrderedJson WriteItemValuesBefore(const ItemValuesBefore& entry)
+OrderedJson WriteValuesBefore(const ValuesBefore& entry)
 {
     OrderedJson json = OrderedJson::object();
     if (!entry.onlyWhen.IsEmpty())
@@ -1333,7 +1333,7 @@ std::string_view GetRenderStylesFileName()
 
 std::string_view GetLookFileName(LookKind kind)
 {
-    return kind == LookKind::ItemEffect ? "ItemEffects.json" : GetRenderStylesFileName();
+    return kind == LookKind::Effect ? "Effects.json" : GetRenderStylesFileName();
 }
 
 void ReadRenderStylesFile(std::string_view text, const std::string& source, RenderStylesFile& file,
@@ -1405,7 +1405,7 @@ std::set<std::string> EachItemNames(const LookDefinition& look)
         add(layer.eachItem);
     }
     add(look.itemValuesAfter.eachItem);
-    for (const ItemValuesBefore& entry : look.itemValuesBefore)
+    for (const ValuesBefore& entry : look.valuesBefore)
     {
         add(entry.values.eachItem);
     }
@@ -1448,9 +1448,9 @@ LookDefinition ResolveForItem(const LookDefinition& look, const std::map<std::st
     {
         put(json[Keys::ItemValuesAfter], look.itemValuesAfter.eachItem);
     }
-    for (std::size_t i = 0; i < look.itemValuesBefore.size(); ++i)
+    for (std::size_t i = 0; i < look.valuesBefore.size(); ++i)
     {
-        put(json[Keys::ItemValuesBefore][i], look.itemValuesBefore[i].values.eachItem);
+        put(json[Keys::ValuesBefore][i], look.valuesBefore[i].values.eachItem);
     }
     LookFile file;
     std::vector<Items::ItemDataIssue> read;
@@ -1500,16 +1500,16 @@ std::string WriteLookFileJson(LookKind kind, std::vector<LookDefinition> looks,
     {
         OrderedJson json = OrderedJson::object();
         json[Keys::Name] = look.name;
-        if (kind == LookKind::ItemEffect)
+        if (kind == LookKind::Effect)
         {
-            if (!look.itemValuesBefore.empty())
+            if (!look.valuesBefore.empty())
             {
                 OrderedJson before = OrderedJson::array();
-                for (const ItemValuesBefore& entry : look.itemValuesBefore)
+                for (const ValuesBefore& entry : look.valuesBefore)
                 {
-                    before.push_back(WriteItemValuesBefore(entry));
+                    before.push_back(WriteValuesBefore(entry));
                 }
-                json[Keys::ItemValuesBefore] = std::move(before);
+                json[Keys::ValuesBefore] = std::move(before);
             }
             if (look.objectLight)
             {
@@ -1558,7 +1558,7 @@ std::string WriteLookFileJson(LookKind kind, std::vector<LookDefinition> looks,
     text = Items::Json::PutListsOnOneLine(text, Keys::NotFor);
     text = Items::Json::PutListEntriesOnOneLine(text, Keys::Layers);
     text = Items::Json::PutObjectsOnOneLine(text, Keys::ItemValuesAfter);
-    text = Items::Json::PutListEntriesOnOneLine(text, Keys::ItemValuesBefore);
+    text = Items::Json::PutListEntriesOnOneLine(text, Keys::ValuesBefore);
     text = Items::Json::PutListsOnOneLine(text, Keys::ObjectLight);
     return text + "\n";
 }

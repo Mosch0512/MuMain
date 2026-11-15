@@ -508,11 +508,11 @@ TEST_CASE("A layer's scrolling mesh is the model's while it draws, and the item 
     }
 }
 
-TEST_CASE("An item effect that is data sets the item values of its entries whose Only when holds, in their order, "
+TEST_CASE("An effect that is data sets the item values of its entries whose Only when holds, in their order, "
           "and the object's light in the update (design L13, L45) [looks]")
 {
     LookDefinition effect{"byLevel", {}, {}};
-    effect.itemValuesBefore = {
+    effect.valuesBefore = {
         {.onlyWhen = {.level = std::pair<int, int>{1, 15}}, .glowsLikeLevel = 7},
         // Reads the level the entry before set.
         {.onlyWhen = {.level = std::pair<int, int>{7, 7}}, .values = {.glowMesh = 1, .glowStrength = 0.5f}},
@@ -547,19 +547,19 @@ TEST_CASE("An item effect that is data sets the item values of its entries whose
     CHECK(object.Light[2] == 1.f);
 }
 
-TEST_CASE("An item names an item effect that is data before one still in code (design L14) [looks]")
+TEST_CASE("An item names an effect that is data before one still in code (design L14) [looks]")
 {
     // wingsOfDarkness stays code until its things on bones move (step 3): it spawns and sets no value.
     LookDefinition effect{"wingsOfDarkness", {}, {}};
-    effect.itemValuesBefore = {{.values = {.glowStrength = 0.25f}}};
-    g_LookStore.SetItemEffects({effect});
+    effect.valuesBefore = {{.values = {.glowStrength = 0.25f}}};
+    g_LookStore.SetEffects({effect});
     REQUIRE(Render::Items::ItemEffects::ExistsInCode("wingsOfDarkness"));
     ItemModelDatabaseScope database;
     Data::Items::ItemModelDefinition entry;
     entry.group = 0;
     entry.number = 0;
     entry.file = "Data/Item/Sword01.bmd";
-    entry.itemEffect = "wingsOfDarkness";
+    entry.effect = "wingsOfDarkness";
     g_ItemModelDatabase.Build(std::span(&entry, 1), Data::Effects::GlowColorList{});
     BMD model;
     OBJECT object;
@@ -570,7 +570,7 @@ TEST_CASE("An item names an item effect that is data before one still in code (d
           Render::Items::ItemEffects::Result::Applied);
     CHECK(look.blendMeshLight == 0.25f);
     CHECK_FALSE(Render::Items::ItemEffects::Spawns(MODEL_SWORD));
-    g_LookStore.SetItemEffects({});
+    g_LookStore.SetEffects({});
     look = {};
     look.blendMeshLight = 0.5f;
     Render::Items::ItemEffects::Apply(&model, &object, look, MODEL_SWORD, alpha, level);

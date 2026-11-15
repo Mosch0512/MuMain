@@ -7352,7 +7352,7 @@ void SpawnLinkedPartEffects(CHARACTER* c, int Type, OBJECT* Object, vec34_t* bon
     vec3_t Position;
     VectorCopy(position, Position);
 
-    // The item effects also reach the part's bones through its item object (TransformByObjectBone).
+    // The effects also reach the part's bones through its item object (TransformByObjectBone).
     struct ItemBones
     {
         OBJECT* object;

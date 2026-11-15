@@ -66,7 +66,7 @@ constexpr char AddEffectPopupId[] = "###AddEffect";
 constexpr char DragPayloadType[] = "MU_LOOKS_TREE";
 // The roots in the order the tree shows them.
 constexpr std::size_t RenderStylesRootIndex = 0;
-constexpr std::size_t ItemEffectsRootIndex = 1;
+constexpr std::size_t EffectsRootIndex = 1;
 // Pixel widths before the editor UI scale.
 constexpr float TreeWidth = 260.0f;
 constexpr float NameWidth = 260.0f;
@@ -77,15 +77,15 @@ constexpr float PartWidth = 200.0f;
 constexpr float EffectNoteColumn = 170.0f;
 constexpr ImVec4 NotFreeColor{1.0f, 0.4f, 0.4f, 1.0f};
 constexpr float MaxPreviewSeconds = 60.0f;
-// A kept draft's key: an item effect and a render style can have the same name.
+// A kept draft's key: an effect and a render style can have the same name.
 std::string DraftKey(Data::Looks::LookKind kind, const std::string& name)
 {
-    return kind == Data::Looks::LookKind::ItemEffect ? "effect " + name : name;
+    return kind == Data::Looks::LookKind::Effect ? "effect " + name : name;
 }
 
 std::size_t RootIndexOf(Data::Looks::LookKind kind)
 {
-    return kind == Data::Looks::LookKind::ItemEffect ? ItemEffectsRootIndex : RenderStylesRootIndex;
+    return kind == Data::Looks::LookKind::Effect ? EffectsRootIndex : RenderStylesRootIndex;
 }
 
 // The problems of a look are about "looks[0]", the only one checked.
@@ -211,9 +211,9 @@ std::optional<LookDefinition> ForItem(const LookDefinition& look, Data::Looks::L
     {
         return std::nullopt;
     }
-    const bool effect = kind == Data::Looks::LookKind::ItemEffect;
-    const std::string& named = effect ? model->itemEffect : model->renderStyle;
-    const std::map<std::string, std::string>& values = effect ? model->itemEffectValues : model->renderStyleValues;
+    const bool effect = kind == Data::Looks::LookKind::Effect;
+    const std::string& named = effect ? model->effect : model->renderStyle;
+    const std::map<std::string, std::string>& values = effect ? model->effectValues : model->renderStyleValues;
     if (named != look.name || values.empty() || !Data::Looks::SetsEachItem(look))
     {
         return std::nullopt;
@@ -265,11 +265,11 @@ CMuStyleEditorUI& CMuStyleEditorUI::GetInstance()
     return instance;
 }
 
-CMuStyleEditorUI::CMuStyleEditorUI() : m_tree({&m_renderStyles, &m_itemEffects}, DragPayloadType, FolderPopupId)
+CMuStyleEditorUI::CMuStyleEditorUI() : m_tree({&m_renderStyles, &m_effects}, DragPayloadType, FolderPopupId)
 {
     m_renderStyles.SetUnappliedCheck([this](const std::string& name) { return HasUnappliedChanges(name); });
-    m_itemEffects.SetUnappliedCheck([this](const std::string& name)
-                                    { return HasUnappliedChanges(name, Data::Looks::LookKind::ItemEffect); });
+    m_effects.SetUnappliedCheck([this](const std::string& name)
+                                    { return HasUnappliedChanges(name, Data::Looks::LookKind::Effect); });
 }
 
 void CMuStyleEditorUI::Render(bool* open)
@@ -324,18 +324,18 @@ void CMuStyleEditorUI::ShowRenderStyle(const std::string& name)
     ImGui::SetWindowFocus(MuEditor::WindowIds::StyleEditor);
 }
 
-void CMuStyleEditorUI::ShowItemEffect(const std::string& name)
+void CMuStyleEditorUI::ShowEffect(const std::string& name)
 {
     g_MuEditorCore.GetToolWindows().styleEditor = true;
-    if (m_itemEffects.Has(name))
+    if (m_effects.Has(name))
     {
-        m_tree.PickEntry(ItemEffectsRootIndex, name);
+        m_tree.PickEntry(EffectsRootIndex, name);
     }
     else
     {
-        m_tree.SetPick(ItemEffectsRootIndex, {});
+        m_tree.SetPick(EffectsRootIndex, {});
     }
-    m_tree.OpenRoot(ItemEffectsRootIndex);
+    m_tree.OpenRoot(EffectsRootIndex);
     ImGui::SetWindowFocus(MuEditor::WindowIds::StyleEditor);
 }
 
@@ -346,18 +346,18 @@ bool CMuStyleEditorUI::IsRenderStylesPicked() const
 
 Data::Looks::LookKind CMuStyleEditorUI::PickedKind() const
 {
-    return m_tree.GetPick().root == ItemEffectsRootIndex ? Data::Looks::LookKind::ItemEffect
+    return m_tree.GetPick().root == EffectsRootIndex ? Data::Looks::LookKind::Effect
                                                          : Data::Looks::LookKind::RenderStyle;
 }
 
 MuEditor::Looks::LooksRoot& CMuStyleEditorUI::RootOf(Data::Looks::LookKind kind)
 {
-    return kind == Data::Looks::LookKind::ItemEffect ? m_itemEffects : m_renderStyles;
+    return kind == Data::Looks::LookKind::Effect ? m_effects : m_renderStyles;
 }
 
 const MuEditor::Looks::LooksRoot& CMuStyleEditorUI::RootOf(Data::Looks::LookKind kind) const
 {
-    return kind == Data::Looks::LookKind::ItemEffect ? m_itemEffects : m_renderStyles;
+    return kind == Data::Looks::LookKind::Effect ? m_effects : m_renderStyles;
 }
 
 MuEditor::Looks::LookEdits& CMuStyleEditorUI::EditsOf(Data::Looks::LookKind kind)
@@ -380,7 +380,7 @@ void CMuStyleEditorUI::RenderFileBar()
         ImGui::SameLine();
         ImGui::TextUnformatted(I18N::Editor::UnsavedChanges);
     }
-    if (!g_LookEdits.IsComplete() || !g_ItemEffectEdits.IsComplete())
+    if (!g_LookEdits.IsComplete() || !g_EffectEdits.IsComplete())
     {
         RenderNote(I18N::Editor::TheLookFileHasAFatalProblem);
     }
@@ -486,8 +486,8 @@ void CMuStyleEditorUI::RenderNameDialog()
     // The names of the root's kind: a look of the file or one in code may not have it.
     const Data::Looks::LookKind kind = PickedKind();
     const bool usable = Data::Items::Json::IsName(name) && !RootOf(kind).Has(name);
-    RenderNote(kind == Data::Looks::LookKind::ItemEffect
-                   ? I18N::Editor::ALookNameOfLettersAndDigitsThatNoOtherItemEffectHas
+    RenderNote(kind == Data::Looks::LookKind::Effect
+                   ? I18N::Editor::ALookNameOfLettersAndDigitsThatNoOtherEffectHas
                    : I18N::Editor::ALookNameOfLettersAndDigitsThatNoOtherRenderStyleHas);
     ImGui::BeginDisabled(!usable);
     if (ImGui::Button(I18N::Editor::OK))
@@ -502,7 +502,7 @@ void CMuStyleEditorUI::RenderNameDialog()
                 const LookDefinition* source = edits.Find(from);
                 if (dialog == NameDialog::New)
                 {
-                    // A new render style draws the item plainly, as one texture layer; a new item effect does nothing.
+                    // A new render style draws the item plainly, as one texture layer; a new effect does nothing.
                     LookDefinition fresh{name};
                     if (kind == Data::Looks::LookKind::RenderStyle)
                     {
@@ -550,7 +550,7 @@ void CMuStyleEditorUI::RenderPicked()
             RenderLook(*look);
             return;
         }
-        RenderCodeLook(pick.entry, pick.root == ItemEffectsRootIndex);
+        RenderCodeLook(pick.entry, pick.root == EffectsRootIndex);
         return;
     }
     if (!pick.folder.empty())
@@ -564,12 +564,12 @@ void CMuStyleEditorUI::RenderPicked()
 void CMuStyleEditorUI::RenderRoot()
 {
     const Data::Looks::LookKind kind = PickedKind();
-    const bool effects = kind == Data::Looks::LookKind::ItemEffect;
+    const bool effects = kind == Data::Looks::LookKind::Effect;
     const std::string file =
         (Data::Effects::GetEffectDataDirectory() / Data::Looks::GetLookFileName(kind)).generic_string();
-    ImGui::TextUnformatted(effects ? I18N::Editor::ItemEffects : I18N::Editor::RenderStyles);
+    ImGui::TextUnformatted(effects ? I18N::Editor::Effects : I18N::Editor::RenderStyles);
     RenderNote(
-        I18N::Format(effects ? I18N::Editor::ItemEffectsRootNote : I18N::Editor::RenderStylesRootNote, {file}).c_str());
+        I18N::Format(effects ? I18N::Editor::EffectsRootNote : I18N::Editor::RenderStylesRootNote, {file}).c_str());
     const std::vector<ItemDataIssue>& issues = EditsOf(kind).GetIssues();
     if (!issues.empty())
     {
@@ -581,7 +581,7 @@ void CMuStyleEditorUI::RenderRoot()
     }
 }
 
-void CMuStyleEditorUI::RenderCodeLook(const std::string& name, bool itemEffect)
+void CMuStyleEditorUI::RenderCodeLook(const std::string& name, bool effect)
 {
     ImGui::TextUnformatted((name + " " + I18N::Editor::CodeMark).c_str());
     RenderPreview(nullptr);
@@ -589,7 +589,7 @@ void CMuStyleEditorUI::RenderCodeLook(const std::string& name, bool itemEffect)
     if (ImGui::BeginChild("##Look"))
     {
         RenderNote(I18N::Editor::CodeLookNote);
-        RenderUsers(UsersOf(name, itemEffect));
+        RenderUsers(UsersOf(name, effect));
     }
     ImGui::EndChild();
 }
@@ -608,10 +608,10 @@ void CMuStyleEditorUI::RenderLook(const LookDefinition& look)
     if (ImGui::BeginChild("##Look"))
     {
         RenderChecks();
-        const bool effect = m_draftKind == Data::Looks::LookKind::ItemEffect;
+        const bool effect = m_draftKind == Data::Looks::LookKind::Effect;
         if (effect)
         {
-            RenderItemEffect();
+            RenderEffect();
         }
         else
         {
@@ -661,7 +661,7 @@ void CMuStyleEditorUI::RenderApply(const LookDefinition& look)
 void CMuStyleEditorUI::OpenApply(const LookDefinition& look)
 {
     // D26: a change to a look reaches all its items; they are listed before it is applied.
-    m_confirmUsers = UsersOf(look.name, m_draftKind == Data::Looks::LookKind::ItemEffect);
+    m_confirmUsers = UsersOf(look.name, m_draftKind == Data::Looks::LookKind::Effect);
     const int itemType = g_ItemSelection.GetItemType();
     m_applyItem =
         g_ItemDatabase.Find(itemType) != nullptr && g_ItemModelDatabase.Find(itemType) != nullptr ? itemType : -1;
@@ -782,8 +782,8 @@ bool CMuStyleEditorUI::RenderApplyCopy()
     bool usable = Data::Items::Json::IsName(copy) && !RootOf(m_draftKind).Has(copy);
     if (!usable)
     {
-        RenderNote(m_draftKind == Data::Looks::LookKind::ItemEffect
-                       ? I18N::Editor::ALookNameOfLettersAndDigitsThatNoOtherItemEffectHas
+        RenderNote(m_draftKind == Data::Looks::LookKind::Effect
+                       ? I18N::Editor::ALookNameOfLettersAndDigitsThatNoOtherEffectHas
                        : I18N::Editor::ALookNameOfLettersAndDigitsThatNoOtherRenderStyleHas);
     }
     if (m_applyTo == ApplyTo::NewItem)
@@ -911,15 +911,15 @@ void CMuStyleEditorUI::RenderLayers()
     ImGui::PopID();
 }
 
-void CMuStyleEditorUI::RenderItemEffect()
+void CMuStyleEditorUI::RenderEffect()
 {
-    std::vector<Data::Looks::ItemValuesBefore>& entries = m_draft.itemValuesBefore;
+    std::vector<Data::Looks::ValuesBefore>& entries = m_draft.valuesBefore;
     ImGui::TextUnformatted(I18N::Editor::BeforeDrawing);
     ImGui::SameLine();
     if (ImGui::SmallButton(I18N::Editor::Add))
     {
         const std::size_t at = std::min(m_line + 1, entries.size());
-        entries.insert(entries.begin() + static_cast<std::ptrdiff_t>(at), Data::Looks::ItemValuesBefore{});
+        entries.insert(entries.begin() + static_cast<std::ptrdiff_t>(at), Data::Looks::ValuesBefore{});
         m_line = at;
     }
     const bool entry = m_line < entries.size();
@@ -951,7 +951,7 @@ void CMuStyleEditorUI::RenderItemEffect()
         {
             ImGui::PushID(static_cast<int>(index));
             const std::string line =
-                std::to_string(index + 1) + ". " + MuEditor::Looks::Fields::DescribeItemValuesBefore(entries[index]);
+                std::to_string(index + 1) + ". " + MuEditor::Looks::Fields::DescribeValuesBefore(entries[index]);
             if (ImGui::Selectable(line.c_str(), m_line == index))
             {
                 m_line = index;
@@ -973,7 +973,7 @@ void CMuStyleEditorUI::RenderItemEffect()
     const std::vector<LookPart> parts = MuEditor::Looks::PartsOf(g_ItemSelection.GetItemType());
     if (m_line < entries.size())
     {
-        MuEditor::Looks::Fields::ItemValuesBeforeEntry(entries[m_line], parts);
+        MuEditor::Looks::Fields::ValuesBeforeEntry(entries[m_line], parts);
     }
     else
     {
@@ -1277,13 +1277,13 @@ void CMuStyleEditorUI::RenderChecks()
     }
 }
 
-const std::vector<int>& CMuStyleEditorUI::UsersOf(const std::string& name, bool itemEffect)
+const std::vector<int>& CMuStyleEditorUI::UsersOf(const std::string& name, bool effect)
 {
     const int modelsVersion = g_ItemModelDatabase.GetVersion();
-    if (m_users.name != name || m_users.itemEffect != itemEffect || m_users.modelsVersion != modelsVersion)
+    if (m_users.name != name || m_users.effect != effect || m_users.modelsVersion != modelsVersion)
     {
-        m_users = {name, itemEffect, modelsVersion,
-                   itemEffect ? MuEditor::Items::FindItemEffectUsers(name)
+        m_users = {name, effect, modelsVersion,
+                   effect ? MuEditor::Items::FindEffectUsers(name)
                               : MuEditor::Items::FindRenderStyleUsers(name)};
     }
     return m_users.items;
@@ -1352,7 +1352,7 @@ void CMuStyleEditorUI::RenderPreview(const LookDefinition* look)
     }
     // The item as it is (with its own look or none), then the look as applied and as the fields have it on the picked
     // item, whatever look it names (design L41).
-    const bool effect = m_draftKind == Data::Looks::LookKind::ItemEffect;
+    const bool effect = m_draftKind == Data::Looks::LookKind::Effect;
     const LookDefinition* applied = EditsOf(m_draftKind).Find(look->name);
     // An item that names this look and sets values of it draws the look with them, as the game does (design L12).
     if (applied != nullptr)

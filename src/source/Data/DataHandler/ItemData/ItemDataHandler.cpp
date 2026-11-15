@@ -926,9 +926,9 @@ void CItemDataHandler::FollowDerivedFieldsAfterMove(const ItemDefinition& before
     }
 }
 
-void CItemDataHandler::SetLookNames(LookNameExists renderStyleExists, LookNameExists itemEffectExists)
+void CItemDataHandler::SetLookNames(LookNameExists renderStyleExists, LookNameExists effectExists)
 {
-    m_lookNames = LookNames{renderStyleExists, itemEffectExists};
+    m_lookNames = LookNames{renderStyleExists, effectExists};
 }
 
 void CItemDataHandler::Validate(std::vector<ItemDataIssue>& issues) const
@@ -978,7 +978,7 @@ void CItemDataHandler::Validate(std::vector<ItemDataIssue>& issues) const
     }
     if (m_lookNames)
     {
-        ValidateItemModelLooks(models, m_lookNames->renderStyle, m_lookNames->itemEffect, issues);
+        ValidateItemModelLooks(models, m_lookNames->renderStyle, m_lookNames->effect, issues);
     }
     ValidateDirectlySharedModelFiles(models, issues);
     ValidateItemModelsAsWritten(g_ItemModelDatabase.GetAllSlots(), issues);
@@ -1020,7 +1020,7 @@ ItemDataSaveResult CItemDataHandler::Save(std::vector<ItemDataIssue>& issues,
     models.groundLabels = &g_ItemDatabase.GetGroundLabels();
     models.groundLabelsChanged = m_groundLabelsChanged;
     // The look files as the Style Editor changed them (design L39), when the read could use the whole file.
-    for (const Data::Looks::LookKind kind : {Data::Looks::LookKind::RenderStyle, Data::Looks::LookKind::ItemEffect})
+    for (const Data::Looks::LookKind kind : {Data::Looks::LookKind::RenderStyle, Data::Looks::LookKind::Effect})
     {
         const LookFileState& state = m_lookFiles[static_cast<std::size_t>(kind)];
         if (!state.changed || !state.complete)

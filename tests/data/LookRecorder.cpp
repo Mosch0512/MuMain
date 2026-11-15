@@ -322,7 +322,7 @@ std::vector<Situation> SituationsFor(std::string_view renderStyle, Data::Looks::
     {
         conditions.push_back(layer.onlyWhen);
     }
-    for (const Data::Looks::ItemValuesBefore& entry : look->itemValuesBefore)
+    for (const Data::Looks::ValuesBefore& entry : look->valuesBefore)
     {
         conditions.push_back(entry.onlyWhen);
     }
@@ -502,7 +502,7 @@ void ShippedItems::Open(std::span<const int> itemTypes)
         }
     }
     Data::Items::ModelLoader::ReopenModels(items, {});
-    // As the game loads them before the looks find theirs: the textures of OpenBasicData and the item effect textures
+    // As the game loads them before the looks find theirs: the textures of OpenBasicData and the effect textures
     // at their indices, which looks in code name; then the textures the looks in data name.
     static const bool effectTexturesLoaded = []
     {
@@ -510,7 +510,7 @@ void ShippedItems::Open(std::span<const int> itemTypes)
         {
             LoadBitmap(texture.file, texture.index, GL_LINEAR, texture.wrap);
         }
-        OpenItemEffectTextures();
+        OpenEffectTextures();
         return true;
     }();
     (void)effectTexturesLoaded;
@@ -522,7 +522,7 @@ std::vector<int> ItemsUsing(std::string_view renderStyle, Data::Looks::LookKind 
     std::vector<int> items;
     for (const Data::Items::ItemModelDefinition& model : ShippedModels().models)
     {
-        if ((kind == Data::Looks::LookKind::ItemEffect ? model.itemEffect : model.renderStyle) == renderStyle)
+        if ((kind == Data::Looks::LookKind::Effect ? model.effect : model.renderStyle) == renderStyle)
         {
             items.push_back(Data::Items::MakeItemType(model.group, model.number));
         }

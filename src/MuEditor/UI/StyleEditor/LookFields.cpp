@@ -1472,13 +1472,13 @@ bool ItemValues(Data::Looks::ItemValues& values, const std::vector<LookPart>& pa
     return changed;
 }
 
-bool ItemValuesBeforeEntry(Data::Looks::ItemValuesBefore& entry, const std::vector<LookPart>& parts)
+bool ValuesBeforeEntry(Data::Looks::ValuesBefore& entry, const std::vector<LookPart>& parts)
 {
     namespace Text = I18N::Editor;
     constexpr int GlowLevel = 7;
     constexpr int MaxLevel = 15;
     bool changed = OnlyWhenFields(entry.onlyWhen, parts);
-    // The drawing sets the model's light after the item effect: an entry has none.
+    // The drawing sets the model's light after the effect: an entry has none.
     changed |= ItemValues(entry.values, parts, false);
     changed |= LeftValue<Number>(Text::DrawingOpacity, entry.drawingOpacity, 1.0f, [](Number& value)
                                  { return NumberField(Text::DrawingOpacity, value, Text::DrawingOpacityTooltip); });
@@ -1522,7 +1522,7 @@ bool ObjectLight(std::optional<std::array<Number, 3>>& light)
     return changed;
 }
 
-std::string DescribeItemValuesBefore(const Data::Looks::ItemValuesBefore& entry)
+std::string DescribeValuesBefore(const Data::Looks::ValuesBefore& entry)
 {
     std::string text = DescribeItemValues(entry.values);
     if (entry.drawingOpacity)

@@ -33,7 +33,7 @@ struct RenderStyleCheckInput
 void CheckRenderStyles(std::span<const LookDefinition> looks, const std::string& source,
                        const RenderStyleCheckInput& input, std::vector<Items::ItemDataIssue>& issues);
 
-// Appends the problems of the item effects `looks`: a mesh number an item's model doesn't have (warning, about that
+// Appends the problems of the effects `looks`: a mesh number an item's model doesn't have (warning, about that
 // item), a value an item sets that the effect doesn't let it set, an effect no item uses (warning).
 void CheckItemEffects(std::span<const LookDefinition> looks, const std::string& source,
                       const RenderStyleCheckInput& input, std::vector<Items::ItemDataIssue>& issues);

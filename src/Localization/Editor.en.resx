@@ -614,7 +614,7 @@
     <value>Never drawn, so the preview can't show it alone.</value>
   </data>
   <data name="Mesh code looks note" xml:space="preserve">
-    <value>The Style Editor shows which parts the render style draws and with which effects; the item effect is drawing code.</value>
+    <value>The Style Editor shows which parts the render style draws and with which effects; the effect is drawing code.</value>
   </data>
   <data name="Preview pick note" xml:space="preserve">
     <value>Click a part to find its mesh in the mesh list.</value>
@@ -631,14 +631,11 @@
   <data name="Render style" xml:space="preserve">
     <value>Render style</value>
   </data>
-  <data name="Item effect" xml:space="preserve">
-    <value>Item effect</value>
+  <data name="Effect" xml:space="preserve">
+    <value>Effect</value>
   </data>
   <data name="Render styles" xml:space="preserve">
     <value>Render styles</value>
-  </data>
-  <data name="Item effects" xml:space="preserve">
-    <value>Item effects</value>
   </data>
   <data name="Style Editor" xml:space="preserve">
     <value>Style Editor</value>
@@ -653,7 +650,7 @@
     <value>Render styles are in Data/Effects/RenderStyles.json or still drawing code, marked (code); Open in Style Editor shows the look. This picks which one the item uses.</value>
   </data>
   <data name="Style Editor tree note" xml:space="preserve">
-    <value>Render styles draw an item in layers; item effects act before it is drawn. Folders only sort the looks: drag a look or a folder onto a folder or onto its root. A look marked (code) is still drawing code: you see it and its items, but can't change it.</value>
+    <value>Render styles draw an item in layers; effects act before it is drawn. Folders only sort the looks: drag a look or a folder onto a folder or onto its root. A look marked (code) is still drawing code: you see it and its items, but can't change it.</value>
   </data>
   <data name="New look" xml:space="preserve">
     <value>New look</value>
@@ -694,8 +691,8 @@
   <data name="A look name of letters and digits that no other render style has" xml:space="preserve">
     <value>A name of letters and digits that no other render style has, in the file or in code.</value>
   </data>
-  <data name="A look name of letters and digits that no other item effect has" xml:space="preserve">
-    <value>A name of letters and digits that no other item effect has</value>
+  <data name="A look name of letters and digits that no other effect has" xml:space="preserve">
+    <value>A name of letters and digits that no other effect has</value>
   </data>
   <data name="Only a look no item uses can be renamed or removed." xml:space="preserve">
     <value>Only a look no item uses can be renamed or removed.</value>
@@ -703,8 +700,8 @@
   <data name="Code look note" xml:space="preserve">
     <value>Still drawing code (Render/Items/ItemRenderStyles.cpp): you see the look and its items here, but can't change it. It moves into the look file in a later step.</value>
   </data>
-  <data name="Item effects root note" xml:space="preserve">
-    <value>The item effects of {0}, and those still drawing code, marked (code). An item effect sets item values before the item is drawn and can put a light on the item's object.</value>
+  <data name="Effects root note" xml:space="preserve">
+    <value>The effects of {0}, and those still drawing code, marked (code). An effect sets item values before the item is drawn and can put a light on the item's object.</value>
   </data>
   <data name="Render styles root note" xml:space="preserve">
     <value>The render styles of {0}, and those still drawing code, marked (code).</value>
@@ -968,7 +965,7 @@
     <value>Only at these levels: the level the item glows like, from and to, both included.</value>
   </data>
   <data name="Only when hidden mesh tooltip" xml:space="preserve">
-    <value>Only when the item hides this mesh in this drawing (its hidden mesh, which item effects can set), or when it hides none.</value>
+    <value>Only when the item hides this mesh in this drawing (its hidden mesh, which effects can set), or when it hides none.</value>
   </data>
   <data name="No hidden mesh" xml:space="preserve">
     <value>No hidden mesh</value>
@@ -1010,7 +1007,7 @@
     <value>Draws alone</value>
   </data>
   <data name="Draws alone tooltip" xml:space="preserve">
-    <value>Drawn right after the item's item effect, in the object's own light, with nothing of the drawing code after it: no level light from +3, no level glow from +7, no excellent glow, no buff tint.</value>
+    <value>Drawn right after the item's effect, in the object's own light, with nothing of the drawing code after it: no level light from +3, no level glow from +7, no excellent glow, no buff tint.</value>
   </data>
   <data name="Before drawing" xml:space="preserve">
     <value>Before drawing</value>
@@ -1116,6 +1113,9 @@
   </data>
   <data name="Effect Browser" xml:space="preserve">
     <value>Effect Browser</value>
+  </data>
+  <data name="Effect types" xml:space="preserve">
+    <value>Effect types</value>
   </data>
   <data name="Effect types not loaded" xml:space="preserve">
     <value>The effect types are not loaded yet; the loading screen loads them.</value>
@@ -3644,7 +3644,7 @@
     <value>Part models</value>
   </data>
   <data name="Part model note" xml:space="preserve">
-    <value>A part model: drawn with items, where the game code puts it (the +15 armor decorations, the Phoenix Soul Star's wing, the Phoenix Soul Armor in the inventory). Its entry in Data/Items/Models/PartModels.json holds its file, texture folders and render style; it has no inventory, ground, glow or item effect. Pick an item to see items again.</value>
+    <value>A part model: drawn with items, where the game code puts it (the +15 armor decorations, the Phoenix Soul Star's wing, the Phoenix Soul Armor in the inventory). Its entry in Data/Items/Models/PartModels.json holds its file, texture folders and render style; it has no inventory, ground, glow or effect. Pick an item to see items again.</value>
   </data>
   <data name="The part model {0} has no entry" xml:space="preserve">
     <value>The part model {0} has no entry in PartModels.json.</value>

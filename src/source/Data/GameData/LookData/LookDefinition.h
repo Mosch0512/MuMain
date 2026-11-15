@@ -8,18 +8,18 @@
 #include <variant>
 #include <vector>
 
-// The looks of items as data (docs/item-data.md, "Render styles and item effects"): named render styles in
-// Data/Effects/RenderStyles.json and item effects in Data/Effects/ItemEffects.json. A render style draws an item in
+// The looks of items as data (docs/item-data.md, "Render styles and effects"): named render styles in
+// Data/Effects/RenderStyles.json and effects in Data/Effects/Effects.json. A render style draws an item in
 // layers; each layer draws some of the model's meshes in one way. Looks still in code (ItemRenderStyles.cpp) are found
 // by the same names when no file has them.
 namespace Data::Looks
 {
-// The two kinds of looks (design L13): a render style draws the item (Data/Effects/RenderStyles.json), an item effect
-// does what comes before the drawing (Data/Effects/ItemEffects.json). A look has only its kind's parts.
+// The two kinds of looks (design L13): a render style draws the item (Data/Effects/RenderStyles.json), an effect
+// does what comes before the drawing (Data/Effects/Effects.json). A look has only its kind's parts.
 enum class LookKind
 {
     RenderStyle,
-    ItemEffect,
+    Effect,
 };
 
 // What a layer draws its meshes with.
@@ -281,12 +281,12 @@ struct ItemValues
     bool operator==(const ItemValues&) const = default;
 };
 
-// Item values an item effect sets before the drawing (design L13), when its Only when holds. The entries apply in
+// Item values an effect sets before the drawing (design L13), when its Only when holds. The entries apply in
 // their order, so a condition can read the level an entry before it set.
-struct ItemValuesBefore
+struct ValuesBefore
 {
     OnlyWhen onlyWhen;
-    // Without the light: the drawing sets the model's light after the item effect.
+    // Without the light: the drawing sets the model's light after the effect.
     ItemValues values;
     // The opacity the drawing hands the look (a layer's "drawing" opacity): the Devil's Eye draws at 2.
     std::optional<Number> drawingOpacity;
@@ -298,7 +298,7 @@ struct ItemValuesBefore
     {
         return values.IsEmpty() && !drawingOpacity && !glowsLikeLevel;
     }
-    bool operator==(const ItemValuesBefore&) const = default;
+    bool operator==(const ValuesBefore&) const = default;
 };
 
 struct LookDefinition
@@ -308,14 +308,14 @@ struct LookDefinition
     std::vector<Layer> layers;
     ItemValues itemValuesAfter;
     NotFor notFor;
-    // Draws alone (design L47): drawn where the item effects that drew the model drew, right after the item effect, in
+    // Draws alone (design L47): drawn where the effects that drew the model drew, right after the effect, in
     // the object's own light, with nothing of the drawing code after it (no level light, level glow, excellent glow or
     // buff tint).
     bool drawsAlone = false;
-    // An item effect's parts: the item values it sets before the drawing, and the light the update puts on the
+    // An effect's parts: the item values it sets before the drawing, and the light the update puts on the
     // item's object (OBJECT::Light, design L45), red, green and blue, which the ground item's next draw adds to its
     // light.
-    std::vector<ItemValuesBefore> itemValuesBefore;
+    std::vector<ValuesBefore> valuesBefore;
     std::optional<std::array<Number, 3>> objectLight;
 
     bool operator==(const LookDefinition&) const = default;

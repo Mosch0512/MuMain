@@ -15,8 +15,8 @@ namespace MuEditor::Looks
 // A look's row in the Style Editor's tree: "chromeMesh0 (12)", with " (code)" for one still in code.
 std::string LookRowLabel(const std::string& name, int users, bool code);
 
-// A root of the Style Editor's tree (design L31): the render styles, or the item effects. Its looks are those of the
-// look file of its kind (Data/Effects/RenderStyles.json or ItemEffects.json, LookEdits::Of) and the ones still in code,
+// A root of the Style Editor's tree (design L31): the render styles, or the effects. Its looks are those of the
+// look file of its kind (Data/Effects/RenderStyles.json or Effects.json, LookEdits::Of) and the ones still in code,
 // sorted by name. Only looks in the file go into its folders; one in code stays under the root, marked "(code)".
 class LooksRoot final : public NamedTreeRoot
 {

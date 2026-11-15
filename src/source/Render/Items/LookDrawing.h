@@ -41,12 +41,12 @@ public:
     [[nodiscard]] static bool Active();
 };
 
-// Sets the item values an item effect that is data sets before the drawing (design L13): each entry whose Only when
+// Sets the item values an effect that is data sets before the drawing (design L13): each entry whose Only when
 // holds, in their order; an entry can also set the opacity the drawing hands the look (`alpha`) and the level the
 // item glows like (`level`, which the later entries' conditions read).
 void ApplyItemEffect(const Data::Looks::LookDefinition& effect, BMD* b, const OBJECT* o, DrawLook& look, float& alpha,
                      int& level);
-// Puts the light of an item effect that is data on the item's object, in the update (design L45).
+// Puts the light of an effect that is data on the item's object, in the update (design L45).
 void SpawnItemEffect(const Data::Looks::LookDefinition& effect, OBJECT* o);
 
 // Finds the texture each layer names, loading the ones no code loaded; done after the item textures are loaded. A layer
