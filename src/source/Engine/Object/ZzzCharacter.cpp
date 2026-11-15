@@ -9758,7 +9758,7 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
     case MONSTER_MAGIC_SKELETON_6:
     case MONSTER_MAGIC_SKELETON_7:
     {
-        BOOL bRender = Calc_RenderObject(o, Translate, Select, 0);
+        BOOL bRender = Calc_RenderObject(o, Translate, Select);
 
         if (auto* pCloth = (CPhysicsCloth*)c->Object.m_pCloth)
         {
@@ -9766,7 +9766,7 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
         }
         if (bRender)
         {
-            Draw_RenderObject(o, Translate, Select, 0);
+            Draw_RenderObject(o, Translate, Select, false);
         }
     }
     break;
@@ -9832,7 +9832,7 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
     {
         if (!styled && c->MonsterIndex == MONSTER_DREADFEAR && o->CurrentAction == MONSTER01_ATTACK2)
         {
-            RenderObject_AfterImage(o, Translate, Select, 0);
+            RenderObject_AfterImage(o, Translate, Select);
         }
         else
         {

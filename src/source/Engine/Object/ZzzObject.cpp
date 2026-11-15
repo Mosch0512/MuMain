@@ -375,8 +375,7 @@ void UpdateDrawnObjectHold(OBJECT* o)
     }
 }
 
-bool Calc_RenderObject(const OBJECT* o, bool Translate, int Select, int ExtraMon, const float* origin,
-                       const ObjectGhost* ghost)
+bool Calc_RenderObject(const OBJECT* o, bool Translate, int Select, const float* origin, const ObjectGhost* ghost)
 {
     DrawLook look = DrawLook::Of(*o);
     if (ghost != nullptr)
@@ -565,7 +564,7 @@ void TintByDebuffs(const OBJECT* o, BMD* b)
 }
 
 // The maps' and the models' code that draws a body (Draw_RenderObject); false when none of it draws this one.
-bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b, int ExtraMon)
+bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (RenderHellasObjectMesh(o, look, b))
     {
@@ -573,16 +572,16 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b, int ExtraMon)
     else if (battleCastle::RenderBattleCastleObjectMesh(o, look, b))
     {
     }
-    else if (M31HuntingGround::RenderHuntingGroundObjectMesh(o, look, b, ExtraMon))
+    else if (M31HuntingGround::RenderHuntingGroundObjectMesh(o, look, b))
     {
     }
     else if (M34CryingWolf2nd::RenderCryingWolf2ndObjectMesh(o, look, b))
     {
     }
-    else if (M33Aida::RenderAidaObjectMesh(o, look, b, ExtraMon))
+    else if (M33Aida::RenderAidaObjectMesh(o, look, b))
     {
     }
-    else if (M34CryWolf1st::RenderCryWolf1stObjectMesh(o, look, b, ExtraMon))
+    else if (M34CryWolf1st::RenderCryWolf1stObjectMesh(o, look, b))
     {
     }
     else if (M37Kanturu1st::RenderKanturu1stObjectMesh(o, look, b))
@@ -591,19 +590,19 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b, int ExtraMon)
     else if (M38Kanturu2nd::Render_Kanturu2nd_ObjectMesh(o, look, b))
     {
     }
-    else if (M39Kanturu3rd::RenderKanturu3rdObjectMesh(o, look, b, ExtraMon))
+    else if (M39Kanturu3rd::RenderKanturu3rdObjectMesh(o, look, b))
     {
     }
     else if (SEASON3A::CGM3rdChangeUp::Instance().RenderObjectMesh(o, look, b))
     {
     }
-    else if (g_CursedTemple->RenderObjectMesh(o, look, b, ExtraMon))
+    else if (g_CursedTemple->RenderObjectMesh(o, look, b))
     {
     }
-    else if (SEASON3B::GMNewTown::RenderObject(o, look, b, ExtraMon))
+    else if (SEASON3B::GMNewTown::RenderObject(o, look, b))
     {
     }
-    else if (SEASON3C::GMSwampOfQuiet::RenderObject(o, look, b, ExtraMon))
+    else if (SEASON3C::GMSwampOfQuiet::RenderObject(o, look, b))
     {
     }
     else if (TheMapProcess().RenderObjectMesh(o, look, b))
@@ -1343,7 +1342,7 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b, int ExtraMon)
 }
 } // namespace
 
-void Draw_RenderObject(const OBJECT* o, bool Translate, int Select, int ExtraMon, const ObjectGhost* ghost)
+void Draw_RenderObject(const OBJECT* o, bool Translate, int Select, bool cloakedOutline, const ObjectGhost* ghost)
 {
     DrawLook look = DrawLook::Of(*o);
     if (ghost != nullptr)
@@ -1365,7 +1364,8 @@ void Draw_RenderObject(const OBJECT* o, bool Translate, int Select, int ExtraMon
 
     if ((EditFlag != EDIT_NONE) || (EditFlag == EDIT_NONE && look.hiddenMesh != -2))
     {
-        if (ExtraMon == 10)
+        // A cloaked rider's mount or pet: a faint outline, unless the hero's siege team may see through the cloak.
+        if (cloakedOutline)
         {
             float Alpha = 0.5f;
 
@@ -1942,7 +1942,7 @@ void Draw_RenderObject(const OBJECT* o, bool Translate, int Select, int ExtraMon
             {
                 TintByDebuffs(o, b);
 
-                BOOL bIsRendered = DrawBodyByCode(o, look, b, ExtraMon) ? TRUE : FALSE;
+                BOOL bIsRendered = DrawBodyByCode(o, look, b) ? TRUE : FALSE;
 
                 if (bIsRendered == TRUE)
                 {
@@ -3322,7 +3322,7 @@ private:
 };
 } // namespace
 
-void RenderObject(const OBJECT* o, bool Translate, int Select, int ExtraMon, const ObjectGhost* ghost)
+void RenderObject(const OBJECT* o, bool Translate, int Select, bool cloakedOutline, const ObjectGhost* ghost)
 {
     const ModelLodScope lod(*o);
     // Split only for map objects; characters' parts come through here too.
@@ -3331,7 +3331,7 @@ void RenderObject(const OBJECT* o, bool Translate, int Select, int ExtraMon, con
         std::optional<FrameProfiler::Scope> animate;
         if (mapObject)
             animate.emplace(FrameProfiler::Pass::ObjectsAnimate);
-        if (Calc_RenderObject(o, Translate, Select, ExtraMon, nullptr, ghost) == false)
+        if (Calc_RenderObject(o, Translate, Select, nullptr, ghost) == false)
         {
             return;
         }
@@ -3339,10 +3339,10 @@ void RenderObject(const OBJECT* o, bool Translate, int Select, int ExtraMon, con
     std::optional<FrameProfiler::Scope> draw;
     if (mapObject)
         draw.emplace(FrameProfiler::Pass::ObjectsDraw);
-    Draw_RenderObject(o, Translate, Select, ExtraMon, ghost);
+    Draw_RenderObject(o, Translate, Select, cloakedOutline, ghost);
 }
 
-void RenderObject_AfterImage(const OBJECT* o, bool Translate, int Select, int ExtraMon)
+void RenderObject_AfterImage(const OBJECT* o, bool Translate, int Select)
 {
     // Two ghosts behind the object, at earlier frames and fainter; the object stays as it stands.
     const ObjectGhost ghosts[] = {{0.2f, o->AnimationFrame - 1.4f}, {0.6f, o->AnimationFrame - 0.7f}};
@@ -4318,16 +4318,16 @@ void RenderObjects()
 #endif
 }
 
-void RenderObject_AfterCharacter(const OBJECT* o, bool Translate, int Select, int ExtraMon)
+void RenderObject_AfterCharacter(const OBJECT* o, bool Translate, int Select)
 {
-    if (Calc_RenderObject(o, Translate, Select, ExtraMon) == false)
+    if (Calc_RenderObject(o, Translate, Select) == false)
     {
         return;
     }
-    Draw_RenderObject_AfterCharacter(o, Translate, Select, ExtraMon);
+    Draw_RenderObject_AfterCharacter(o, Translate, Select);
 }
 
-void Draw_RenderObject_AfterCharacter(const OBJECT* o, bool Translate, int Select, int ExtraMon)
+void Draw_RenderObject_AfterCharacter(const OBJECT* o, bool Translate, int Select)
 {
     DrawLook look = DrawLook::Of(*o);
     BMD* b = &Models[o->Type];
@@ -6449,11 +6449,11 @@ void RenderItems()
     }
 }
 
-void PartObjectColor(int Type, float Alpha, float Bright, vec3_t Light, bool ExtraMon)
+void PartObjectColor(int Type, float Alpha, float Bright, vec3_t Light, bool inMonsterHands)
 {
     // Monsters keep their colors here; items have theirs in the item model files.
     std::array<float, 3> color{};
-    if (ExtraMon && (Type == MODEL_BALROG || Type == MODEL_BILL_OF_BALROG))
+    if (inMonsterHands && (Type == MODEL_BALROG || Type == MODEL_BILL_OF_BALROG))
     {
         color = {0.8f, 0.8f, 1.0f};
     }
@@ -6474,7 +6474,7 @@ void PartObjectColor(int Type, float Alpha, float Bright, vec3_t Light, bool Ext
     Vector(Bright * color[0], Bright * color[1], Bright * color[2], Light);
 }
 
-void PartObjectColor2(int Type, float Alpha, float Bright, vec3_t Light, bool ExtraMon)
+void PartObjectColor2(int Type, float Alpha, float Bright, vec3_t Light, bool inMonsterHands)
 {
     const Render::Items::Glow::Colors& colors = Render::Items::Glow::GetColors(Type);
     if (colors.shineWhite)
@@ -6488,7 +6488,7 @@ void PartObjectColor2(int Type, float Alpha, float Bright, vec3_t Light, bool Ex
     Vector(Bright * color[0] * Light[0], Bright * color[1] * Light[1], Bright * color[2] * Light[2], Light);
 }
 
-void PartObjectColor3(int Type, float Alpha, float Bright, vec3_t Light, bool ExtraMon)
+void PartObjectColor3(int Type, float Alpha, float Bright, vec3_t Light, bool inMonsterHands)
 {
     const Render::Items::Glow::Color& color = Render::Items::Glow::GetColors(Type).ancientColor;
     Vector(color[0], color[1], color[2], Light);

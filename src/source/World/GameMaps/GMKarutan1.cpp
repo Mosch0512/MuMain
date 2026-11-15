@@ -165,7 +165,7 @@ bool CGMKarutan1::UpdateObjectEffects(OBJECT* o, BMD* b)
     return false;
 }
 
-bool CGMKarutan1::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool CGMKarutan1::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (!IsKarutanMap())
         return false;
@@ -279,7 +279,7 @@ bool CGMKarutan1::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool
     return false;
 }
 
-void CGMKarutan1::RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+void CGMKarutan1::RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (!IsKarutanMap())
         return;

@@ -424,7 +424,7 @@ bool M39Kanturu3rd::UpdateKanturu3rdObjectEffects(OBJECT* o, BMD* b)
     return true;
 }
 
-bool M39Kanturu3rd::RenderKanturu3rdObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool M39Kanturu3rd::RenderKanturu3rdObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (IsInKanturu3rd())
     {
@@ -594,10 +594,10 @@ bool M39Kanturu3rd::RenderKanturu3rdObjectMesh(const OBJECT* o, DrawLook& look, 
         }
     }
 
-    return RenderKanturu3rdMonsterObjectMesh(o, look, b, ExtraMon);
+    return RenderKanturu3rdMonsterObjectMesh(o, look, b);
 }
 
-void M39Kanturu3rd::RenderKanturu3rdAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+void M39Kanturu3rd::RenderKanturu3rdAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (IsInKanturu3rd())
     {
@@ -1175,7 +1175,7 @@ bool M39Kanturu3rd::UpdateKanturu3rdMonsterEffects(CHARACTER* c, OBJECT* o, BMD*
     return false;
 }
 
-bool M39Kanturu3rd::RenderKanturu3rdMonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool M39Kanturu3rd::RenderKanturu3rdMonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     switch (o->Type)
     {

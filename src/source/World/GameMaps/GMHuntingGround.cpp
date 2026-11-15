@@ -159,7 +159,7 @@ bool M31HuntingGround::UpdateHuntingGroundObjectEffects(OBJECT* pObject, BMD* pM
 
     return true;
 }
-bool M31HuntingGround::RenderHuntingGroundObjectMesh(const OBJECT* pObject, DrawLook& look, BMD* pModel, bool ExtraMon)
+bool M31HuntingGround::RenderHuntingGroundObjectMesh(const OBJECT* pObject, DrawLook& look, BMD* pModel)
 {
     if (IsInHuntingGround())
     {
@@ -197,7 +197,7 @@ bool M31HuntingGround::RenderHuntingGroundObjectMesh(const OBJECT* pObject, Draw
                                look.blendMeshV, look.hiddenMesh);
         }
     }
-    return RenderHuntingGroundMonsterObjectMesh(pObject, look, pModel, ExtraMon);
+    return RenderHuntingGroundMonsterObjectMesh(pObject, look, pModel);
 }
 
 bool M31HuntingGround::MoveHuntingGroundMonsterVisual(OBJECT* pObject, BMD* pModel)
@@ -614,8 +614,7 @@ bool M31HuntingGround::UpdateHuntingGroundMonsterEffects(CHARACTER* pCharacter, 
     }
     return false;
 }
-bool M31HuntingGround::RenderHuntingGroundMonsterObjectMesh(const OBJECT* pObject, DrawLook& look, BMD* pModel,
-                                                            bool ExtraMon)
+bool M31HuntingGround::RenderHuntingGroundMonsterObjectMesh(const OBJECT* pObject, DrawLook& look, BMD* pModel)
 {
     switch (pObject->Type)
     {

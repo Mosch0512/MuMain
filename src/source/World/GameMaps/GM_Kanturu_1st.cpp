@@ -314,7 +314,7 @@ bool M37Kanturu1st::RenderKanturu1stObjectVisual(const OBJECT* pObject, DrawLook
     return true;
 }
 
-bool M37Kanturu1st::RenderKanturu1stObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool M37Kanturu1st::RenderKanturu1stObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (IsKanturu1st() || M40GMArea::IsGmArea())
     {
@@ -342,7 +342,7 @@ bool M37Kanturu1st::RenderKanturu1stObjectMesh(const OBJECT* o, DrawLook& look, 
         }
     }
 
-    return RenderKanturu1stMonsterObjectMesh(o, look, b, ExtraMon);
+    return RenderKanturu1stMonsterObjectMesh(o, look, b);
 }
 
 void M37Kanturu1st::RenderKanturu1stAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
@@ -637,7 +637,7 @@ bool M37Kanturu1st::MoveKanturu1stMonsterVisual(CHARACTER* c, OBJECT* o, BMD* b)
     return false;
 }
 
-bool M37Kanturu1st::RenderKanturu1stMonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, int ExtraMon)
+bool M37Kanturu1st::RenderKanturu1stMonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     switch (o->Type)
     {

@@ -679,7 +679,7 @@ TEST_CASE("A dying Blood Assassin breaks apart from the update, body and head, a
     FenrirScope::ClearSpawns();
 
     DrawLook look = DrawLook::Of(o);
-    CheckDrawSpawnsNone([&] { map->RenderObjectMesh(&o, look, b, false); });
+    CheckDrawSpawnsNone([&] { map->RenderObjectMesh(&o, look, b); });
     CHECK(liveEffects() == 0);
     map->UpdateMonsterEffects(&c, &o, b);
     CHECK(liveEffects() == 2);
@@ -1222,8 +1222,8 @@ TEST_CASE("A dying Dreadfear fades in its update, by the reference clock, not in
         CheckDrawSpawnsNone(
             [&]
             {
-                M38Kanturu2nd::Render_Kanturu2nd_MonsterObjectMesh(&dreadfear, look, b, 0);
-                M39Kanturu3rd::RenderKanturu3rdMonsterObjectMesh(&dreadfear, look, b, false);
+                M38Kanturu2nd::Render_Kanturu2nd_MonsterObjectMesh(&dreadfear, look, b);
+                M39Kanturu3rd::RenderKanturu3rdMonsterObjectMesh(&dreadfear, look, b);
             });
         CHECK(dreadfear.Alpha == 0.5f);
 
@@ -1293,7 +1293,7 @@ TEST_CASE("Drawing an object whose pose the update has not built leaves its pose
     REQUIRE_FALSE(Engine::Object::Pose::IsCurrent(&rock, b, true));
     const float before = rock.BoneTransform[0][0][3];
 
-    CheckDrawSpawnsNone([&] { CHECK(Calc_RenderObject(&rock, false, 0, 0)); });
+    CheckDrawSpawnsNone([&] { CHECK(Calc_RenderObject(&rock, false, 0)); });
     CHECK_FALSE(Engine::Object::Pose::IsCurrent(&rock, b, true));
     CHECK(rock.BoneTransform[0][0][3] == before);
 }
@@ -1392,7 +1392,7 @@ TEST_CASE("A Dragon Kick afterimage leaves the fading character's alpha, place a
     CHECK(o->AnimationFrame == 4.f);
     CHECK(o->Position[0] == 1000.f);
 
-    RepeatedDraws::CheckChangesNothing([o] { RenderObject_AfterImage(o, true, 0, 0); });
+    RepeatedDraws::CheckChangesNothing([o] { RenderObject_AfterImage(o, true, 0); });
     CHECK(o->Alpha == 0.4f);
     CHECK(o->AnimationFrame == 4.f);
 }

@@ -222,7 +222,7 @@ void CGMDoppelGanger1::MoveBlurEffect(CHARACTER* pCharacter, OBJECT* pObject, BM
     }
 }
 
-bool CGMDoppelGanger1::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool CGMDoppelGanger1::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (IsDoppelGanger1() == false)
         return false;
@@ -458,7 +458,7 @@ bool CGMDoppelGanger1::RenderMonsterVisual(const CHARACTER* c, const OBJECT* o, 
     return false;
 }
 
-void CGMDoppelGanger1::RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+void CGMDoppelGanger1::RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (IsDoppelGanger1() == false)
         return;

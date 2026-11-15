@@ -254,7 +254,7 @@ bool SEASON3A::CGM3rdChangeUp::UpdateObjectEffects(OBJECT* pObject, BMD* pModel)
     return true;
 }
 
-bool SEASON3A::CGM3rdChangeUp::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool SEASON3A::CGM3rdChangeUp::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (IsBalgasBarrackMap() || IsBalgasRefugeMap())
     {
@@ -288,7 +288,7 @@ bool SEASON3A::CGM3rdChangeUp::RenderObjectMesh(const OBJECT* o, DrawLook& look,
             return true;
         }
     }
-    return RenderMonsterObjectMesh(o, look, b, ExtraMon);
+    return RenderMonsterObjectMesh(o, look, b);
 }
 
 void SEASON3A::CGM3rdChangeUp::RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
@@ -637,7 +637,7 @@ void SEASON3A::CGM3rdChangeUp::MoveBalgasBarrackBlurEffect(CHARACTER* c, OBJECT*
     }
 }
 
-bool SEASON3A::CGM3rdChangeUp::RenderMonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, int ExtraMon)
+bool SEASON3A::CGM3rdChangeUp::RenderMonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     switch (o->Type)
     {

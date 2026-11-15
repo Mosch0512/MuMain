@@ -617,12 +617,12 @@ void GMEmpireGuardian4::MoveBlurEffect(CHARACTER* c, OBJECT* o, BMD* b)
     }
 }
 
-bool GMEmpireGuardian4::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool GMEmpireGuardian4::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (gMapManager.IsEmpireGuardian4() == false)
         return false;
 
-    if (true == g_EmpireGuardian1.RenderObjectMesh(o, look, b, ExtraMon))
+    if (true == g_EmpireGuardian1.RenderObjectMesh(o, look, b))
     {
         return true;
     }
@@ -633,7 +633,7 @@ bool GMEmpireGuardian4::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b
     case MODEL_JERRY:
     case MODEL_LUCAS:
     {
-        RenderMonster(o, look, b, ExtraMon);
+        RenderMonster(o, look, b);
 
         return true;
     }
@@ -983,7 +983,7 @@ bool GMEmpireGuardian4::UpdateObjectEffects(OBJECT* o, BMD* b)
     return false;
 }
 
-bool GMEmpireGuardian4::RenderMonster(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool GMEmpireGuardian4::RenderMonster(const OBJECT* o, DrawLook& look, BMD* b)
 {
     switch (o->Type)
     {
@@ -1207,7 +1207,7 @@ bool GMEmpireGuardian4::UpdateMonsterEffects(CHARACTER* c, OBJECT* o, BMD* b)
     return false;
 }
 
-void GMEmpireGuardian4::RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+void GMEmpireGuardian4::RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (gMapManager.IsEmpireGuardian4() == false)
         return;

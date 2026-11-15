@@ -339,13 +339,13 @@ bool M33Aida::RenderAidaObjectVisual(const OBJECT* pObject, DrawLook& look, BMD*
 
     return true;
 }
-bool M33Aida::RenderAidaObjectMesh(const OBJECT* pObject, DrawLook& look, BMD* pModel, bool ExtraMon)
+bool M33Aida::RenderAidaObjectMesh(const OBJECT* pObject, DrawLook& look, BMD* pModel)
 {
     if (IsInAida())
     {
     }
 
-    return RenderAidaMonsterObjectMesh(pObject, look, pModel, ExtraMon);
+    return RenderAidaMonsterObjectMesh(pObject, look, pModel);
 }
 
 bool M33Aida::MoveAidaMonsterVisual(OBJECT* pObject, BMD* pModel)
@@ -932,7 +932,7 @@ bool M33Aida::UpdateAidaMonsterEffects(CHARACTER* pCharacter, OBJECT* pObject, B
     return false;
 }
 
-bool M33Aida::RenderAidaMonsterObjectMesh(const OBJECT* pObject, DrawLook& look, BMD* pModel, bool ExtraMon)
+bool M33Aida::RenderAidaMonsterObjectMesh(const OBJECT* pObject, DrawLook& look, BMD* pModel)
 {
     switch (pObject->Type)
     {

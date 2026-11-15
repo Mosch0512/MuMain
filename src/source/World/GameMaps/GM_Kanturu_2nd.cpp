@@ -407,7 +407,7 @@ bool M38Kanturu2nd::Update_Kanturu2nd_ObjectEffects(OBJECT* o, BMD* b)
     return true;
 }
 
-bool M38Kanturu2nd::Render_Kanturu2nd_ObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool M38Kanturu2nd::Render_Kanturu2nd_ObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (Is_Kanturu2nd() == true)
     {
@@ -512,7 +512,7 @@ bool M38Kanturu2nd::Render_Kanturu2nd_ObjectMesh(const OBJECT* o, DrawLook& look
         }
     }
 
-    return Render_Kanturu2nd_MonsterObjectMesh(o, look, b, ExtraMon);
+    return Render_Kanturu2nd_MonsterObjectMesh(o, look, b);
 }
 
 void M38Kanturu2nd::Render_Kanturu2nd_AfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
@@ -572,7 +572,7 @@ void M38Kanturu2nd::Render_Kanturu2nd_AfterObjectMesh(const OBJECT* o, DrawLook&
     }
 }
 
-bool M38Kanturu2nd::Render_Kanturu2nd_MonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, int ExtraMon)
+bool M38Kanturu2nd::Render_Kanturu2nd_MonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     switch (o->Type)
     {

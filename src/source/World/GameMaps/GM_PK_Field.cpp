@@ -420,7 +420,7 @@ bool CGM_PK_Field::UpdateObjectEffects(OBJECT* o, BMD* b)
     return false;
 }
 
-bool CGM_PK_Field::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool CGM_PK_Field::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (!gMapManager.IsPKField())
     {
@@ -429,7 +429,7 @@ bool CGM_PK_Field::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, boo
 
     if (o->Type >= MODEL_ZOMBIE_FIGHTER && o->Type <= MODEL_BURNING_LAVA_GIANT)
     {
-        RenderMonster(o, look, b, ExtraMon);
+        RenderMonster(o, look, b);
 
         return true;
     }
@@ -476,7 +476,7 @@ bool CGM_PK_Field::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, boo
     return false;
 }
 
-void CGM_PK_Field::RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+void CGM_PK_Field::RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (!gMapManager.IsPKField())
         return;
@@ -788,7 +788,7 @@ bool CGM_PK_Field::UpdateMonsterEffects(CHARACTER* c, OBJECT* o, BMD* b)
     return false;
 }
 
-bool CGM_PK_Field::RenderMonster(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool CGM_PK_Field::RenderMonster(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (!gMapManager.IsPKField())
     {

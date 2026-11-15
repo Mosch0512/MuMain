@@ -195,7 +195,7 @@ void GMUnitedMarketPlace::MoveBlurEffect(CHARACTER* c, OBJECT* o, BMD* b)
     // 	} //switch end
 }
 
-bool GMUnitedMarketPlace::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool GMUnitedMarketPlace::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (IsUnitedMarketPlace() == false)
     {
@@ -310,7 +310,7 @@ bool GMUnitedMarketPlace::UpdateObjectEffects(OBJECT* o, BMD* b)
     return false;
 }
 
-bool GMUnitedMarketPlace::RenderMonster(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+bool GMUnitedMarketPlace::RenderMonster(const OBJECT* o, DrawLook& look, BMD* b)
 {
     switch (o->Type)
     {
@@ -385,7 +385,7 @@ bool GMUnitedMarketPlace::UpdateMonsterEffects(CHARACTER* c, OBJECT* o, BMD* b)
     return false;
 }
 
-void GMUnitedMarketPlace::RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, bool ExtraMon)
+void GMUnitedMarketPlace::RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (IsUnitedMarketPlace() == false)
         return;

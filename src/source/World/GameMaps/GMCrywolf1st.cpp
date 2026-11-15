@@ -588,7 +588,7 @@ bool M34CryWolf1st::UpdateCryWolf1stObjectEffects(OBJECT* o, BMD* b)
 
     return true;
 }
-bool M34CryWolf1st::RenderCryWolf1stObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, int ExtraMon)
+bool M34CryWolf1st::RenderCryWolf1stObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     if (!IsCyrWolf1st())
     {
@@ -668,7 +668,7 @@ bool M34CryWolf1st::RenderCryWolf1stObjectMesh(const OBJECT* o, DrawLook& look, 
     return true;
     }
 
-    return RenderCryWolf1stMonsterObjectMesh(o, look, b, ExtraMon);
+    return RenderCryWolf1stMonsterObjectMesh(o, look, b);
 }
 
 bool M34CryWolf1st::MoveCryWolf1stMonsterVisual(CHARACTER* c, OBJECT* o, BMD* b)
@@ -1359,7 +1359,7 @@ void M34CryWolf1st::MoveCryWolf1stBlurEffect(CHARACTER* c, OBJECT* o, BMD* b)
     }
 }
 
-bool M34CryWolf1st::RenderCryWolf1stMonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b, int ExtraMon)
+bool M34CryWolf1st::RenderCryWolf1stMonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
 {
     switch (o->Type)
     {
