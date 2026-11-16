@@ -9910,14 +9910,6 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
             pCloth[0].Render();
         }
     }
-    else if (!styled && c->MonsterIndex == MONSTER_DRAKAN)
-    {
-        // Tints the body light below.
-        Vector(0.1f, 0.1f, 1.f, Light);
-        RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_CHROME | RENDER_BRIGHT, 1.f);
-        RenderPartObjectBodyColor2(&Models[o->Type], o, o->Type, o->Alpha,
-                                   RENDER_CHROME2 | RENDER_LIGHTMAP | RENDER_BRIGHT, 1.f);
-    }
     else if (c->MonsterIndex == MONSTER_DARK_PHOENIX)
     {
         float fSin = 0.5f * (1.0f + sinf((float)((int)WorldTime % 10000) * 0.001f));

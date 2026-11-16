@@ -456,7 +456,8 @@ Lizard King, Vepar, Tantalos, Wheel, Dark Knight, Iron Knight, Napin, Rabbit and
 the Great Golden Dragon) and the Golden Titan and Soldier (`goldenShine`) have
 theirs too. Some models name the look of all their monsters: the Phantom
 Knight (`phantomKnight`), the Kalima shop, the Werewolf Quarrel, the Cherry
-Blossom spirit and the Seed Master. A monster drawn with a
+Blossom spirit and the Seed Master, the Drakan (`drakan`), and the Lizard
+Warrior, Fire Golem, Queen Bee, Poison Golem and Axe Warrior. A monster drawn with a
 render style is drawn by it alone: no pass of the code draws over its body.
 
 A look name that no look file has is an Error in Data Checks (areas Monsters

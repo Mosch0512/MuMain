@@ -397,7 +397,8 @@
       "file": "Data/Monster/Monster55.bmd",
       "textureFolders": ["Monster"],
       "animations": {"die": 0.22},
-      "noneBlendMeshes": [0, 3, 4]
+      "noneBlendMeshes": [0, 3, 4],
+      "renderStyle": "drakan"
     },
     {
       "slot": "MONSTER_MODEL_DARK_PHOENIX_SHIELD",
@@ -636,30 +637,35 @@
       "slot": "MONSTER_MODEL_LIZARD_WARRIOR",
       "file": "Data/Monster/Monster82.bmd",
       "textureFolders": ["Monster"],
+      "renderStyle": "lizardWarrior",
       "namedBones": {"Monster81_EyeRight": 29, "Monster81_EyeLeft": 30}
     },
     {
       "slot": "MONSTER_MODEL_FIRE_GOLEM",
       "file": "Data/Monster/Monster83.bmd",
       "textureFolders": ["Monster"],
+      "renderStyle": "fireGolem",
       "namedBones": {"Monster82_RHand": 45, "Monster82_LHand": 34, "Monster82_Eye": 48, "Monster82_Back": 46}
     },
     {
       "slot": "MONSTER_MODEL_QUEEN_BEE",
       "file": "Data/Monster/Monster84.bmd",
       "textureFolders": ["Monster"],
+      "renderStyle": "queenBee",
       "namedBones": {"Monster83_Tail": 62}
     },
     {
       "slot": "MONSTER_MODEL_POISON_GOLEM",
       "file": "Data/Monster/Monster85.bmd",
       "textureFolders": ["Monster"],
+      "renderStyle": "poisonGolem",
       "namedBones": {"Monster84_PoisonTop": 53, "Monster84_PoisonRight": 54, "Monster84_PoisonLeft": 55, "Monster84_LeftHand": 37, "Monster84_RightHand": 50}
     },
     {
       "slot": "MONSTER_MODEL_AXE_HERO",
       "file": "Data/Monster/Monster86.bmd",
       "textureFolders": ["Monster"],
+      "renderStyle": "axeWarrior",
       "namedBones": {"Monster85_LeftEye": 18, "Monster85_RightEye": 19}
     },
     {
