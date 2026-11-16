@@ -74,6 +74,18 @@ constexpr BasicTexture BasicTextures[] = {
     {L"Monster\\Kni022.jpg", BITMAP_DEST_ORC_WAR2, GL_CLAMP_TO_EDGE},
 };
 
+// The textures the monsters' maps load at their slots (MapManager::Load), after the looks found theirs: the looks
+// find them again then (RefindTextures).
+constexpr BasicTexture MapTextures[] = {
+    {L"Monster\\bosswing.tga", BITMAP_HGBOSS_WING, GL_REPEAT},
+    {L"Monster\\bossmap1_R.jpg", BITMAP_HGBOSS_PATTERN, GL_CLAMP_TO_EDGE},
+    {L"Npc\\khs_kan2gate001.jpg", BITMAP_KANTURU_2ND_NPC1, GL_CLAMP_TO_EDGE},
+    {L"Npc\\khs_kan2gate003.jpg", BITMAP_KANTURU_2ND_NPC2, GL_CLAMP_TO_EDGE},
+    {L"Npc\\khs_kan2gate004.jpg", BITMAP_KANTURU_2ND_NPC3, GL_CLAMP_TO_EDGE},
+    {L"Monster\\nightmare_R.jpg", BITMAP_NIGHTMARE_EFFECT1, GL_CLAMP_TO_EDGE},
+    {L"Monster\\nightmaresward_R.jpg", BITMAP_NIGHTMARE_EFFECT2, GL_CLAMP_TO_EDGE},
+};
+
 std::string Number(double value)
 {
     char text[32];
@@ -216,6 +228,15 @@ ShippedLooks::ShippedLooks() : m_state(new State)
     }();
     (void)basicTexturesLoaded;
     Render::Items::Looks::PrepareTextures();
+    // A map loads its textures after the looks found theirs, as when the hero enters it.
+    static const bool mapTexturesLoaded = []
+    {
+        for (const BasicTexture& texture : MapTextures)
+            LoadBitmap(texture.file, texture.index, GL_LINEAR, texture.wrap);
+        return true;
+    }();
+    (void)mapTexturesLoaded;
+    Render::Items::Looks::RefindTextures();
 }
 
 ShippedLooks::~ShippedLooks()

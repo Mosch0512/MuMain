@@ -58,4 +58,9 @@ void PrepareTextures(const Data::Looks::LookDefinition& style);
 // The same for a look the Style Editor shows before it is applied, when it changes; a missing texture is not logged
 // (the look's problems name it).
 void PrepareDraftTextures(const Data::Looks::LookDefinition& style);
+// Finds every texture the looks name again after a map loaded its textures and dropped the last map's
+// (CMapManager::LoadWorld, MN8): a texture the map loads at a slot of its own (the Erohim's wing) is drawn from that
+// slot while the map has it, as its code draws it, else from the copy the looks loaded, which is loaded again when it
+// is gone.
+void RefindTextures();
 } // namespace Render::Items::Looks

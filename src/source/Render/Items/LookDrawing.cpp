@@ -769,6 +769,21 @@ void PrepareTextures(const LookDefinition& style)
     PrepareMissingTextures(style, true);
 }
 
+void RefindTextures()
+{
+    std::vector<std::string> names;
+    names.reserve(s_textures.size());
+    for (const auto& [texture, index] : s_textures)
+    {
+        names.push_back(texture);
+    }
+    // The lowest index of a file comes first: a map's slot before the copy the looks loaded.
+    for (const std::string& texture : names)
+    {
+        PrepareTexture({}, texture, false);
+    }
+}
+
 void PrepareDraftTextures(const LookDefinition& style)
 {
     PrepareMissingTextures(style, false);

@@ -7,6 +7,7 @@
 #include "Camera/CameraMove.h"
 #include "GameLogic/Events/Cinematic/CDirection.h"
 #include "Audio/DSPlaySound.h"
+#include "Render/Items/LookDrawing.h"
 #include "Render/Sprites/GlobalBitmap.h"
 #include "Data/DataHandler/LoadData.h"
 #include "Data/DataHandler/MonsterData/MonsterModelLoader.h"
@@ -946,6 +947,8 @@ void CMapManager::LoadWorld(int Map)
     g_Direction.m_CKanturu.m_iNightmareState = 0;
 
     this->Load();
+    // The looks draw a texture the map loads from the map's slot, as their code did.
+    Render::Items::Looks::RefindTextures();
     // The sounds of its objects (Data/Maps/ObjectSounds.json, maps design MP1).
     World::MapObjectSounds::LoadForMap(GetServerMap(), GetServerStage());
 

@@ -765,6 +765,34 @@ TEST_CASE("A texture missing when its look was prepared is found when the look i
     Render::Sprites::SetGpuUploadsSkipped(false);
 }
 
+// A map loads its own textures and drops the last map's (CMapManager::LoadWorld): the looks find theirs again then,
+// so a texture the map has is drawn from where the map loaded it (MN8).
+TEST_CASE("A texture loaded again elsewhere, as a map loads its textures, is drawn from there after the looks find "
+          "theirs again [looks]")
+{
+    Render::Sprites::SetGpuUploadsSkipped(true);
+    const LookDefinition style{"testLook", {Layer{.meshes = {{0}}, .texture = "Item/test_look_map.jpg"}}, {}};
+    const LookStoreScope looks({style});
+    TestSword sword("testLook");
+    std::vector<std::uint8_t> rgba(static_cast<std::size_t>(ImageSize) * ImageSize * 4, 255);
+    const GLuint first = Bitmaps.LoadImagePixels(L"Data\\Item\\test_look_map.jpg", rgba, ImageSize, ImageSize, true);
+    Render::Items::Looks::PrepareTextures(style);
+    DrawLook look;
+    REQUIRE(sword.Draw(look).size() == 1);
+    CHECK(sword.Draw(look)[0].texture == static_cast<int>(first));
+
+    // The texture goes and comes back under another index, as a map drops and loads its own.
+    Bitmaps.UnloadImage(first, true);
+    const GLuint again = Bitmaps.LoadImagePixels(L"Data\\Item\\test_look_map.jpg", rgba, ImageSize, ImageSize, true);
+    REQUIRE(again != first);
+    Render::Items::Looks::RefindTextures();
+    const std::vector<MeshDraw> draws = sword.Draw(look);
+    REQUIRE(draws.size() == 1);
+    CHECK(draws[0].texture == static_cast<int>(again));
+    Bitmaps.UnloadImage(again, true);
+    Render::Sprites::SetGpuUploadsSkipped(false);
+}
+
 TEST_CASE("A render style not for a drawing leaves the item to the plain drawing, and one only for a monster's hands "
           "draws without the mark (design L11) [looks]")
 {
