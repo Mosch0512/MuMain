@@ -1179,49 +1179,6 @@ bool M39Kanturu3rd::RenderKanturu3rdMonsterObjectMesh(const OBJECT* o, DrawLook&
 {
     switch (o->Type)
     {
-    case MODEL_DARK_SKULL_SOLDIER_5:
-    {
-        b->BeginRender(1.f);
-
-        b->BodyLight[0] = 1.0f;
-        b->BodyLight[1] = 1.0f;
-        b->BodyLight[2] = 1.0f;
-
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(3, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        float fLumi = (sinf(WorldTime * 0.003f) + 1.f) * 0.35f;
-
-        b->BodyLight[0] = fLumi;
-        b->BodyLight[1] = fLumi;
-        b->BodyLight[2] = fLumi;
-
-        b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV, BITMAP_NIGHTMARE_EFFECT2);
-        b->RenderMesh(1, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV, BITMAP_NIGHTMARE_EFFECT1);
-
-        if (o->CurrentAction == MONSTER01_ATTACK1 || o->CurrentAction == MONSTER01_ATTACK2)
-        {
-            b->BodyLight[0] = 0.7f;
-            b->BodyLight[1] = 0.7f;
-            b->BodyLight[2] = 1.0f;
-
-            b->RenderMesh(2, RENDER_BRIGHT | RENDER_CHROME2, look.alpha, look.blendMesh, look.blendMeshLight,
-                          look.blendMeshU, look.blendMeshV);
-            b->RenderMesh(3, RENDER_BRIGHT | RENDER_CHROME2, look.alpha, look.blendMesh, look.blendMeshLight,
-                          look.blendMeshU, look.blendMeshV);
-        }
-
-        b->EndRender();
-    }
-        return true;
     case MODEL_SUMMON:
     case MODEL_STORM2:
     {

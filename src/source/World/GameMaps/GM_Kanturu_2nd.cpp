@@ -576,35 +576,6 @@ bool M38Kanturu2nd::Render_Kanturu2nd_MonsterObjectMesh(const OBJECT* o, DrawLoo
 {
     switch (o->Type)
     {
-    case MODEL_KANTURU2ND_ENTER_NPC:
-    {
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        b->RenderMesh(1, RENDER_CHROME, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV, BITMAP_CHROME);
-        b->RenderMesh(1, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV, BITMAP_KANTURU_2ND_NPC3);
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        b->RenderMesh(2, RENDER_CHROME, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV, BITMAP_CHROME);
-        b->RenderMesh(2, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV, BITMAP_KANTURU_2ND_NPC2);
-        b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        b->RenderMesh(3, RENDER_TEXTURE, look.alpha, 3, look.blendMeshLight, look.blendMeshU, -WorldTime * 0.0003f,
-                      BITMAP_CHROME);
-        b->RenderMesh(3, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV, BITMAP_KANTURU_2ND_NPC1);
-        b->RenderMesh(3, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        return true;
-    }
-    break;
     case MODEL_TRAP_CANON:
     {
         g_TrapCanon.Render_Object(o, look, b);

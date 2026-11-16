@@ -373,6 +373,19 @@
       ]
     },
     {
+      "name": "erohim",
+      "layers": [
+        {"kind": "texture", "meshes": {"allBut": [5]}},
+        {"kind": "texture", "meshes": [5], "texture": "Monster/bosswing.tga", "opacity": 1, "glowMesh": "none"},
+        {"kind": "texture", "meshes": [5], "opacity": 1, "glowMesh": "none"},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [4], "opacity": 1, "light": [1, 0.5, 0]},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [0], "opacity": 1, "light": [0.75, 0.65, 0.5]},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [1], "opacity": 1},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [3], "opacity": 1},
+        {"kind": "texture", "meshes": [0], "texture": "Monster/bossmap1_R.jpg", "opacity": 1, "glowMesh": 0, "glowStrength": {"shape": "wave", "from": 0.3, "to": 0.9, "seconds": 5.235987755982989}}
+      ]
+    },
+    {
       "name": "eventTicket",
       "layers": [
         {"kind": "texture"},
@@ -664,6 +677,21 @@
       ]
     },
     {
+      "name": "kanturuGate",
+      "layers": [
+        {"kind": "texture", "meshes": [0]},
+        {"kind": "reflection", "motion": "slowDrift", "meshes": [1], "texture": "Effect/Chrome01.jpg"},
+        {"kind": "texture", "blend": "glow", "meshes": [1], "texture": "Npc/khs_kan2gate004.jpg"},
+        {"kind": "texture", "meshes": [1]},
+        {"kind": "reflection", "motion": "slowDrift", "meshes": [2], "texture": "Effect/Chrome01.jpg"},
+        {"kind": "texture", "blend": "glow", "meshes": [2], "texture": "Npc/khs_kan2gate003.jpg"},
+        {"kind": "texture", "meshes": [2]},
+        {"kind": "texture", "meshes": [3], "texture": "Effect/Chrome01.jpg", "glowMesh": 3, "scrollV": {"shape": "scroll", "perSecond": -0.3}},
+        {"kind": "texture", "blend": "glow", "meshes": [3], "texture": "Npc/khs_kan2gate001.jpg"},
+        {"kind": "texture", "meshes": [3]}
+      ]
+    },
+    {
       "name": "kentauros",
       "layers": [
         {"kind": "texture", "light": [1, 1, 1]},
@@ -786,6 +814,21 @@
         {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [1], "texture": "Effect/Chrome01.jpg"},
         {"kind": "texture", "meshes": [2]},
         {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [2], "texture": "Effect/Chrome01.jpg"}
+      ]
+    },
+    {
+      "name": "nightmareSoldier",
+      "layers": [
+        {"kind": "texture", "meshes": [0], "light": [1, 1, 1]},
+        {"kind": "texture", "meshes": [1]},
+        {"kind": "texture", "meshes": [2]},
+        {"kind": "texture", "meshes": [3]},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "texture": "Monster/nightmaresward_R.jpg", "light": [{"shape": "wave", "from": 0, "to": 0.7, "seconds": 2.0943951023931953}, {"shape": "wave", "from": 0, "to": 0.7, "seconds": 2.0943951023931953}, {"shape": "wave", "from": 0, "to": 0.7, "seconds": 2.0943951023931953}]},
+        {"kind": "texture", "blend": "glow", "meshes": [1], "texture": "Monster/nightmare_R.jpg"},
+        {"kind": "reflection", "motion": "fastSweep", "blend": "glow", "meshes": [2], "onlyWhen": {"animation": "attack1"}, "light": [0.7, 0.7, 1]},
+        {"kind": "reflection", "motion": "fastSweep", "blend": "glow", "meshes": [3], "onlyWhen": {"animation": "attack1"}},
+        {"kind": "reflection", "motion": "fastSweep", "blend": "glow", "meshes": [2], "onlyWhen": {"animation": "attack2"}, "light": [0.7, 0.7, 1]},
+        {"kind": "reflection", "motion": "fastSweep", "blend": "glow", "meshes": [3], "onlyWhen": {"animation": "attack2"}}
       ]
     },
     {

@@ -678,6 +678,7 @@
       "slot": "MONSTER_MODEL_EROHIM",
       "file": "Data/Monster/Monster88.bmd",
       "textureFolders": ["Monster"],
+      "renderStyle": "erohim",
       "namedBones": {"Monster87_LeftEye": 8, "Monster87_RightEye": 9, "Monster87_LeftHand": 16}
     },
     {
@@ -913,6 +914,7 @@
       "file": "Data/Monster/monster122.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop1": 0.22, "stop2": 0.22, "walk": 0.25, "attack1": 0.25, "attack2": 0.25, "die": 0.12, "appear": 0.22, "attack3": 0.25, "attack4": 0.25},
+      "renderStyle": "nightmareSoldier",
       "namedBones": {"Body_Bone1": 61, "Body_Bone2": 62, "Body_Bone3": 54, "Body_Bone4": 55, "Body_Bone5": 21, "Body_Bone6": 22, "Body_Bone7": 25, "Body_Bone8": 26, "Body_Bone9": 71, "Body_Bone10": 70, "Body_Bone11": 43, "Body_Bone12": 44, "LHand_Bone": 14, "Body_Bone13": 63, "Sword_Bone1": 39, "Sword_Bone2": 40, "Eye_Bone1": 9, "Eye_Bone2": 10, "Windmill_Bone1": 47}
     },
     {
@@ -2340,6 +2342,7 @@
       "slot": "MODEL_KANTURU2ND_ENTER_NPC",
       "file": "Data/NPC/to3gate.bmd",
       "textureFolders": ["NPC"],
+      "renderStyle": "kanturuGate",
       "namedBones": {"KANTURU2ND_ENTER_NPC_1": 37, "KANTURU2ND_ENTER_NPC_2": 38, "KANTURU2ND_ENTER_NPC_3": 39, "KANTURU2ND_ENTER_NPC_4": 40, "KANTURU2ND_ENTER_NPC_5": 41, "KANTURU2ND_ENTER_NPC_6": 42, "KANTURU2ND_ENTER_NPC_7": 43, "KANTURU2ND_ENTER_NPC_8": 6, "KANTURU2ND_ENTER_NPC_9": 7, "KANTURU2ND_ENTER_NPC_10": 8, "KANTURU2ND_ENTER_NPC_11": 15, "KANTURU2ND_ENTER_NPC_12": 16, "KANTURU2ND_ENTER_NPC_13": 17, "KANTURU2ND_ENTER_NPC_14": 10}
     },
     {

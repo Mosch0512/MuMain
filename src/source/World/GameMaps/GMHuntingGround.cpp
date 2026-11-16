@@ -618,44 +618,6 @@ bool M31HuntingGround::RenderHuntingGroundMonsterObjectMesh(const OBJECT* pObjec
 {
     switch (pObject->Type)
     {
-    case MODEL_EROHIM:
-    {
-        pModel->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                           look.blendMeshV, 5);
-
-        pModel->BeginRender(1.f);
-
-        look.alpha = 1.0f;
-        pModel->RenderMesh(5, RENDER_TEXTURE, look.alpha, -1, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                           BITMAP_HGBOSS_WING);
-        pModel->RenderMesh(5, RENDER_TEXTURE, look.alpha, -1, look.blendMeshLight, look.blendMeshU, look.blendMeshV);
-
-        vec3_t LightBackup;
-        VectorCopy(pModel->BodyLight, LightBackup); //. backup
-
-        Vector(1.f, 0.5f, 0.f, pModel->BodyLight);
-        pModel->RenderMesh(4, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                           look.blendMeshU, look.blendMeshV);
-
-        Vector(0.75f, 0.65f, 0.5f, pModel->BodyLight);
-        pModel->RenderMesh(0, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                           look.blendMeshU, look.blendMeshV);
-        pModel->RenderMesh(1, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                           look.blendMeshU, look.blendMeshV);
-        pModel->RenderMesh(3, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                           look.blendMeshU, look.blendMeshV);
-
-        float Luminosity = sinf(WorldTime * 0.0012f) * 0.3f + 0.6f;
-        pModel->RenderMesh(0, RENDER_TEXTURE, look.alpha, 0, Luminosity, look.blendMeshU, look.blendMeshV,
-                           BITMAP_HGBOSS_PATTERN);
-
-        VectorCopy(LightBackup, pModel->BodyLight); //. restore
-
-        pModel->EndRender();
-
-        return true;
-    }
-    break;
     case MODEL_FISSURE:
     {
         pModel->BeginRender(1.f);
