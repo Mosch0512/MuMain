@@ -629,14 +629,6 @@ bool GMEmpireGuardian4::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b
 
     switch (o->Type)
     {
-    case MODEL_GAYION:
-    case MODEL_JERRY:
-    case MODEL_LUCAS:
-    {
-        RenderMonster(o, look, b);
-
-        return true;
-    }
     case 96:
     case 97:
     case 100:
@@ -644,22 +636,6 @@ bool GMEmpireGuardian4::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b
         Vector(0.170382, 0.170382, 0.170382, b->BodyLight);
         b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
                       look.hiddenMesh);
-    }
-        return true;
-    case MODEL_STAR_GATE:
-    {
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      look.hiddenMesh);
-    }
-        return true;
-
-    case MODEL_RUSH_GATE:
-    {
-        if (o->CurrentAction != MONSTER01_DIE)
-        {
-            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                          look.blendMeshV, look.hiddenMesh);
-        }
     }
         return true;
     }
@@ -980,46 +956,6 @@ bool GMEmpireGuardian4::UpdateObjectEffects(OBJECT* o, BMD* b)
         return true;
     }
 
-    return false;
-}
-
-bool GMEmpireGuardian4::RenderMonster(const OBJECT* o, DrawLook& look, BMD* b)
-{
-    switch (o->Type)
-    {
-    case MODEL_GAYION:
-    {
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      look.hiddenMesh);
-    }
-    break;
-    case MODEL_JERRY:
-    case MODEL_DEATH_ANGEL_3:
-    {
-        vec3_t v3LightBackup;
-
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        b->RenderMesh(3, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        Vector(b->BodyLight[0], b->BodyLight[1], b->BodyLight[2], v3LightBackup);
-        Vector(0.3f, 0.3f, 0.3f, b->BodyLight);
-
-        b->RenderMesh(3, RENDER_BRIGHT | RENDER_CHROME, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV);
-
-        VectorCopy(v3LightBackup, b->BodyLight);
-    }
-        return true;
-    }
     return false;
 }
 

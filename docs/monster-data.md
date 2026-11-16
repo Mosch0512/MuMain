@@ -464,7 +464,11 @@ Wolf and Kentauros (the Berserk and Gigantis glows left out while they die,
 hands, the Erohim, Kanturu's gate and the Nightmare's skull soldier, and the
 Crywolf and Balgass barracks' Balgass, Soram and Dark Elf (Trainee Soldier), and Karutan's Bone Scorpion,
 Crypta, Crypos, Condra and Narcondra (their glows, and all of Condra and
-Narcondra, left out while they die). A texture
+Narcondra, left out while they die), and the Empire Guardian's Erkanne,
+Galia, Quartermaster, Knight Commander and Grand Wizard (green while it dies),
+and its Castle Gates 2 and 4 and Stone Statue (`goneWhenDying`: not drawn while
+they die). Jerint (505) names `jerint` on its entry, as Jerint the Assistant
+shares its model and keeps the model's plain look. A texture
 a map loads (the Erohim's wing) is drawn from where the map loaded it while the
 hero is on that map: the looks find their textures again when a map loads. A
 monster drawn with a

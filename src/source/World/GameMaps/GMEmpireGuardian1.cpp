@@ -1637,13 +1637,6 @@ bool GMEmpireGuardian1::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b
         return true;
 
     case MODEL_RAYMOND:
-    case MODEL_LUCAS:
-    case MODEL_EVIL_GATE:
-    case MODEL_LION_GATE:
-    case MODEL_STATUE:
-    case MODEL_DEVIL_LORD:
-    case MODEL_QUARTER_MASTER:
-    case MODEL_DEFENDER:
     {
         RenderMonster(o, look, b);
     }
@@ -1960,86 +1953,6 @@ bool GMEmpireGuardian1::RenderMonster(const OBJECT* o, DrawLook& look, BMD* b)
         VectorCopy(_temp, b->BodyLight);
         b->RenderMesh(3, RENDER_BRIGHT | RENDER_CHROME, look.alpha, look.blendMesh, look.blendMeshLight,
                       look.blendMeshU, look.blendMeshV);
-    }
-        return true;
-    case MODEL_LUCAS:
-    {
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        b->RenderMesh(3, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(3, RENDER_BRIGHT | RENDER_CHROME, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV);
-
-        b->RenderMesh(4, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        // b->RenderMesh ( 4, RENDER_BRIGHT|RENDER_CHROME, look.alpha, look.blendMesh, look.blendMeshLight,
-        // look.blendMeshU, look.blendMeshV ); b->RenderMesh ( 4, RENDER_BRIGHT|RENDER_CHROME6, look.alpha,
-        // look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV );
-    }
-        return true;
-    case MODEL_DEVIL_LORD:
-    {
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(3, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        b->RenderMesh(2, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV);
-        b->RenderMesh(2, RENDER_TEXTURE | RENDER_CHROME4, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV);
-    }
-        return true;
-    case MODEL_QUARTER_MASTER:
-    {
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(2, RENDER_CHROME | RENDER_BRIGHT, 0.3f, 2, 0.3f, look.blendMeshU, look.blendMeshV);
-    }
-        return true;
-    case MODEL_DEFENDER:
-    {
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      look.hiddenMesh);
-    }
-        return true;
-    case MODEL_EVIL_GATE:
-    {
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      look.hiddenMesh);
-    }
-        return true;
-
-    case MODEL_LION_GATE:
-    {
-        if (o->CurrentAction != MONSTER01_DIE)
-        {
-            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                          look.blendMeshV, look.hiddenMesh);
-        }
-    }
-        return true;
-    case MODEL_STATUE:
-    {
-        if (o->CurrentAction != MONSTER01_DIE)
-        {
-            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                          look.blendMeshV, look.hiddenMesh);
-        }
     }
         return true;
     }

@@ -489,19 +489,6 @@ bool GMEmpireGuardian2::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b
         return true;
     }
 
-    switch (o->Type)
-    {
-    case MODEL_LUCAS:
-    case MODEL_HAMMERIZE:
-    case MODEL_ATICLES_HEAD:
-    case MODEL_DARK_GHOST:
-    {
-        RenderMonster(o, look, b);
-
-        return true;
-    }
-    }
-
     return false;
 }
 
@@ -774,47 +761,6 @@ bool GMEmpireGuardian2::UpdateObjectEffects(OBJECT* o, BMD* b)
         return true;
     }
 
-    return false;
-}
-
-bool GMEmpireGuardian2::RenderMonster(const OBJECT* o, DrawLook& look, BMD* b)
-{
-    switch (o->Type)
-    {
-    case MODEL_HAMMERIZE:
-    {
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      look.hiddenMesh);
-    }
-        return true;
-    case MODEL_ATICLES_HEAD:
-    {
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(2, RENDER_BRIGHT | RENDER_CHROME, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV);
-    }
-        return true;
-    case MODEL_DARK_GHOST:
-    {
-        if (o->CurrentAction == MONSTER01_DIE)
-        {
-            Vector(0.3f, 1.0f, 0.2f, b->BodyLight);
-        }
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(3, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 3, 0.5f, look.blendMeshU, look.blendMeshV);
-    }
-        return true;
-    }
     return false;
 }
 

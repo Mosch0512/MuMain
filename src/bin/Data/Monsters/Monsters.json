@@ -6045,6 +6045,7 @@
         "clearSkill": "always"
       },
       "scale": 1.45,
+      "renderStyle": "jerint",
       "hooks": [
         {
           "hook": "EmpireGuardianRageReset",

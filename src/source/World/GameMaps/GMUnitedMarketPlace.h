@@ -21,7 +21,6 @@ public:
     virtual bool RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b);
     virtual void RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b);
     virtual void RenderFrontSideVisual();
-    bool RenderMonster(const OBJECT* o, DrawLook& look, BMD* b);
 
 public:
     virtual bool MoveMonsterVisual(OBJECT* o, BMD* b);

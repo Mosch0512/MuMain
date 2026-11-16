@@ -1494,7 +1494,8 @@
       "slot": "MONSTER_MODEL_LUCAS",
       "file": "Data/Monster/Monster168.bmd",
       "textureFolders": ["Monster"],
-      "animations": {"stop1": 0.6, "stop2": 0.6, "walk": 0.5, "attack1": 0.71, "attack2": 0.4, "die": 0.3, "appear": 0.8, "attack3": 0.4}
+      "animations": {"stop1": 0.6, "stop2": 0.6, "walk": 0.5, "attack1": 0.71, "attack2": 0.4, "die": 0.3, "appear": 0.8, "attack3": 0.4},
+      "renderStyle": "erkanne"
     },
     {
       "slot": "MONSTER_MODEL_FRED",
@@ -1523,13 +1524,15 @@
       "slot": "MONSTER_MODEL_DEVIL_LORD",
       "file": "Data/Monster/monster172.bmd",
       "textureFolders": ["Monster"],
-      "animations": {"stop1": 0.3, "stop2": 0.3, "walk": 0.4, "attack1": 0.45, "attack2": 0.5, "die": 0.3, "appear": 0.45, "attack3": 0.45}
+      "animations": {"stop1": 0.3, "stop2": 0.3, "walk": 0.4, "attack1": 0.45, "attack2": 0.5, "die": 0.3, "appear": 0.45, "attack3": 0.45},
+      "renderStyle": "galia"
     },
     {
       "slot": "MONSTER_MODEL_QUARTER_MASTER",
       "file": "Data/Monster/monster173.bmd",
       "textureFolders": ["Monster"],
       "animations": {"walk": 0.5, "attack1": 0.66},
+      "renderStyle": "quartermaster",
       "cues": [
         {"name": "step 1", "animation": "walk", "frames": [1, 2]},
         {"name": "step 2", "animation": "walk", "frames": [7, 8]}
@@ -1549,13 +1552,15 @@
       "slot": "MONSTER_MODEL_ATICLES_HEAD",
       "file": "Data/Monster/Monster175.bmd",
       "textureFolders": ["Monster"],
-      "animations": {"stop1": 0.3, "stop2": 0.3, "walk": 0.65, "attack1": 0.86, "attack2": 0.86, "die": 0.3, "appear": 0.86}
+      "animations": {"stop1": 0.3, "stop2": 0.3, "walk": 0.65, "attack1": 0.86, "attack2": 0.86, "die": 0.3, "appear": 0.86},
+      "renderStyle": "knightCommander"
     },
     {
       "slot": "MONSTER_MODEL_DARK_GHOST",
       "file": "Data/Monster/Monster176.bmd",
       "textureFolders": ["Monster"],
-      "animations": {"stop1": 0.6, "stop2": 0.6, "walk": 0.8, "attack1": 0.96, "attack2": 0.96, "shock": 1, "die": 0.3}
+      "animations": {"stop1": 0.6, "stop2": 0.6, "walk": 0.8, "attack1": 0.96, "attack2": 0.96, "shock": 1, "die": 0.3},
+      "renderStyle": "grandWizard"
     },
     {
       "slot": "MONSTER_MODEL_BANSHEE",
@@ -1608,12 +1613,14 @@
     {
       "slot": "MONSTER_MODEL_LION_GATE",
       "file": "Data/Monster/monster185.bmd",
-      "textureFolders": ["Monster"]
+      "textureFolders": ["Monster"],
+      "renderStyle": "goneWhenDying"
     },
     {
       "slot": "MONSTER_MODEL_STATUE",
       "file": "Data/Monster/monster186.bmd",
-      "textureFolders": ["Monster"]
+      "textureFolders": ["Monster"],
+      "renderStyle": "goneWhenDying"
     },
     {
       "slot": "MONSTER_MODEL_STAR_GATE",
@@ -1623,7 +1630,8 @@
     {
       "slot": "MONSTER_MODEL_RUSH_GATE",
       "file": "Data/Monster/monster188.bmd",
-      "textureFolders": ["Monster"]
+      "textureFolders": ["Monster"],
+      "renderStyle": "goneWhenDying"
     },
     {
       "slot": "MONSTER_MODEL_MAD_BUTCHER",
