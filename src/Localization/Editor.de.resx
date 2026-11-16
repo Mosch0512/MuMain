@@ -1144,6 +1144,15 @@
   <data name="Light map tooltip" xml:space="preserve">
     <value>Die Spiegelung beleuchtet das Mesh als Lichtkarte, wie das zweite Chrom des Drakan.</value>
   </data>
+  <data name="Not in animation" xml:space="preserve">
+    <value>Nicht in Animation</value>
+  </data>
+  <data name="Animation tooltip" xml:space="preserve">
+    <value>Nur während das Monster diese Animation spielt.</value>
+  </data>
+  <data name="Not in animation tooltip" xml:space="preserve">
+    <value>Nicht während das Monster diese Animation spielt: ein Leuchten, das beim Sterben wegfällt.</value>
+  </data>
   <data name="Effect types" xml:space="preserve">
     <value>Effekttypen</value>
   </data>

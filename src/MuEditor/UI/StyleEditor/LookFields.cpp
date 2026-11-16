@@ -6,6 +6,7 @@
 
 #include "../MuEditor/Core/MuEditorCore.h"
 #include "../MuEditor/UI/ItemTools/ItemTextInput.h"
+#include "Data/GameData/MonsterData/MonsterAnimations.h"
 #include "Data/GameData/Common/MeshLimits.h"
 #include "I18N/All.h"
 #include "Render/Items/LookDrawing.h"
@@ -1135,6 +1136,33 @@ const Names<Place>& PlaceNames()
     return names;
 }
 
+// A monster's animations by their names (stop1, walk, die, ...), as the monster data names them.
+const Names<int>& AnimationNames()
+{
+    static const std::vector<std::string> texts = []
+    {
+        std::vector<std::string> names;
+        for (int animation = 0; animation < Data::Monsters::MonsterNamedAnimationCount; ++animation)
+            names.push_back(Data::Monsters::GetMonsterAnimationName(animation));
+        return names;
+    }();
+    static const std::vector<const char*> pointers = []
+    {
+        std::vector<const char*> list;
+        for (const std::string& text : texts)
+            list.push_back(text.c_str());
+        return list;
+    }();
+    static const Names<int> names = []
+    {
+        Names<int> list;
+        for (std::size_t index = 0; index < pointers.size(); ++index)
+            list.emplace_back(static_cast<int>(index), &pointers[index]);
+        return list;
+    }();
+    return names;
+}
+
 const Names<LookBuff>& BuffNames()
 {
     static const Names<LookBuff> names{{LookBuff::InfinityArrow, &I18N::Editor::InfinityArrow},
@@ -1273,6 +1301,9 @@ bool OnlyWhenFields(OnlyWhen& when, const std::vector<LookPart>& parts)
     changed |= HiddenMeshCondition(when.hiddenMesh, parts);
     changed |= OptionalChoice(Text::Buff, when.buff, BuffNames(), &Text::None, Text::BuffTooltip);
     changed |= OptionalChoice(Text::WithoutBuff, when.withoutBuff, BuffNames(), &Text::None, Text::WithoutBuffTooltip);
+    changed |= OptionalChoice(Text::Animation, when.animation, AnimationNames(), &Text::None, Text::AnimationTooltip);
+    changed |= OptionalChoice(Text::NotInAnimation, when.notAnimation, AnimationNames(), &Text::None,
+                              Text::NotInAnimationTooltip);
     ImGui::TreePop();
     return changed;
 }

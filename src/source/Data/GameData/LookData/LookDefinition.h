@@ -210,10 +210,14 @@ struct OnlyWhen
     std::optional<LookBuff> buff;
     // A buff the character must not have.
     std::optional<LookBuff> withoutBuff;
+    // The animation the drawn object plays (OBJECT::CurrentAction, a monster's MONSTER01_ action, MN8), or one it
+    // must not play: a monster's glow left out while it dies.
+    std::optional<int> animation;
+    std::optional<int> notAnimation;
 
     [[nodiscard]] bool IsEmpty() const
     {
-        return !place && !level && !hiddenMesh && !buff && !withoutBuff;
+        return !place && !level && !hiddenMesh && !buff && !withoutBuff && !animation && !notAnimation;
     }
     bool operator==(const OnlyWhen&) const = default;
 };

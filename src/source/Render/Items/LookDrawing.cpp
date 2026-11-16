@@ -443,6 +443,11 @@ bool Holds(const OnlyWhen& when, const BMD* b, const OBJECT* o, const DrawLook& 
     {
         return false;
     }
+    const int action = o != nullptr ? o->CurrentAction : 0;
+    if ((when.animation && action != *when.animation) || (when.notAnimation && action == *when.notAnimation))
+    {
+        return false;
+    }
     return !when.buff || HasBuff(*when.buff, o);
 }
 

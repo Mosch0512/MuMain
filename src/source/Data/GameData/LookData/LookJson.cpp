@@ -5,6 +5,7 @@
 #include "Data/GameData/ColorFolders/ColorFolders.h"
 #include "Data/GameData/Common/MeshLimits.h"
 #include "Data/GameData/ItemData/ItemJsonCommon.h"
+#include "Data/GameData/MonsterData/MonsterAnimations.h"
 #include "Data/GameData/MonsterData/MonsterJsonCommon.h"
 
 #include <algorithm>
@@ -68,6 +69,8 @@ constexpr const char* Place = "place";
 constexpr const char* Level = "level";
 constexpr const char* Buff = "buff";
 constexpr const char* WithoutBuff = "withoutBuff";
+constexpr const char* Animation = "animation";
+constexpr const char* NotAnimation = "notAnimation";
 constexpr const char* EachItem = "eachItem";
 constexpr const char* Default = "default";
 constexpr const char* DrawingOpacity = "drawingOpacity";
@@ -694,11 +697,31 @@ void LookReader::ReadOnlyWhen(const OrderedJson& json, const std::string& field,
     {
         onlyWhen.withoutBuff = buff;
     }
+    for (const auto& [key, target] :
+         {std::pair{Keys::Animation, &onlyWhen.animation}, std::pair{Keys::NotAnimation, &onlyWhen.notAnimation}})
+    {
+        const auto animation = entry->find(key);
+        if (animation == entry->end())
+        {
+            continue;
+        }
+        const std::optional<int> action =
+            animation->is_string() ? Monsters::FindMonsterAnimation(animation->get<std::string>()) : std::nullopt;
+        if (!action)
+        {
+            AddFatal(whenField + "." + key, "must be a monster's animation: stop1, stop2, walk, attack1, attack2, "
+                                            "shock, die, appear, attack3, attack4, run or attack5");
+            continue;
+        }
+        *target = action;
+    }
     if (entry->empty())
     {
         AddIssue(ItemDataIssueSeverity::Warning, whenField, "sets no condition: the layer always draws");
     }
-    WarnAboutUnknownKeys(*entry, {Keys::Place, Keys::Level, Keys::HiddenMesh, Keys::Buff, Keys::WithoutBuff},
+    WarnAboutUnknownKeys(*entry,
+                         {Keys::Place, Keys::Level, Keys::HiddenMesh, Keys::Buff, Keys::WithoutBuff, Keys::Animation,
+                          Keys::NotAnimation},
                          whenField);
 }
 
@@ -1186,6 +1209,14 @@ OrderedJson WriteOnlyWhen(const OnlyWhen& onlyWhen)
     if (onlyWhen.withoutBuff)
     {
         json[Keys::WithoutBuff] = NameOf(BuffNames, *onlyWhen.withoutBuff);
+    }
+    if (onlyWhen.animation)
+    {
+        json[Keys::Animation] = Monsters::GetMonsterAnimationName(*onlyWhen.animation);
+    }
+    if (onlyWhen.notAnimation)
+    {
+        json[Keys::NotAnimation] = Monsters::GetMonsterAnimationName(*onlyWhen.notAnimation);
     }
     return json;
 }
