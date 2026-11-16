@@ -5909,6 +5909,7 @@
       "model": "MONSTER_MODEL_GOLDEN_STONE_GOLEM",
       "soundSet": "Blue Golem",
       "scale": 1.35,
+      "renderStyle": "goldenStoneGolem",
       "numbers": [
         {"number": 495}
       ]

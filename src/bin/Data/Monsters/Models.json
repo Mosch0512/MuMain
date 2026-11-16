@@ -769,6 +769,7 @@
       "file": "Data/Monster/monster102.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop1": 0.15, "stop2": 0.15, "walk": 0.3, "attack1": 0.23, "attack2": 0.23, "die": 0.2},
+      "renderStyle": "stoneGolem",
       "namedBones": {"Monster101_L_Arm": 12, "Monster101_R_Arm": 20, "Monster101_Head": 6}
     },
     {
@@ -776,6 +777,7 @@
       "file": "Data/Monster/monster103.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop1": 0.15, "stop2": 0.15, "walk": 0.3, "attack1": 0.23, "attack2": 0.23, "die": 0.15},
+      "renderStyle": "deathRider",
       "namedBones": {"Monster102_Footstepst": 0, "Monster102_Head": 6}
     },
     {
@@ -795,6 +797,7 @@
       "file": "Data/Monster/monster106.bmd",
       "textureFolders": ["Monster"],
       "animations": {"walk": 0.15},
+      "renderStyle": "hellMaine",
       "namedBones": {"Monster105_R_Eye": 9, "Monster105_L_Eye": 10, "Monster105_L_Arm00": 33, "Monster105_L_Arm01": 34, "Monster105_L_Arm02": 35, "Monster105_L_Hand": 20, "Monster105_R_Hand": 39}
     },
     {
@@ -802,6 +805,7 @@
       "file": "Data/Monster/Monster107.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop2": 0.25, "walk": 0.23, "attack1": 0.28, "attack2": 0.28, "die": 0.19},
+      "renderStyle": "berserk",
       "namedBones": {"BERSERK_MOUTH": 9}
     },
     {
@@ -809,6 +813,7 @@
       "file": "Data/Monster/monster108.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop2": 0.25, "walk": 0.27, "attack1": 0.3, "attack2": 0.3, "die": 0.3},
+      "renderStyle": "splinterWolf",
       "namedBones": {"SPL_WOLF_EYE_26": 16, "SPL_WOLF_EYE_25": 17}
     },
     {
@@ -836,13 +841,15 @@
       "file": "Data/Monster/monster112.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop2": 0.25, "walk": 0.27, "attack1": 0.27, "attack2": 0.27, "die": 0.25},
+      "renderStyle": "kentauros",
       "namedBones": {"KENTAUROS_BIP_23": 27, "KENTAUROS_BIP_24": 28, "KENTAUROS_BIP_25": 29, "KENTAUROS_BIP_26": 30, "KENTAUROS_BIP_18": 34, "KENTAUROS_BIP_19": 35, "KENTAUROS_BIP_20": 36, "KENTAUROS_BIP_21": 37, "KENTAUROS_BIP_TAIL": 81, "KENTAUROS_BIP_TAIL_1": 82, "KENTAUROS_BIP_TAIL_2": 83, "KENTAUROS_BIP_SPAIN_1": 4, "KENTAUROS_BIP_SPAIN_2": 5, "KENTAUROS_BIP_SPAIN_3": 6}
     },
     {
       "slot": "MONSTER_MODEL_GIGANTIS",
       "file": "Data/Monster/Monster113.bmd",
       "textureFolders": ["Monster"],
-      "animations": {"attack1": 0.26, "attack2": 0.26, "die": 0.21}
+      "animations": {"attack1": 0.26, "attack2": 0.26, "die": 0.21},
+      "renderStyle": "gigantis"
     },
     {
       "slot": "MONSTER_MODEL_GENOCIDER",
@@ -1643,6 +1650,7 @@
       "file": "Data/Monster/monster195.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop1": 0.15, "stop2": 0.15, "walk": 0.3, "attack1": 0.23, "attack2": 0.23, "die": 0.15},
+      "renderStyle": "deathRider",
       "namedBones": {"Monster102_Footstepst": 0, "Monster102_Head": 6}
     },
     {
@@ -1650,6 +1658,7 @@
       "file": "Data/Monster/Monster196.bmd",
       "textureFolders": ["Monster"],
       "animations": {"die": 0.2},
+      "renderStyle": "stoneGolem",
       "namedBones": {"Monster101_L_Arm": 12, "Monster101_R_Arm": 20, "Monster101_Head": 6}
     },
     {
@@ -1664,6 +1673,7 @@
       "file": "Data/Monster/Monster198.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop2": 0.25, "walk": 0.23, "attack1": 0.28, "attack2": 0.28, "die": 0.19},
+      "renderStyle": "berserk",
       "namedBones": {"BERSERK_MOUTH": 9}
     },
     {
@@ -1671,13 +1681,15 @@
       "file": "Data/Monster/monster199.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop2": 0.25, "walk": 0.27, "attack1": 0.27, "attack2": 0.27, "die": 0.25},
+      "renderStyle": "kentauros",
       "namedBones": {"KENTAUROS_BIP_23": 27, "KENTAUROS_BIP_24": 28, "KENTAUROS_BIP_25": 29, "KENTAUROS_BIP_26": 30, "KENTAUROS_BIP_18": 34, "KENTAUROS_BIP_19": 35, "KENTAUROS_BIP_20": 36, "KENTAUROS_BIP_21": 37, "KENTAUROS_BIP_TAIL": 81, "KENTAUROS_BIP_TAIL_1": 82, "KENTAUROS_BIP_TAIL_2": 83, "KENTAUROS_BIP_SPAIN_1": 4, "KENTAUROS_BIP_SPAIN_2": 5, "KENTAUROS_BIP_SPAIN_3": 6}
     },
     {
       "slot": "MONSTER_MODEL_GIGANTIS_WARRIOR",
       "file": "Data/Monster/Monster200.bmd",
       "textureFolders": ["Monster"],
-      "animations": {"attack1": 0.26, "attack2": 0.26, "die": 0.21}
+      "animations": {"attack1": 0.26, "attack2": 0.26, "die": 0.21},
+      "renderStyle": "gigantis"
     },
     {
       "slot": "MONSTER_MODEL_SOCCERBALL",

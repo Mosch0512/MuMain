@@ -578,9 +578,6 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b)
     else if (M34CryingWolf2nd::RenderCryingWolf2ndObjectMesh(o, look, b))
     {
     }
-    else if (M33Aida::RenderAidaObjectMesh(o, look, b))
-    {
-    }
     else if (M34CryWolf1st::RenderCryWolf1stObjectMesh(o, look, b))
     {
     }
