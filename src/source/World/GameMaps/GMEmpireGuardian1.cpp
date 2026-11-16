@@ -1635,12 +1635,6 @@ bool GMEmpireGuardian1::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b
                       look.hiddenMesh);
     }
         return true;
-
-    case MODEL_RAYMOND:
-    {
-        RenderMonster(o, look, b);
-    }
-        return true;
     }
 
     return false;
@@ -1929,30 +1923,6 @@ bool GMEmpireGuardian1::UpdateObjectEffects(OBJECT* o, BMD* b)
             Vector(1.f, 1.f, 1.f, Light);
             CreateParticle(BITMAP_SMOKE, o->Position, o->Angle, Light, 21, o->Scale * 2.0f, o);
         }
-    }
-        return true;
-    }
-
-    return false;
-}
-
-bool GMEmpireGuardian1::RenderMonster(const OBJECT* o, DrawLook& look, BMD* b)
-{
-    switch (o->Type)
-    {
-    case MODEL_RAYMOND:
-    {
-        float fBlendMeshLight = (sinf(WorldTime * 0.003f) + 1.0f) * 0.5f;
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      look.hiddenMesh);
-        vec3_t _temp;
-        VectorCopy(b->BodyLight, _temp);
-        Vector(b->BodyLight[0] * 3.0f, b->BodyLight[0] * 3.0f, b->BodyLight[0] * 3.0f, b->BodyLight);
-        b->RenderMesh(1, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 1, fBlendMeshLight, look.blendMeshU,
-                      look.blendMeshV, BITMAP_RAYMOND_SWORD);
-        VectorCopy(_temp, b->BodyLight);
-        b->RenderMesh(3, RENDER_BRIGHT | RENDER_CHROME, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV);
     }
         return true;
     }

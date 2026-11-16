@@ -1371,6 +1371,7 @@
       "file": "Data/Monster/MONSTER158.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop1": 0.28, "walk": 0.3, "attack1": 0.17, "shock": 0.25, "die": 0.2},
+      "renderStyle": "zombieFighter",
       "boundingBox": {"min": [-100, -70, 0], "max": [100, 70, 150]}
     },
     {
@@ -1378,6 +1379,7 @@
       "file": "Data/Monster/MONSTER159.bmd",
       "textureFolders": ["Monster"],
       "animations": {"walk": 0.3, "attack1": 0.28, "shock": 0.2, "die": 0.18},
+      "renderStyle": "zombieFighter",
       "boundingBox": {"min": [-100, -100, 50], "max": [100, 100, 150]}
     },
     {
@@ -1385,6 +1387,7 @@
       "file": "Data/Monster/MONSTER160.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop1": 0.2, "walk": 0.4, "attack1": 0.17, "shock": 0.25, "die": 0.2},
+      "renderStyle": "ashSlaughterer",
       "boundingBox": {"min": [-100, -100, 0], "max": [100, 100, 180]}
     },
     {
@@ -1392,6 +1395,7 @@
       "file": "Data/Monster/MONSTER161.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop1": 0.28, "walk": 0.5, "attack1": 0.17, "shock": 0.25, "die": 0.4},
+      "renderStyle": "bloodAssassin",
       "parts": [
         {
           "effect": "pkFieldAssassinEffectGreenHead",
@@ -1425,6 +1429,7 @@
       "file": "Data/Monster/MONSTER162.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop1": 0.28, "walk": 0.5, "attack1": 0.17, "shock": 0.25, "die": 0.4},
+      "renderStyle": "cruelBloodAssassin",
       "boundingBox": {"min": [-80, -80, 0], "max": [80, 80, 130]}
     },
     {
@@ -1485,6 +1490,7 @@
       "file": "Data/Monster/Monster167.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop1": 0.6, "stop2": 0.6, "walk": 0.55, "attack1": 0.75, "attack2": 0.5, "die": 0.3, "appear": 0.8, "attack3": 0.5},
+      "renderStyle": "raymond",
       "cues": [
         {"name": "step 1", "animation": "walk", "frames": [1, 2]},
         {"name": "step 2", "animation": "walk", "frames": [7, 8]}

@@ -1178,9 +1178,7 @@ TEST_CASE("A Lion Gate is placed by its update, not by its draw [effects]")
     Vector(23410.f, 2860.f, 0.f, gate.Position); // tile 234, 28
     BMD* b = &Models[gate.Type];
 
-    DrawLook look = DrawLook::Of(gate);
-    CheckDrawSpawnsNone([&] { GMEmpireGuardian1::Make()->RenderMonster(&gate, look, b); });
-    CHECK(gate.Position[0] == 23410.f);
+    // Its draw is the goneWhenDying look of Data/Effects/RenderStyles.json, which moves nothing.
 
     GMEmpireGuardian1::Make()->MoveMonsterVisual(&scope.character(), &gate, b);
     CHECK(gate.Position[0] == 23450.f);

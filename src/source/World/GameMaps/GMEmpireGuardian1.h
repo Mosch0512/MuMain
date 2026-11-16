@@ -24,7 +24,6 @@ public: // Object
     virtual bool RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b);
     virtual void RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b);
     virtual void RenderFrontSideVisual();
-    bool RenderMonster(const OBJECT* o, DrawLook& look, BMD* b);
     // The wall cannons fire on every Empire Guardian map.
     void UpdateProjectileLauncher(OBJECT* o, BMD* b);
 

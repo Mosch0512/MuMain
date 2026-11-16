@@ -218,6 +218,7 @@ a question below decides otherwise.
 | ML-P14 | Medusa, Moss and Zyro arm `deathEffect`, which nothing reads for them. | `Monsters.json` |
 | ML-P15 | Uninitialised values: Alquamos' attack angle, Aticles Head's sprite offset. | `ZzzCharacter.cpp:2147`, `GMEmpireGuardian2.cpp` |
 | ML-P16 | The monsters design's P10 (`ZzzCharacter.cpp:10054`) is no longer at that line; it may be ML-P1. To check. | – |
+| ML-P17 | Raymond's sword and the Blood Assassins' back are lit from the red channel through `Vector`, a macro that sets one channel after another, so green and blue read the red just set: Raymond's sword is lit `[3, 9, 9]` times the red, the Blood Assassins' back `[0.65, 0.4225, 0.4225]` and its chrome `[1.3, 1.3, 0.52]`. Meant: the light times 3, then times 0.65 and `[2, 1, 0.4]`. The move keeps them with `{"fromRed": ...}`. | `GMEmpireGuardian1.cpp` (Raymond), `GM_PK_Field.cpp` (Blood Assassins) |
 
 ## Target design
 
