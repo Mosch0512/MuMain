@@ -1815,7 +1815,8 @@
       "slot": "MONSTER_MODEL_BONE_SCORPION",
       "file": "Data/Monster/Monster211.bmd",
       "textureFolders": ["Monster"],
-      "animations": {"walk": 1, "attack1": 0.4, "attack2": 0.4, "die": 0.2}
+      "animations": {"walk": 1, "attack1": 0.4, "attack2": 0.4, "die": 0.2},
+      "renderStyle": "boneScorpion"
     },
     {
       "slot": "MONSTER_MODEL_ORCUS",
@@ -1842,6 +1843,7 @@
       "file": "Data/Monster/Monster214.bmd",
       "textureFolders": ["Monster"],
       "animations": {"walk": 0.9, "attack1": 0.37, "attack2": 0.37, "die": 0.25},
+      "renderStyle": "crypta",
       "cues": [
         {"name": "step 1", "animation": "walk", "frames": [1, 2]},
         {"name": "step 2", "animation": "walk", "frames": [7, 8]}
@@ -1852,6 +1854,7 @@
       "file": "Data/Monster/Monster215.bmd",
       "textureFolders": ["Monster"],
       "animations": {"walk": 0.9, "attack1": 0.37, "attack2": 0.37, "die": 0.25},
+      "renderStyle": "crypos",
       "cues": [
         {"name": "step 1", "animation": "walk", "frames": [1, 2]},
         {"name": "step 2", "animation": "walk", "frames": [7, 8]}
@@ -1862,6 +1865,7 @@
       "file": "Data/Monster/Monster216.bmd",
       "textureFolders": ["Monster"],
       "animations": {"attack1": 0.8, "attack2": 0.8},
+      "renderStyle": "condra",
       "cues": [
         {"name": "step 1", "animation": "walk", "frames": [1, 2]},
         {"name": "step 2", "animation": "walk", "frames": [7, 8]}
@@ -1916,6 +1920,7 @@
       "file": "Data/Monster/Monster217.bmd",
       "textureFolders": ["Monster"],
       "animations": {"attack1": 0.75, "attack2": 0.75},
+      "renderStyle": "narcondra",
       "cues": [
         {"name": "step 1", "animation": "walk", "frames": [1, 2]},
         {"name": "step 2", "animation": "walk", "frames": [7, 8]}

@@ -125,6 +125,13 @@
       "itemValuesAfter": {"scrollU": 0, "scrollV": {"shape": "scroll", "perSecond": -0.5}, "light": {"tint": [1, 1, 1]}}
     },
     {
+      "name": "boneScorpion",
+      "layers": [
+        {"kind": "texture"},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "onlyWhen": {"notAnimation": "die"}, "texture": "Monster/BoneSE.jpg", "glowMesh": 0, "glowStrength": {"shape": "wave", "from": -0.5, "to": 1.5, "seconds": 3.141592653589793}}
+      ]
+    },
+    {
       "name": "boostAura",
       "layers": [
         {"kind": "texture"},
@@ -223,6 +230,17 @@
       ]
     },
     {
+      "name": "condra",
+      "layers": [
+        {"kind": "texture", "meshes": [0], "onlyWhen": {"notAnimation": "die"}},
+        {"kind": "texture", "meshes": [1], "onlyWhen": {"notAnimation": "die"}},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "onlyWhen": {"notAnimation": "die"}, "texture": "Monster/bora_golem_effect.jpg", "glowMesh": 0, "glowStrength": {"shape": "wave", "from": 0, "to": 2, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [1], "onlyWhen": {"notAnimation": "die"}, "texture": "Monster/bora_golem2_effect.jpg", "glowMesh": 1, "glowStrength": {"shape": "wave", "from": 0, "to": 2, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [3], "onlyWhen": {"notAnimation": "die"}, "glowMesh": 3, "glowStrength": 0.9, "scrollU": {"shape": "scroll", "perSecond": 1}},
+        {"kind": "texture", "blend": "glow", "meshes": [2], "onlyWhen": {"notAnimation": "die"}, "glowMesh": 2, "glowStrength": 0.3, "scrollU": {"shape": "scroll", "perSecond": 1.5}, "light": [0.4, 0.95, 1]}
+      ]
+    },
+    {
       "name": "contractSummon",
       "layers": [
         {"kind": "texture", "meshes": [0], "onlyWhen": {"hiddenMesh": 1}, "opacity": 1, "light": [1, 1, 1]},
@@ -245,6 +263,22 @@
         {"kind": "texture", "blend": "glow", "meshes": [2]}
       ],
       "itemValuesAfter": {"scrollingMesh": 1}
+    },
+    {
+      "name": "crypos",
+      "layers": [
+        {"kind": "texture", "meshes": [0]},
+        {"kind": "texture", "meshes": [1]},
+        {"kind": "texture", "meshes": [2]},
+        {"kind": "texture", "blend": "glow", "meshes": [3], "glowMesh": 0, "glowStrength": 1, "light": [1, 1, 1]}
+      ]
+    },
+    {
+      "name": "crypta",
+      "layers": [
+        {"kind": "texture"},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "onlyWhen": {"notAnimation": "die"}, "texture": "Monster/KryptaBall2.jpg", "glowMesh": 0, "glowStrength": {"shape": "wave", "from": 0, "to": 2, "seconds": 3.141592653589793}}
+      ]
     },
     {
       "name": "darkElfTrainee",
@@ -838,6 +872,20 @@
         {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [1], "texture": "Effect/Chrome01.jpg"},
         {"kind": "texture", "meshes": [2]},
         {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [2], "texture": "Effect/Chrome01.jpg"}
+      ]
+    },
+    {
+      "name": "narcondra",
+      "layers": [
+        {"kind": "texture", "meshes": [1], "onlyWhen": {"notAnimation": "die"}},
+        {"kind": "texture", "meshes": [2], "onlyWhen": {"notAnimation": "die"}},
+        {"kind": "texture", "meshes": [3], "onlyWhen": {"notAnimation": "die"}},
+        {"kind": "texture", "blend": "glow", "meshes": [2], "onlyWhen": {"notAnimation": "die"}, "texture": "Monster/king_golem01_effect.jpg", "glowMesh": 2, "glowStrength": {"shape": "wave", "from": 0, "to": 2, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [3], "onlyWhen": {"notAnimation": "die"}, "texture": "Monster/king_golem02_effect.jpg", "glowMesh": 3, "glowStrength": {"shape": "wave", "from": 0, "to": 2, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [1], "onlyWhen": {"notAnimation": "die"}, "texture": "Monster/king_golem03_effect.jpg", "glowMesh": 1, "glowStrength": {"shape": "wave", "from": 0, "to": 2, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "onlyWhen": {"notAnimation": "die"}, "glowMesh": 0, "glowStrength": 1, "light": [1, 1, 1]},
+        {"kind": "texture", "blend": "glow", "meshes": [4], "onlyWhen": {"notAnimation": "die"}, "glowMesh": 4, "glowStrength": 0.9, "scrollU": {"shape": "scroll", "perSecond": 1}, "light": [1, 0.1, 1]},
+        {"kind": "texture", "blend": "glow", "meshes": [5], "onlyWhen": {"notAnimation": "die"}, "glowMesh": 5, "glowStrength": 0.7, "scrollU": {"shape": "scroll", "perSecond": 1.5}, "light": [0.7, 0.4, 1]}
       ]
     },
     {

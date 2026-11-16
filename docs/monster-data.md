@@ -462,7 +462,9 @@ golems, death riders and Hell Maine, and Kanturu's Berserk, Gigantis, Splinter
 Wolf and Kentauros (the Berserk and Gigantis glows left out while they die,
 `"notAnimation": "die"`), Persona, Twin Tail (green while it dies) and the Maya
 hands, the Erohim, Kanturu's gate and the Nightmare's skull soldier, and the
-Crywolf and Balgass barracks' Balgass, Soram and Dark Elf (Trainee Soldier). A texture
+Crywolf and Balgass barracks' Balgass, Soram and Dark Elf (Trainee Soldier), and Karutan's Bone Scorpion,
+Crypta, Crypos, Condra and Narcondra (their glows, and all of Condra and
+Narcondra, left out while they die). A texture
 a map loads (the Erohim's wing) is drawn from where the map loaded it while the
 hero is on that map: the looks find their textures again when a map loads. A
 monster drawn with a
