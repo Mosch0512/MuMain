@@ -160,6 +160,14 @@
       ]
     },
     {
+      "name": "cherryBlossomSpirit",
+      "layers": [
+        {"kind": "texture", "meshes": [0], "glowStrength": 2},
+        {"kind": "reflection", "motion": "verySlowDrift", "meshes": [0], "opacity": 0.25, "glowStrength": 1},
+        {"kind": "texture", "meshes": {"allBut": [0]}, "opacity": 0.8, "glowStrength": 2}
+      ]
+    },
+    {
       "name": "chromeMesh0",
       "layers": [
         {"kind": "texture"},
@@ -566,6 +574,16 @@
       ]
     },
     {
+      "name": "kalimaShop",
+      "layers": [
+        {"kind": "texture", "meshes": [4], "light": [1, 1, 1]},
+        {"kind": "texture", "meshes": [3]},
+        {"kind": "texture", "meshes": [2]},
+        {"kind": "texture", "meshes": [1]},
+        {"kind": "texture", "meshes": [0]}
+      ]
+    },
+    {
       "name": "knightBlade",
       "layers": [
         {"kind": "texture", "opacity": "drawing"},
@@ -766,6 +784,13 @@
       ]
     },
     {
+      "name": "phantomKnight",
+      "layers": [
+        {"kind": "texture", "light": [1, 1, 1]},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "texture": "Effect/bab2.jpg", "light": [0.9, 0.8, 1]}
+      ]
+    },
+    {
       "name": "phoenixSoulArmor",
       "layers": [
         {"kind": "texture", "meshes": [0]},
@@ -817,6 +842,15 @@
         {"kind": "texture", "blend": "glow", "meshes": [1], "opacity": 1, "glowMesh": 1, "scrollU": {"shape": "scroll", "perSecond": 0.9}, "scrollV": {"shape": "scroll", "perSecond": 0.9}}
       ],
       "itemValuesAfter": {"hiddenMesh": 1}
+    },
+    {
+      "name": "quarrel",
+      "layers": [
+        {"kind": "texture", "meshes": [0], "light": [0.5, 0.5, 0.8]},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [0], "texture": "Effect/Chrome01.jpg"},
+        {"kind": "texture", "meshes": [1]},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [1], "texture": "Effect/Chrome01.jpg"}
+      ]
     },
     {
       "name": "rareItemTicket",
@@ -974,6 +1008,13 @@
       "layers": [
         {"kind": "texture"},
         {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [1], "glowMesh": 1}
+      ]
+    },
+    {
+      "name": "seedMaster",
+      "layers": [
+        {"kind": "texture"},
+        {"kind": "texture", "blend": "glow", "meshes": [1], "opacity": {"shape": "wave", "from": 0, "to": 0.4, "seconds": 6.283185307179586}, "glowMesh": 1, "glowStrength": {"shape": "wave", "from": 0, "to": 0.4, "seconds": 6.283185307179586}}
       ]
     },
     {

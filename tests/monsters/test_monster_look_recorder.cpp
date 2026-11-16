@@ -106,7 +106,8 @@ TEST_CASE("The monster look recorder draws a monster the same way twice, and its
 }
 
 // The baseline (tests/monsters/baseline/MonsterLookDraws.txt) holds every situation of every number with a look of
-// the data, on each map the number is placed on, as its old code drew it. MU_MONSTER_LOOK_WRITE=<numbers,
+// the data, and of every number whose drawing code was cleaned up, on each map the number is placed on, as its old
+// code drew it. MU_MONSTER_LOOK_WRITE=<numbers,
 // comma-separated> records those numbers as their code draws them without their looks: run it while their old code
 // is still there.
 TEST_CASE("Monster looks moved into data draw as their old code did (the baseline) [monsters][looks][recorder]")
@@ -135,7 +136,9 @@ TEST_CASE("Monster looks moved into data draw as their old code did (the baselin
     for (int number = 0; number < Data::Monsters::MonsterNumberCount; ++number)
     {
         const MonsterDefinition* monster = g_MonsterDatabase.Find(number);
-        if (monster == nullptr || !HasLook(*monster))
+        // A number with lines draws as they say whether or not it names a look: its old code was cleaned up (a case
+        // that drew as the default goes) or moved.
+        if (monster == nullptr || (!HasLook(*monster) && !withLines.contains(number)))
             continue;
         CAPTURE(number);
         CHECK(withLines.contains(number));

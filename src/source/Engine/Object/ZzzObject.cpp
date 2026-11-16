@@ -608,71 +608,18 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b)
     else if (TheMapProcess().RenderObjectMesh(o, look, b))
     {
     }
-                    else
-                        if (o->Type == MODEL_KALIMA_SHOP)
-                        {
-                            Vector(1.f, 1.f, 1.f, b->BodyLight);
-                            b->BeginRender(look.alpha);
-                            b->RenderMesh(4, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV);
-                            b->RenderMesh(3, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV);
-                            b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV);
-                            b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV);
-                            b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV);
-                            b->EndRender();
-                        }
-                        else
-                            if (o->Type == MODEL_NPC_QUARREL)
-                            {
-                                Vector(0.5f, 0.5f, 0.8f, b->BodyLight);
-                                b->BeginRender(look.alpha);
-                                for (int i = 0; i < Models[o->Type].NumMeshs; i++)
-                                {
-                                    b->RenderMesh(i, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                  look.blendMeshLight, look.blendMeshU, look.blendMeshV);
-                                    b->RenderMesh(i, RENDER_CHROME | RENDER_BRIGHT, look.alpha,
-                                                  look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                                                  look.blendMeshV, BITMAP_CHROME);
-                                }
-                                b->EndRender();
-                            }
-                            else
-                                if (o->Type == MODEL_SEED_MASTER)
-                                {
-                                    b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                  look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                                                  look.hiddenMesh);
-                                    float fLumi = (sinf(WorldTime * 0.001f) + 1.0f) * 0.2f + 0.0f;
-                                    b->RenderMesh(1, RENDER_TEXTURE | RENDER_BRIGHT, fLumi, 1, fLumi,
-                                                  look.blendMeshU, look.blendMeshV);
-                                }
-                                else
-                                    if (o->Type == MODEL_MUTANT)
-                                    {
-                                        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight,
-                                                      look.blendMeshU, look.blendMeshV, look.hiddenMesh);
-                                    }
-                                    else
-                                        if (o->Type == MODEL_TANTALLOS && o->SubType == 1)
-                                        {
-                                            b->BeginRender(look.alpha);
-                                            float Light = sinf(WorldTime * 0.002f) * 0.01f + 1.f;
-                                            b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 0,
-                                                          Light, look.blendMeshU, look.blendMeshV,
-                                                          BITMAP_MONSTER_SKIN + 1);
-                                            b->RenderMesh(1, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 1,
-                                                          Light, look.blendMeshU, look.blendMeshV,
-                                                          BITMAP_MONSTER_SKIN);
-                                            b->RenderMesh(2, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 1,
-                                                          Light, look.blendMeshU, look.blendMeshV);
-                                            b->RenderMesh(2, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 1,
-                                                          Light, look.blendMeshU, look.blendMeshV);
-                                            b->EndRender();
-                                        }
+    else if (o->Type == MODEL_TANTALLOS && o->SubType == 1)
+    {
+        b->BeginRender(look.alpha);
+        float Light = sinf(WorldTime * 0.002f) * 0.01f + 1.f;
+        b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 0, Light, look.blendMeshU, look.blendMeshV,
+                      BITMAP_MONSTER_SKIN + 1);
+        b->RenderMesh(1, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 1, Light, look.blendMeshU, look.blendMeshV,
+                      BITMAP_MONSTER_SKIN);
+        b->RenderMesh(2, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 1, Light, look.blendMeshU, look.blendMeshV);
+        b->RenderMesh(2, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 1, Light, look.blendMeshU, look.blendMeshV);
+        b->EndRender();
+    }
                                         else if (o->Type == MODEL_MAGIC_SKELETON)
                                         {
                                             b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
@@ -692,30 +639,6 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b)
                                             pSideHair->Create(VertexTransform, b, o);
                                             pSideHair->Render(VertexTransform, LightTransform);
                                             pSideHair->Destroy();
-                                        }
-                                        else if (o->Type == MODEL_DRAKAN)
-                                        {
-                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                                                          look.hiddenMesh);
-                                        }
-                                        else if (o->Type == MODEL_ORC_ARCHER)
-                                        {
-                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                                                          look.hiddenMesh);
-                                        }
-                                        else if (o->Type == MODEL_ORC)
-                                        {
-                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                                                          look.hiddenMesh);
-                                        }
-                                        else if (o->Type == MODEL_CURSED_KING)
-                                        {
-                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                                                          look.hiddenMesh);
                                         }
                                         else if (o->Type == MODEL_CRUST)
                                         {
@@ -737,18 +660,6 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b)
                                                           look.blendMeshLight, look.blendMeshU, look.blendMeshV,
                                                           look.hiddenMesh);
                                         }
-                                        else if (o->Type == MODEL_PHANTOM_KNIGHT)
-                                        {
-                                            Vector(1.f, 1.f, 1.f, b->BodyLight);
-                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          look.blendMeshLight, look.blendMeshU,
-                                                          look.blendMeshV, look.hiddenMesh);
-                                            Vector(.9f, .8f, 1.0f, b->BodyLight);
-                                            b->RenderBody(RENDER_CHROME | RENDER_BRIGHT, look.alpha,
-                                                          look.blendMesh, look.blendMeshLight,
-                                                          look.blendMeshU, look.blendMeshV, look.hiddenMesh,
-                                                          BITMAP_CHROME + 1);
-                                        }
                                         else if (o->Type == MODEL_QUEEN_RAINER)
                                         {
                                             b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
@@ -763,12 +674,6 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b)
                                                           look.blendMesh, look.blendMeshLight,
                                                           look.blendMeshU, look.blendMeshV,
                                                           look.hiddenMesh);
-                                        }
-                                        else if (o->Type == MODEL_LUNAR_RABBIT)
-                                        {
-                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          look.blendMeshLight, look.blendMeshU,
-                                                          look.blendMeshV, look.hiddenMesh);
                                         }
                                         else if (o->Type == MODEL_MOONHARVEST_MOON)
                                         {
@@ -790,22 +695,6 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b)
                                                           look.blendMeshV, look.hiddenMesh);
                                         }
                                         else if (o->Type == MODEL_MOONHARVEST_SONGPUEN2)
-                                        {
-                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          look.blendMeshLight, look.blendMeshU,
-                                                          look.blendMeshV, look.hiddenMesh);
-                                        }
-                                        else if (o->Type == MODEL_NPC_CHERRYBLOSSOM)
-                                        {
-                                            b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          2.f, look.blendMeshU, look.blendMeshV);
-                                            b->RenderMesh(0, RENDER_TEXTURE | RENDER_CHROME7, 0.25f,
-                                                          look.blendMesh, 1.f, look.blendMeshU,
-                                                          look.blendMeshV);
-                                            b->RenderBody(RENDER_TEXTURE, 0.8f, look.blendMesh, 2.f,
-                                                          look.blendMeshU, look.blendMeshV, 0);
-                                        }
-                                        else if (o->Type == MODEL_NPC_CHERRYBLOSSOMTREE)
                                         {
                                             b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
                                                           look.blendMeshLight, look.blendMeshU,

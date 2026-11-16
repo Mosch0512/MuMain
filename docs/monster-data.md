@@ -454,7 +454,9 @@ Axl Hero, Gigas Golem, Scout (Hero) and Werewolf (Hero). The Balrog
 model with a golden glow (`goldenChrome`: Golden Budge Dragon, Goblin, Derkon,
 Lizard King, Vepar, Tantalos, Wheel, Dark Knight, Iron Knight, Napin, Rabbit and
 the Great Golden Dragon) and the Golden Titan and Soldier (`goldenShine`) have
-theirs too. A monster drawn with a
+theirs too. Some models name the look of all their monsters: the Phantom
+Knight (`phantomKnight`), the Kalima shop, the Werewolf Quarrel, the Cherry
+Blossom spirit and the Seed Master. A monster drawn with a
 render style is drawn by it alone: no pass of the code draws over its body.
 
 A look name that no look file has is an Error in Data Checks (areas Monsters

@@ -389,6 +389,7 @@
       "file": "Data/Monster/Monster54.bmd",
       "textureFolders": ["Monster"],
       "animations": {"die": 0.22},
+      "renderStyle": "phantomKnight",
       "linkBones": [30, 39]
     },
     {
@@ -2210,7 +2211,8 @@
     {
       "slot": "MODEL_KALIMA_SHOP",
       "file": "Data/NPC/kalnpc.bmd",
-      "textureFolders": ["NPC"]
+      "textureFolders": ["NPC"],
+      "renderStyle": "kalimaShop"
     },
     {
       "slot": "MODEL_BC_NPC1",
@@ -2346,7 +2348,8 @@
     {
       "slot": "MODEL_NPC_QUARREL",
       "file": "Data/NPC/WereQuarrel.bmd",
-      "textureFolders": ["Monster"]
+      "textureFolders": ["Monster"],
+      "renderStyle": "quarrel"
     },
     {
       "slot": "MODEL_NPC_CASTEL_GATE",
@@ -2402,7 +2405,8 @@
     {
       "slot": "MODEL_NPC_CHERRYBLOSSOM",
       "file": "Data/NPC/cherryblossom/cherry_blossom.bmd",
-      "textureFolders": ["NPC/cherryblossom"]
+      "textureFolders": ["NPC/cherryblossom"],
+      "renderStyle": "cherryBlossomSpirit"
     },
     {
       "slot": "MODEL_NPC_CHERRYBLOSSOMTREE",
@@ -2412,7 +2416,8 @@
     {
       "slot": "MODEL_SEED_MASTER",
       "file": "Data/NPC/goblinmaster.bmd",
-      "textureFolders": ["NPC"]
+      "textureFolders": ["NPC"],
+      "renderStyle": "seedMaster"
     },
     {
       "slot": "MODEL_SEED_INVESTIGATOR",

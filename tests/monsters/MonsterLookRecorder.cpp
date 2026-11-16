@@ -61,6 +61,7 @@ struct BasicTexture
 };
 constexpr BasicTexture BasicTextures[] = {
     {L"Effect\\Chrome01.jpg", BITMAP_CHROME, GL_REPEAT},
+    {L"Effect\\bab2.jpg", BITMAP_CHROME + 1, GL_REPEAT},
     {L"Effect\\Shiny02.jpg", BITMAP_SHINY + 1, GL_CLAMP_TO_EDGE},
     {L"Monster\\King11.jpg", BITMAP_WHITE_WIZARD, GL_CLAMP_TO_EDGE},
     {L"Monster\\Kni000.jpg", BITMAP_DEST_ORC_WAR0, GL_CLAMP_TO_EDGE},
