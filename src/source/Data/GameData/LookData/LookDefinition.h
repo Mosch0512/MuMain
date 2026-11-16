@@ -163,6 +163,9 @@ struct LayerLight
     std::optional<Number> brightness;
     // `color` times the drawing's opacity (MN8): the monsters' glow passes dim their light as they fade.
     bool timesOpacity = false;
+    // `color` times the red of the model's light, for each channel (MN8): Raymond's sword and the Blood Assassins'
+    // backs, which the code lit from the red channel alone.
+    bool fromRed = false;
 
     bool operator==(const LayerLight&) const = default;
 };
@@ -248,6 +251,9 @@ struct Layer
     std::optional<int> scrollingMesh;
     // A reflection that lights the mesh as a light map (RENDER_LIGHTMAP, MN8): the Drakan's second chrome.
     bool lightMap = false;
+    // Drawn with the depth test off, over the model's other meshes and the world (MN8): the PK Field's Zombie Fighter
+    // and Gladiator glows.
+    bool onTop = false;
     OnlyWhen onlyWhen;
     EachItemFields eachItem;
 

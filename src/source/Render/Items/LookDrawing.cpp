@@ -351,7 +351,15 @@ void DrawLayer(const Layer& layer, BMD* b, const DrawLook& look, float alpha, in
     }
     const int scrolling = b->StreamMesh;
     b->StreamMesh = layer.scrollingMesh.value_or(scrolling);
+    if (layer.onTop)
+    {
+        DisableDepthTest();
+    }
     DrawMeshes(layer, b, look, *draw);
+    if (layer.onTop)
+    {
+        EnableDepthTest();
+    }
     b->StreamMesh = scrolling;
 }
 
@@ -469,7 +477,10 @@ std::array<float, 3> LightOf(const LayerLight& light, const vec3_t modelLight, M
     for (int channel = 0; channel < 3; ++channel)
     {
         const float value = NumberAt(light.color[channel], moment);
-        color[channel] = light.tint ? value * modelLight[channel] : light.timesOpacity ? value * moment.alpha : value;
+        color[channel] = light.tint           ? value * modelLight[channel]
+                         : light.fromRed      ? value * modelLight[0]
+                         : light.timesOpacity ? value * moment.alpha
+                                              : value;
     }
     return color;
 }
@@ -537,8 +548,16 @@ void DrawMeshByMesh(const LookDefinition& style, BMD* b, const OBJECT* o, const 
         const int scrolling = b->StreamMesh;
         b->StreamMesh = pass.layer->scrollingMesh.value_or(scrolling);
         const LayerDraw& draw = *pass.draw;
+        if (pass.layer->onTop)
+        {
+            DisableDepthTest();
+        }
         b->RenderScriptedMesh(mesh, flags, draw.opacity, draw.glowMesh, draw.glowStrength, draw.u, draw.v,
                               draw.texture);
+        if (pass.layer->onTop)
+        {
+            EnableDepthTest();
+        }
         b->StreamMesh = scrolling;
     };
     const auto drawKeepingLight = [b, &drawPass](const MeshPass& pass, int mesh, int flags)

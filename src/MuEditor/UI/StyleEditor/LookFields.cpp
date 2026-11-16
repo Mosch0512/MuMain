@@ -805,6 +805,7 @@ enum class LightChoice
     Tint,
     Brightness,
     TimesOpacity,
+    FromRed,
 };
 
 bool LightField(std::optional<LayerLight>& light)
@@ -814,12 +815,14 @@ bool LightField(std::optional<LayerLight>& light)
                          : light->brightness   ? LightChoice::Brightness
                          : light->tint         ? LightChoice::Tint
                          : light->timesOpacity ? LightChoice::TimesOpacity
+                         : light->fromRed      ? LightChoice::FromRed
                                                : LightChoice::Color;
     static const Names<LightChoice> names{{LightChoice::Before, &I18N::Editor::TheLightBefore},
                                           {LightChoice::Color, &I18N::Editor::AColor},
                                           {LightChoice::Tint, &I18N::Editor::TintOfTheItemLight},
                                           {LightChoice::Brightness, &I18N::Editor::TheItemLightAtABrightness},
-                                          {LightChoice::TimesOpacity, &I18N::Editor::AColorTimesTheOpacity}};
+                                          {LightChoice::TimesOpacity, &I18N::Editor::AColorTimesTheOpacity},
+                                          {LightChoice::FromRed, &I18N::Editor::AColorTimesTheRedOfTheLight}};
     bool changed = false;
     if (Choice(I18N::Editor::Light, choice, names, I18N::Editor::LayerLightTooltip))
     {
@@ -836,7 +839,8 @@ bool LightField(std::optional<LayerLight>& light)
             const LayerLight kept = light.value_or(LayerLight{});
             light = LayerLight{.tint = choice == LightChoice::Tint,
                                .color = kept.color,
-                               .timesOpacity = choice == LightChoice::TimesOpacity};
+                               .timesOpacity = choice == LightChoice::TimesOpacity,
+                               .fromRed = choice == LightChoice::FromRed};
         }
         changed = true;
     }
@@ -1355,6 +1359,8 @@ bool Layer(Data::Looks::Layer& layer, const std::vector<LookPart>& parts)
         changed |= ImGui::Checkbox(Text::LightMap, &layer.lightMap);
         Tip(Text::LightMapTooltip);
     }
+    changed |= ImGui::Checkbox(Text::OnTop, &layer.onTop);
+    Tip(Text::OnTopTooltip);
     changed |= OnlyWhenFields(layer.onlyWhen, parts);
     changed |= EachItemBoxes(layer.eachItem, {{"meshes", &Text::Meshes},
                                               {"texture", &Text::Texture},

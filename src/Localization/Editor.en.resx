@@ -1129,8 +1129,17 @@
   <data name="A color times the opacity" xml:space="preserve">
     <value>A color times the opacity</value>
   </data>
+  <data name="A color times the red of the light" xml:space="preserve">
+    <value>A color times the red of the light</value>
+  </data>
   <data name="Tinting debuff" xml:space="preserve">
     <value>Tinting debuff (poison, freeze, Blow of Destruction)</value>
+  </data>
+  <data name="On top" xml:space="preserve">
+    <value>On top</value>
+  </data>
+  <data name="On top tooltip" xml:space="preserve">
+    <value>Drawn without the depth test: over the model's other meshes and over walls, as the PK Field's Zombie Fighter glows.</value>
   </data>
   <data name="Light map" xml:space="preserve">
     <value>Light map</value>

@@ -52,6 +52,7 @@ constexpr const char* Tint = "tint";
 constexpr const char* Brightness = "brightness";
 constexpr const char* ScrollingMesh = "scrollingMesh";
 constexpr const char* LightMap = "lightMap";
+constexpr const char* OnTop = "onTop";
 constexpr const char* Shape = "shape";
 constexpr const char* From = "from";
 constexpr const char* To = "to";
@@ -63,6 +64,7 @@ constexpr const char* SecondsEach = "secondsEach";
 constexpr const char* TimesItem = "timesItem";
 constexpr const char* AtMost = "atMost";
 constexpr const char* TimesOpacity = "timesOpacity";
+constexpr const char* FromRed = "fromRed";
 constexpr const char* NotFor = "notFor";
 constexpr const char* OnlyWhen = "onlyWhen";
 constexpr const char* Place = "place";
@@ -574,10 +576,21 @@ void LookReader::ReadLayer(const OrderedJson& marked, const std::string& field, 
             layer.lightMap = lightMap->get<bool>();
         }
     }
+    if (const auto onTop = json.find(Keys::OnTop); onTop != json.end())
+    {
+        if (!onTop->is_boolean())
+        {
+            AddFatal(field + "." + Keys::OnTop, "must be true or false");
+        }
+        else
+        {
+            layer.onTop = onTop->get<bool>();
+        }
+    }
     WarnAboutUnknownKeys(json,
                          {Keys::Kind, Keys::Motion, Keys::Where, Keys::Blend, Keys::Meshes, Keys::OnlyWhen,
                           Keys::Texture, Keys::Opacity, Keys::GlowMesh, Keys::GlowStrength, Keys::ScrollU,
-                          Keys::ScrollV, Keys::Light, Keys::ScrollingMesh, Keys::LightMap},
+                          Keys::ScrollV, Keys::Light, Keys::ScrollingMesh, Keys::LightMap, Keys::OnTop},
                          field);
 }
 
@@ -982,16 +995,20 @@ void LookReader::ReadLight(const OrderedJson& json, const std::string& field, st
     {
         const auto tint = entry->find(Keys::Tint);
         const auto timesOpacity = entry->find(Keys::TimesOpacity);
-        if (entry->size() != 1 || (tint == entry->end() && timesOpacity == entry->end()))
+        const auto fromRed = entry->find(Keys::FromRed);
+        if (entry->size() != 1 || (tint == entry->end() && timesOpacity == entry->end() && fromRed == entry->end()))
         {
             AddFatal(lightField, "must be [red, green, blue], {\"tint\": [red, green, blue]}, {\"timesOpacity\": "
-                                 "[red, green, blue]} or {\"brightness\": a number}");
+                                 "[red, green, blue]}, {\"fromRed\": [red, green, blue]} or {\"brightness\": a "
+                                 "number}");
             return;
         }
         read.tint = tint != entry->end();
-        read.timesOpacity = !read.tint;
-        color = read.tint ? &*tint : &*timesOpacity;
-        colorField += std::string(".") + (read.tint ? Keys::Tint : Keys::TimesOpacity);
+        read.timesOpacity = timesOpacity != entry->end();
+        read.fromRed = fromRed != entry->end();
+        const char* key = read.tint ? Keys::Tint : read.timesOpacity ? Keys::TimesOpacity : Keys::FromRed;
+        color = &(*entry)[key];
+        colorField += std::string(".") + key;
     }
     if (!color->is_array() || color->size() != 3)
     {
@@ -1251,6 +1268,10 @@ OrderedJson WriteLight(const LayerLight& light)
     {
         return OrderedJson{{Keys::TimesOpacity, std::move(color)}};
     }
+    if (light.fromRed)
+    {
+        return OrderedJson{{Keys::FromRed, std::move(color)}};
+    }
     return light.tint ? OrderedJson{{Keys::Tint, std::move(color)}} : color;
 }
 
@@ -1321,6 +1342,10 @@ OrderedJson WriteLayer(const Layer& layer)
     if (layer.lightMap)
     {
         json[Keys::LightMap] = true;
+    }
+    if (layer.onTop)
+    {
+        json[Keys::OnTop] = true;
     }
     PutEachItem(json, layer.eachItem,
                 {Keys::Kind, Keys::Motion, Keys::Where, Keys::Blend, Keys::Meshes, Keys::OnlyWhen, Keys::Texture,
