@@ -13,6 +13,7 @@
 #include "Engine/Object/ZzzCharacter.h"
 #include "Render/Items/LookDrawing.h"
 #include "Render/Models/ZzzBMD.h"
+#include "Render/Sprites/GlobalBitmap.h"
 #include "Render/Textures/ZzzOpenglUtil.h"
 #include "Render/Textures/ZzzTexture.h"
 
@@ -23,6 +24,7 @@
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -62,6 +64,7 @@ struct BasicTexture
 constexpr BasicTexture BasicTextures[] = {
     {L"Effect\\Chrome01.jpg", BITMAP_CHROME, GL_REPEAT},
     {L"Effect\\bab2.jpg", BITMAP_CHROME + 1, GL_REPEAT},
+    {L"Effect\\Chrome03.jpg", BITMAP_CHROME3, GL_CLAMP_TO_EDGE},
     {L"Effect\\Shiny02.jpg", BITMAP_SHINY + 1, GL_CLAMP_TO_EDGE},
     {L"Monster\\King11.jpg", BITMAP_WHITE_WIZARD, GL_CLAMP_TO_EDGE},
     {L"Monster\\illumi_R.jpg", BITMAP_TWINTAIL_EFFECT, GL_CLAMP_TO_EDGE},
@@ -85,6 +88,18 @@ constexpr BasicTexture MapTextures[] = {
     {L"Monster\\nightmare_R.jpg", BITMAP_NIGHTMARE_EFFECT1, GL_CLAMP_TO_EDGE},
     {L"Monster\\nightmaresward_R.jpg", BITMAP_NIGHTMARE_EFFECT2, GL_CLAMP_TO_EDGE},
 };
+
+// Loads the textures whose slot is empty or holds another file. A slot loaded by an earlier test case can be empty
+// in a later one of the same run (the White Wizard's King11.jpg was), so every recorder setup checks them again.
+void LoadMissing(std::span<const BasicTexture> textures)
+{
+    for (const BasicTexture& texture : textures)
+    {
+        const BITMAP_t* loaded = Bitmaps.FindTexture(static_cast<GLuint>(texture.index));
+        if (loaded == nullptr || std::wstring_view(loaded->FileName) != std::wstring(L"Data\\") + texture.file)
+            LoadBitmap(texture.file, texture.index, GL_LINEAR, texture.wrap);
+    }
+}
 
 std::string Number(double value)
 {
@@ -220,22 +235,10 @@ ShippedLooks::ShippedLooks() : m_state(new State)
         REQUIRE_FALSE(Data::Items::HasFatal(shipped.issues));
         g_LookStore.SetLooks(kind, std::move(shipped.looks));
     }
-    static const bool basicTexturesLoaded = []
-    {
-        for (const BasicTexture& texture : BasicTextures)
-            LoadBitmap(texture.file, texture.index, GL_LINEAR, texture.wrap);
-        return true;
-    }();
-    (void)basicTexturesLoaded;
+    LoadMissing(BasicTextures);
     Render::Items::Looks::PrepareTextures();
     // A map loads its textures after the looks found theirs, as when the hero enters it.
-    static const bool mapTexturesLoaded = []
-    {
-        for (const BasicTexture& texture : MapTextures)
-            LoadBitmap(texture.file, texture.index, GL_LINEAR, texture.wrap);
-        return true;
-    }();
-    (void)mapTexturesLoaded;
+    LoadMissing(MapTextures);
     Render::Items::Looks::RefindTextures();
 }
 
