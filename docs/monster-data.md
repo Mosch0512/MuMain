@@ -471,7 +471,10 @@ they die). Jerint (505) names `jerint` on its entry, as Jerint the Assistant
 shares its model and keeps the model's plain look. Raymond (`raymond`) and the
 PK Field's Zombie Fighter and Resurrected Gladiator (`zombieFighter`, their glow
 drawn on top), Ash Slaughterer, and Blood and Cruel Blood Assassin (not drawn
-while they die) name theirs too. A texture
+while they die) name theirs too, as do Doppelganger's Slaughterer and Furious
+Slaughterer (`doppelgangerSlaughterer`). Its Ice Walker (531) and Larva (532)
+name their retextured looks on their numbers, as the Ice Walker and Larva of
+the other maps share their models. A texture
 a map loads (the Erohim's wing) is drawn from where the map loaded it while the
 hero is on that map: the looks find their textures again when a map loads. A
 monster drawn with a

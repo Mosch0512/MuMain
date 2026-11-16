@@ -318,7 +318,7 @@
       "scale": 0.6,
       "numbers": [
         {"number": 12, "maps": [1]},
-        {"number": 532}
+        {"number": 532, "renderStyle": "doppelgangerLarva"}
       ]
     },
     {
@@ -5427,7 +5427,7 @@
       "scale": 1.2,
       "numbers": [
         {"number": 454, "maps": [57]},
-        {"number": 531, "attacks": {"otherwise": "generic", "clearSkill": "never"}}
+        {"number": 531, "attacks": {"otherwise": "generic", "clearSkill": "never"}, "renderStyle": "doppelgangerIceWalker"}
       ]
     },
     {

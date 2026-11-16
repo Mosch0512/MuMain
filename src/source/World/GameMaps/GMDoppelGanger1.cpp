@@ -227,8 +227,6 @@ bool CGMDoppelGanger1::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
     if (IsDoppelGanger1() == false)
         return false;
 
-    float fBlendMeshLight = 0;
-
     switch (o->Type)
     {
     case 19:
@@ -253,41 +251,6 @@ bool CGMDoppelGanger1::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
         b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
                       look.blendMeshU, -(int)WorldTime % 4000 * 0.00025f);
         b->StreamMesh = -1;
-        return true;
-    case MODEL_ICE_WALKER:
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV, BITMAP_DOPPELGANGER_ICEWALKER0);
-        b->RenderMesh(1, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV, BITMAP_DOPPELGANGER_ICEWALKER1);
-        return true;
-    case MODEL_LARVA:
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV, BITMAP_DOPPELGANGER_SNAKE01);
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        return true;
-    case MODEL_MAD_BUTCHER:
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        fBlendMeshLight = (sinf(WorldTime * 0.003f) + 1.0f) * 0.5f * 0.8f;
-        b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 0, fBlendMeshLight, look.blendMeshU,
-                      look.blendMeshV, BITMAP_BUGBEAR_R);
-        // b->Actions[MONSTER01_WALK].PlaySpeed =		0.34f;
-        return true;
-    case MODEL_TERRIBLE_BUTCHER:
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        fBlendMeshLight = (sinf(WorldTime * 0.003f) + 1.0f) * 0.5f * 0.8f;
-        b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 0, fBlendMeshLight, look.blendMeshU,
-                      look.blendMeshV, BITMAP_BUGBEAR_R);
         return true;
     case MODEL_DOPPELGANGER:
         return true;

@@ -1643,13 +1643,15 @@
       "slot": "MONSTER_MODEL_MAD_BUTCHER",
       "file": "Data/Monster/monster190.bmd",
       "textureFolders": ["Monster"],
-      "animations": {"shock": 0.25, "die": 0.3}
+      "animations": {"shock": 0.25, "die": 0.3},
+      "renderStyle": "doppelgangerSlaughterer"
     },
     {
       "slot": "MONSTER_MODEL_TERRIBLE_BUTCHER",
       "file": "Data/Monster/monster191.bmd",
       "textureFolders": ["Monster"],
-      "animations": {"shock": 0.25, "die": 0.3}
+      "animations": {"shock": 0.25, "die": 0.3},
+      "renderStyle": "doppelgangerSlaughterer"
     },
     {
       "slot": "MONSTER_MODEL_DOPPELGANGER",

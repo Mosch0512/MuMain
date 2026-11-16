@@ -425,6 +425,29 @@
       ]
     },
     {
+      "name": "doppelgangerIceWalker",
+      "layers": [
+        {"kind": "texture", "meshes": [0], "texture": "Monster/DGicewalker_body.jpg"},
+        {"kind": "texture", "blend": "glow", "meshes": [1], "texture": "Monster/DGicewalker_R.jpg"}
+      ]
+    },
+    {
+      "name": "doppelgangerLarva",
+      "layers": [
+        {"kind": "texture", "meshes": [0], "texture": "Monster/Snake1.jpg"},
+        {"kind": "texture", "meshes": [1]}
+      ]
+    },
+    {
+      "name": "doppelgangerSlaughterer",
+      "layers": [
+        {"kind": "texture", "meshes": [0]},
+        {"kind": "texture", "meshes": [1]},
+        {"kind": "texture", "meshes": [2]},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "texture": "Effect/Bugbear_R.jpg", "glowMesh": 0, "glowStrength": {"shape": "wave", "from": 0, "to": 0.8, "seconds": 2.0943951023931953}}
+      ]
+    },
+    {
       "name": "dragonSpear",
       "layers": [
         {"kind": "texture", "blend": "asDrawing", "opacity": "drawing"},

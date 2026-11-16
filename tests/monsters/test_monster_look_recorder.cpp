@@ -13,6 +13,7 @@
 #include "Data/GameData/MonsterData/MonsterModelSlots.h"
 #include "Engine/Object/w_CharacterInfo.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <map>
 #include <set>
@@ -26,10 +27,30 @@ using Data::Maps::MapRef;
 using Data::Monsters::MonsterDefinition;
 using Data::Monsters::MonsterSetup;
 
-// The maps the number is drawn on: those its entry places it on (D61), or map 0 for none.
-std::vector<MapRef> MapsOf(const MonsterDefinition& monster)
+// The maps the number is drawn on: those its entry places it on (D61). A number the server places without a map in
+// the data (Doppelganger's) is drawn on MU_MONSTER_LOOK_MAP=<map> while its lines are written or compared, then on the
+// maps its baseline lines name; else on map 0.
+std::vector<MapRef> MapsOf(const MonsterDefinition& monster,
+                           const std::map<std::string, std::string>* baseline = nullptr)
 {
-    return monster.maps.empty() ? std::vector<MapRef>{MapRef{}} : monster.maps;
+    if (!monster.maps.empty())
+        return monster.maps;
+    if (const char* map = std::getenv("MU_MONSTER_LOOK_MAP"))
+        return {MapRef{.map = std::stoi(map)}};
+    if (baseline == nullptr)
+        return {MapRef{}};
+    std::vector<MapRef> maps;
+    const std::string prefix = std::to_string(monster.number) + " on map ";
+    for (auto line = baseline->lower_bound(prefix); line != baseline->end() && line->first.starts_with(prefix); ++line)
+    {
+        const std::string rest = line->first.substr(prefix.size());
+        MapRef map{.map = std::stoi(rest)};
+        if (const std::size_t stage = rest.find(" stage "); stage != std::string::npos && stage < rest.find(','))
+            map.stage = std::stoi(rest.substr(stage + 7));
+        if (std::ranges::find(maps, map) == maps.end())
+            maps.push_back(map);
+    }
+    return maps.empty() ? std::vector<MapRef>{MapRef{}} : maps;
 }
 
 bool NamesLook(const MonsterSetup& setup)
@@ -63,10 +84,10 @@ std::set<int> SplitNumbers(const char* text)
 // The baseline lines of a number as it draws now, on each of its maps; `code`: without its looks, as its old code
 // draws it.
 std::map<std::string, std::string> RecordNumber(MonsterRecorder::CreationScope& scope, const MonsterDefinition& monster,
-                                                bool code = false)
+                                                const std::map<std::string, std::string>& baseline, bool code = false)
 {
     std::map<std::string, std::string> lines;
-    for (const MapRef& map : MapsOf(monster))
+    for (const MapRef& map : MapsOf(monster, &baseline))
     {
         scope.SetServerMap(map.map, map.stage);
         CHARACTER* character = scope.Create(monster.number);
@@ -123,7 +144,7 @@ TEST_CASE("Monster looks moved into data draw as their old code did (the baselin
             REQUIRE(monster != nullptr);
             const std::string prefix = std::to_string(number) + " on map ";
             std::erase_if(baseline, [&](const auto& line) { return line.first.rfind(prefix, 0) == 0; });
-            baseline.merge(RecordNumber(scope, *monster, true));
+            baseline.merge(RecordNumber(scope, *monster, baseline, true));
         }
         MonsterRecorder::WriteBaseline(baseline);
         MESSAGE("Wrote the monster look baseline");
@@ -142,7 +163,7 @@ TEST_CASE("Monster looks moved into data draw as their old code did (the baselin
             continue;
         CAPTURE(number);
         CHECK(withLines.contains(number));
-        for (const auto& [key, digest] : RecordNumber(scope, *monster))
+        for (const auto& [key, digest] : RecordNumber(scope, *monster, baseline))
         {
             CAPTURE(key);
             const auto line = baseline.find(key);
