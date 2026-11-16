@@ -9875,37 +9875,23 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
         }
     }
 
-    if (!styled && (c->MonsterIndex == MONSTER_BALROG || c->MonsterIndex == MONSTER_GOLDEN_BUDGE_DRAGON ||
-                    c->MonsterIndex == MONSTER_SILVER_VALKYRIE || c->MonsterIndex == MONSTER_ZAIKAN ||
-                    (78 <= c->MonsterIndex && c->MonsterIndex <= MONSTER_GOLDEN_WHEEL) ||
+    // Zaikan and the golden monsters whose bodies are their models' code (494 to 498) glow in code still.
+    if (!styled && (c->MonsterIndex == MONSTER_ZAIKAN ||
                     (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT && c->MonsterIndex <= MONSTER_GOLDEN_RABBIT)))
     {
         vec3_t vBackupBodyLight;
 
-        float Bright = 1.f;
-        if (c->MonsterIndex == MONSTER_ZAIKAN)
-            Bright = 0.5f;
-        if (c->MonsterIndex == MONSTER_GOLDEN_BUDGE_DRAGON ||
-            (78 <= c->MonsterIndex && c->MonsterIndex <= MONSTER_GOLDEN_WHEEL) ||
-            (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT && c->MonsterIndex <= MONSTER_GOLDEN_RABBIT))
+        const float Bright = c->MonsterIndex == MONSTER_ZAIKAN ? 0.5f : 1.f;
+        if (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT)
         {
-            if (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT)
-            {
-                VectorCopy(Models[o->Type].BodyLight, vBackupBodyLight);
-                Vector(1.f, 0.6f, 0.3f, Models[o->Type].BodyLight);
-            }
-
-            if (c->MonsterIndex == MONSTER_GOLDEN_GREAT_DRAGON)
-            {
-                VectorCopy(Models[o->Type].BodyLight, vBackupBodyLight);
-                Vector(1.f, 0.0f, 0.0f, Models[o->Type].BodyLight);
-            }
+            VectorCopy(Models[o->Type].BodyLight, vBackupBodyLight);
+            Vector(1.f, 0.6f, 0.3f, Models[o->Type].BodyLight);
             RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_METAL | RENDER_BRIGHT, Bright);
         }
 
         RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_CHROME | RENDER_BRIGHT, Bright);
 
-        if (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT && c->MonsterIndex <= MONSTER_GOLDEN_RABBIT)
+        if (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT)
         {
             VectorCopy(vBackupBodyLight, Models[o->Type].BodyLight);
         }
@@ -9953,12 +9939,6 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
         {
             pCloth[0].Render();
         }
-    }
-
-    if (!styled && (c->MonsterIndex == MONSTER_GOLDEN_TITAN || c->MonsterIndex == MONSTER_GOLDEN_SOLDIER))
-    {
-        RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_METAL | RENDER_BRIGHT, 1.f,
-                                  BITMAP_SHINY + 1);
     }
 
     if (RendersWingCarriedModels(c))

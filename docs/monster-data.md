@@ -449,7 +449,12 @@ change.
 The monsters that were drawn as variants of a shared model name their own
 render style: Metal Balrog (`metalBalrog`), Alpha Crust, Great Drakan, the
 White Wizard, the Orc Soldier and Archer of Doom, Hero Mutant, Omega Wing,
-Axl Hero, Gigas Golem, Scout (Hero) and Werewolf (Hero). A monster drawn with a
+Axl Hero, Gigas Golem, Scout (Hero) and Werewolf (Hero). The Balrog
+(`balrogChrome`), the Silver Valkyrie, the golden monsters drawn as their
+model with a golden glow (`goldenChrome`: Golden Budge Dragon, Goblin, Derkon,
+Lizard King, Vepar, Tantalos, Wheel, Dark Knight, Iron Knight, Napin, Rabbit and
+the Great Golden Dragon) and the Golden Titan and Soldier (`goldenShine`) have
+theirs too. A monster drawn with a
 render style is drawn by it alone: no pass of the code draws over its body.
 
 A look name that no look file has is an Error in Data Checks (areas Monsters

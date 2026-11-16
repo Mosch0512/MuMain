@@ -772,6 +772,7 @@
       "model": "MONSTER_MODEL_BALROG",
       "soundSet": "Balrog",
       "scale": 1.6,
+      "renderStyle": "balrogChrome",
       "equipment": {
         "weapons": [
           {
@@ -855,6 +856,7 @@
       "model": "MONSTER_MODEL_BUDGE_DRAGON",
       "soundSet": "Budge Dragon",
       "scale": 0.7,
+      "renderStyle": "goldenChrome",
       "numbers": [
         {"number": 43}
       ]
@@ -968,6 +970,7 @@
       "model": "MONSTER_MODEL_VALKYRIE",
       "soundSet": "Valkyrie",
       "scale": 1.4,
+      "renderStyle": "silverValkyrieChrome",
       "equipment": {
         "weapons": [
           {
@@ -986,6 +989,7 @@
       "model": "MONSTER_MODEL_TITAN",
       "soundSet": "Dark Knight",
       "scale": 1.8,
+      "renderStyle": "goldenShine",
       "glowMesh": 2,
       "spawnEffects": [
         {
@@ -1014,6 +1018,7 @@
       "model": "MONSTER_MODEL_SOLDIER",
       "soundSet": "Lizard King",
       "scale": 1.1,
+      "renderStyle": "goldenShine",
       "equipment": {
         "weapons": [
           null,
@@ -1464,6 +1469,7 @@
       "model": "MONSTER_MODEL_GOBLIN",
       "soundSet": "Goblin",
       "scale": 0.8,
+      "renderStyle": "goldenChrome",
       "equipment": {
         "weapons": [
           {
@@ -1482,6 +1488,7 @@
       "kind": "monster",
       "model": "MONSTER_MODEL_DRAGON",
       "soundSet": "Red Dragon",
+      "renderStyle": "goldenChrome",
       "numbers": [
         {"number": 79}
       ]
@@ -1492,6 +1499,7 @@
       "model": "MONSTER_MODEL_LIZARD",
       "soundSet": "Lizard King",
       "scale": 1.4,
+      "renderStyle": "goldenChrome",
       "equipment": {
         "weapons": [
           {
@@ -1511,6 +1519,7 @@
       "model": "MONSTER_MODEL_VEPAR",
       "soundSet": "Vepar",
       "scale": 1,
+      "renderStyle": "goldenChrome",
       "numbers": [
         {"number": 81}
       ]
@@ -1521,6 +1530,7 @@
       "model": "MONSTER_MODEL_TANTALLOS",
       "soundSet": "Tantalos",
       "scale": 1.8,
+      "renderStyle": "goldenChrome",
       "glowMesh": 2,
       "equipment": {
         "weapons": [
@@ -1553,6 +1563,7 @@
       "model": "MONSTER_MODEL_GOLDEN_WHEEL",
       "soundSet": "Iron Wheel",
       "scale": 1.4,
+      "renderStyle": "goldenChrome",
       "equipment": {
         "weapons": [
           {
@@ -5869,6 +5880,7 @@
       "soundSet": "Dark Knight",
       "scale": 0.8,
       "lookLevel": 1,
+      "renderStyle": "goldenChrome",
       "equipment": {
         "weapons": [
           {
@@ -5952,6 +5964,7 @@
       "model": "MONSTER_MODEL_IRON_KNIGHT",
       "soundSet": "Iron Knight",
       "scale": 1.5,
+      "renderStyle": "goldenChrome",
       "numbers": [
         {"number": 499}
       ]
@@ -5962,6 +5975,7 @@
       "model": "MONSTER_MODEL_NAPIN",
       "soundSet": "Thunder Napin",
       "scale": 0.95,
+      "renderStyle": "goldenChrome",
       "numbers": [
         {"number": 500}
       ]
@@ -5972,6 +5986,7 @@
       "model": "MONSTER_MODEL_DRAGON",
       "soundSet": "Red Dragon",
       "scale": 0.88,
+      "renderStyle": "goldenChrome",
       "numbers": [
         {"number": 501}
       ]
@@ -5982,6 +5997,7 @@
       "model": "MONSTER_MODEL_RABBIT",
       "soundSet": "Strange Rabbit",
       "scale": 0.95,
+      "renderStyle": "goldenChrome",
       "numbers": [
         {"number": 502}
       ]

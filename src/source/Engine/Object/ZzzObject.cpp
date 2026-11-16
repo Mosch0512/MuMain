@@ -6453,17 +6453,9 @@ void PartObjectColor(int Type, float Alpha, float Bright, vec3_t Light, bool inM
 {
     // Monsters keep their colors here; items have theirs in the item model files.
     std::array<float, 3> color{};
-    if (inMonsterHands && (Type == MODEL_BALROG || Type == MODEL_BILL_OF_BALROG))
+    if (inMonsterHands && Type == MODEL_BILL_OF_BALROG)
     {
         color = {0.8f, 0.8f, 1.0f};
-    }
-    else if (Type == MODEL_BALROG)
-    {
-        color = {1.0f, 0.2f, 0.0f};
-    }
-    else if (Type == MODEL_VALKYRIE)
-    {
-        color = {1.0f, 1.0f, 1.0f};
     }
     else
     {

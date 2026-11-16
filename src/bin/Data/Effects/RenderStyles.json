@@ -67,6 +67,13 @@
       ]
     },
     {
+      "name": "balrogChrome",
+      "layers": [
+        {"kind": "texture"},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [1, 0.2, 0]}}
+      ]
+    },
+    {
       "name": "battleScepter",
       "layers": [
         {"kind": "texture", "opacity": "drawing", "glowStrength": {"shape": "wave", "from": -0.2, "to": 1, "seconds": 6.283185}},
@@ -417,11 +424,26 @@
       ]
     },
     {
+      "name": "goldenChrome",
+      "layers": [
+        {"kind": "texture"},
+        {"kind": "reflection", "motion": "stillShine", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [1, 0.5, 0]}},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [1, 0.5, 0]}}
+      ]
+    },
+    {
       "name": "goldenOrSilverBox",
       "layers": [
         {"kind": "texture", "meshes": [1]},
         {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [1], "glowMesh": 1},
         {"kind": "texture", "meshes": [2]}
+      ]
+    },
+    {
+      "name": "goldenShine",
+      "layers": [
+        {"kind": "texture"},
+        {"kind": "reflection", "motion": "stillShine", "blend": "glow", "meshes": "allEvenHidden", "texture": "Effect/Shiny02.jpg", "light": {"timesOpacity": [1, 0.5, 0]}}
       ]
     },
     {
@@ -963,6 +985,13 @@
         {"kind": "texture", "meshes": [1], "onlyWhen": {"hiddenMesh": 0}, "opacity": 1, "light": [1, 1, 1]},
         {"kind": "reflection", "motion": "stillShine", "blend": "glow", "meshes": [1], "onlyWhen": {"hiddenMesh": 0}, "opacity": 1, "light": [0.1, 0.5, 1]},
         {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [1], "onlyWhen": {"hiddenMesh": 0}, "opacity": 1}
+      ]
+    },
+    {
+      "name": "silverValkyrieChrome",
+      "layers": [
+        {"kind": "texture"},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [1, 1, 1]}}
       ]
     },
     {
