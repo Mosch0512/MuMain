@@ -641,13 +641,6 @@ bool SEASON3A::CGM3rdChangeUp::RenderMonsterObjectMesh(const OBJECT* o, DrawLook
 {
     switch (o->Type)
     {
-    case MODEL_BALRAM:
-    {
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      5);
-        return true;
-    }
-    break;
     case MODEL_DEATH_SPIRIT:
     {
         b->BeginRender(look.alpha);
@@ -679,30 +672,6 @@ bool SEASON3A::CGM3rdChangeUp::RenderMonsterObjectMesh(const OBJECT* o, DrawLook
         return true;
     }
     break;
-    case MODEL_SORAM:
-    {
-        Vector(1.f, 1.f, 1.f, b->BodyLight);
-        b->BeginRender(look.alpha);
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      5);
-        b->EndRender();
-        return true;
-    }
-    break;
-    case MODEL_DARK_ELF:
-        b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(0, RENDER_BRIGHT | RENDER_CHROME, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV);
-        b->RenderMesh(0, RENDER_BRIGHT | RENDER_CHROME6, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV);
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(1, RENDER_BRIGHT | RENDER_CHROME, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV);
-        b->RenderMesh(1, RENDER_BRIGHT | RENDER_CHROME6, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV);
-        return true;
     }
     return false;
 }

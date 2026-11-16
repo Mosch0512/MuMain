@@ -685,7 +685,8 @@
       "slot": "MONSTER_MODEL_BALGASS",
       "file": "Data/Monster/Monster90.bmd",
       "textureFolders": ["Monster"],
-      "animations": {"appear": 0.33, "attack3": 0.33, "attack4": 0.33}
+      "animations": {"appear": 0.33, "attack3": 0.33, "attack4": 0.33},
+      "renderStyle": "balgass"
     },
     {
       "slot": "MONSTER_MODEL_CHIEF_SKELETON_WARRIOR_2",
@@ -714,7 +715,8 @@
       "slot": "MONSTER_MODEL_SORAM",
       "file": "Data/Monster/Monster95.bmd",
       "textureFolders": ["Monster"],
-      "animations": {"walk": 0.2}
+      "animations": {"walk": 0.2},
+      "renderStyle": "soram"
     },
     {
       "slot": "MONSTER_MODEL_WEREWOLF_HERO",
@@ -942,6 +944,7 @@
       "slot": "MONSTER_MODEL_DARK_ELF",
       "file": "Data/Monster/Monster127.bmd",
       "textureFolders": ["Monster"],
+      "renderStyle": "darkElfTrainee",
       "namedBones": {"Left_Hand": 17}
     },
     {

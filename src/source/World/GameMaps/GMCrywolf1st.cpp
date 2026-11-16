@@ -1363,38 +1363,6 @@ bool M34CryWolf1st::RenderCryWolf1stMonsterObjectMesh(const OBJECT* o, DrawLook&
 {
     switch (o->Type)
     {
-    case MODEL_SORAM:
-    {
-        Vector(1.f, 1.f, 1.f, b->BodyLight);
-        b->BeginRender(look.alpha);
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      5);
-        b->EndRender();
-        return true;
-    }
-    break;
-    case MODEL_BALGASS:
-    {
-        Vector(1.f, 1.f, 1.f, b->BodyLight);
-        b->BeginRender(look.alpha);
-        for (int i = 0; i < Models[o->Type].NumMeshs; i++)
-        {
-            b->RenderMesh(i, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                          look.blendMeshV);
-            b->RenderMesh(i, RENDER_CHROME2 | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                          look.blendMeshU, look.blendMeshV, BITMAP_CHROME3);
-        }
-        b->EndRender();
-        return true;
-    }
-    break;
-    case MODEL_BALRAM:
-    {
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      5);
-        return true;
-    }
-    break;
     case MODEL_DEATH_SPIRIT:
     {
         b->BeginRender(look.alpha);
@@ -1423,20 +1391,6 @@ bool M34CryWolf1st::RenderCryWolf1stMonsterObjectMesh(const OBJECT* o, DrawLook&
         }
         b->EndRender();
         look.alpha = 1.0f;
-        return true;
-    }
-    break;
-    case MODEL_SCOUT:
-    {
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      5);
-        return true;
-    }
-    break;
-    case MODEL_WEREWOLF_HERO:
-    {
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      5);
         return true;
     }
     break;
