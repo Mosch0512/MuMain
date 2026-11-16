@@ -514,6 +514,17 @@
       ]
     },
     {
+      "name": "goldenTwinTail",
+      "layers": [
+        {"kind": "texture", "onlyWhen": {"notAnimation": "die"}, "light": [0.9, 0.9, 1]},
+        {"kind": "texture", "onlyWhen": {"animation": "die"}, "light": [0.3, 1, 0.2]},
+        {"kind": "texture", "blend": "glow", "meshes": [2], "texture": "Monster/illumi_R.jpg", "glowMesh": 2, "glowStrength": {"shape": "wave", "from": 0, "to": 2, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [3], "glowMesh": 3, "glowStrength": {"shape": "wave", "from": 0, "to": 1, "seconds": 3.141592653589793}, "scrollU": 0, "scrollV": 0},
+        {"kind": "reflection", "motion": "stillShine", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [1, 0.5, 0]}},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [1, 0.5, 0]}}
+      ]
+    },
+    {
       "name": "grade15Decoration",
       "layers": [
         {"kind": "texture", "blend": "glow", "meshes": [0], "glowMesh": 0, "glowStrength": {"shape": "bounce", "from": 0.7, "to": 0.2, "seconds": 1.74532925}},
@@ -722,6 +733,24 @@
       "itemValuesAfter": {"glowMesh": 1, "glowStrength": 1}
     },
     {
+      "name": "mayaHandLeft",
+      "layers": [
+        {"kind": "texture", "meshes": [0]},
+        {"kind": "texture", "meshes": [1]},
+        {"kind": "texture", "meshes": [2]},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [2], "texture": "Effect/Chrome01.jpg"}
+      ]
+    },
+    {
+      "name": "mayaHandRight",
+      "layers": [
+        {"kind": "texture", "meshes": [0]},
+        {"kind": "texture", "meshes": [2]},
+        {"kind": "texture", "meshes": [1]},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [1]}
+      ]
+    },
+    {
       "name": "meshesPerLevel",
       "drawsAlone": true,
       "layers": [
@@ -865,6 +894,14 @@
       "name": "packageBoxF",
       "layers": [
         {"kind": "texture", "meshes": [0], "texture": "Item/InGameShop/membership_item_sky.jpg", "glowMesh": "none"}
+      ]
+    },
+    {
+      "name": "persona",
+      "layers": [
+        {"kind": "texture"},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "texture": "Monster/prsona_R.jpg", "glowMesh": 0, "glowStrength": {"shape": "wave", "from": 0, "to": 1, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [2], "texture": "Monster/prsonass_R.jpg", "glowMesh": 2, "glowStrength": {"shape": "wave", "from": 0, "to": 1, "seconds": 3.141592653589793}}
       ]
     },
     {
@@ -1340,6 +1377,15 @@
       "layers": [
         {"kind": "texture"},
         {"kind": "reflection", "motion": "slowDrift", "where": "underHoles", "blend": "glow", "texture": "Effect/bab2.jpg", "light": {"tint": [0.85, 0.85, 1.2]}}
+      ]
+    },
+    {
+      "name": "twinTail",
+      "layers": [
+        {"kind": "texture", "onlyWhen": {"notAnimation": "die"}, "light": [0.9, 0.9, 1]},
+        {"kind": "texture", "onlyWhen": {"animation": "die"}, "light": [0.3, 1, 0.2]},
+        {"kind": "texture", "blend": "glow", "meshes": [2], "texture": "Monster/illumi_R.jpg", "glowMesh": 2, "glowStrength": {"shape": "wave", "from": 0, "to": 2, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [3], "glowMesh": 3, "glowStrength": {"shape": "wave", "from": 0, "to": 1, "seconds": 3.141592653589793}, "scrollU": 0, "scrollV": 0}
       ]
     },
     {

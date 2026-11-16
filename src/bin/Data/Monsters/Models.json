@@ -863,6 +863,7 @@
       "file": "Data/Monster/Monster115.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop2": 0.25, "die": 0.23},
+      "renderStyle": "persona",
       "namedBones": {"PRSona_A1": 73, "PRSona_Tail": 76, "PRSona_Tail1": 77}
     },
     {
@@ -870,6 +871,7 @@
       "file": "Data/Monster/Monster116.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop2": 0.25, "attack1": 0.23, "attack2": 0.23, "die": 0.23},
+      "renderStyle": "twinTail",
       "timers": [
         {"name": "hair swing", "animation": "walk", "everyMs": 500}
       ],
@@ -895,6 +897,7 @@
       "file": "Data/Monster/monster119.bmd",
       "textureFolders": ["Monster"],
       "animations": {"die": 0.12, "appear": 0.12},
+      "renderStyle": "mayaHandLeft",
       "namedBones": {"L_Hand01": 7, "L_Hand02": 13, "L_Hand03": 19, "L_Hand04": 25, "L_Hand05": 31, "L_Hand11": 11, "L_Hand12": 17, "L_Hand13": 23, "L_Hand14": 29, "L_Hand15": 5, "L_Hand21": 12, "L_Hand22": 18, "L_Hand23": 24, "L_Hand24": 30, "L_Hand25": 6}
     },
     {
@@ -902,6 +905,7 @@
       "file": "Data/Monster/monster120.bmd",
       "textureFolders": ["Monster"],
       "animations": {"die": 0.12, "appear": 0.12},
+      "renderStyle": "mayaHandRight",
       "namedBones": {"R_Hand01": 59, "R_Hand02": 48, "R_Hand03": 11, "R_Hand04": 37, "R_Hand05": 26, "R_Hand11": 54, "R_Hand12": 43, "R_Hand13": 32, "R_Hand14": 6, "R_Hand15": 21, "R_Hand21": 5, "R_Hand22": 53, "R_Hand23": 42, "R_Hand24": 20, "R_Hand25": 31}
     },
     {

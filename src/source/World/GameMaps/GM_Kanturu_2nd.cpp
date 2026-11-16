@@ -576,49 +576,6 @@ bool M38Kanturu2nd::Render_Kanturu2nd_MonsterObjectMesh(const OBJECT* o, DrawLoo
 {
     switch (o->Type)
     {
-    case MODEL_PERSONA:
-    {
-        float fLumi2 = (sinf(WorldTime * 0.002f) + 1.f) * 0.5f;
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      look.hiddenMesh);
-        b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 0, fLumi2, look.blendMeshU, look.blendMeshV,
-                      BITMAP_PRSONA_EFFECT);
-        b->RenderMesh(2, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 2, fLumi2, look.blendMeshU, look.blendMeshV,
-                      BITMAP_PRSONA_EFFECT2);
-        return true;
-    }
-    break;
-    case MODEL_TWIN_TAIL:
-    {
-        float fLumi = (sinf(WorldTime * 0.002f) + 1.f) * 0.5f;
-        float fLumi2 = (sinf(WorldTime * 0.002f) + 1.f);
-
-        if (o->CurrentAction != MONSTER01_DIE)
-        {
-            Vector(0.9f, 0.9f, 1.0f, b->BodyLight);
-        }
-        else
-        {
-            Vector(0.3f, 1.0f, 0.2f, b->BodyLight);
-        }
-
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      look.hiddenMesh);
-
-        b->RenderMesh(2, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 2, fLumi2, look.blendMeshU, look.blendMeshV,
-                      BITMAP_TWINTAIL_EFFECT);
-
-        b->RenderMesh(3, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 3, fLumi);
-        return true;
-    }
-    break;
-    case MODEL_DREADFEAR:
-    {
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      look.hiddenMesh);
-        return true;
-    }
-    break;
     case MODEL_KANTURU2ND_ENTER_NPC:
     {
         b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,

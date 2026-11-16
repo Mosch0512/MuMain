@@ -460,7 +460,8 @@ Blossom spirit and the Seed Master, the Drakan (`drakan`), and the Lizard
 Warrior, Fire Golem, Queen Bee, Poison Golem and Axe Warrior; Aida's stone
 golems, death riders and Hell Maine, and Kanturu's Berserk, Gigantis, Splinter
 Wolf and Kentauros (the Berserk and Gigantis glows left out while they die,
-`"notAnimation": "die"`). A monster drawn with a
+`"notAnimation": "die"`), Persona, Twin Tail (green while it dies) and the Maya
+hands. A monster drawn with a
 render style is drawn by it alone: no pass of the code draws over its body.
 
 A look name that no look file has is an Error in Data Checks (areas Monsters

@@ -5954,6 +5954,7 @@
       "model": "MONSTER_MODEL_TWIN_TAIL",
       "soundSet": "Twin Tail",
       "scale": 1.3,
+      "renderStyle": "goldenTwinTail",
       "randomStart": true,
       "numbers": [
         {"number": 498}
