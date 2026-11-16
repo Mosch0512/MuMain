@@ -50,6 +50,7 @@ constexpr const char* Light = "light";
 constexpr const char* Tint = "tint";
 constexpr const char* Brightness = "brightness";
 constexpr const char* ScrollingMesh = "scrollingMesh";
+constexpr const char* LightMap = "lightMap";
 constexpr const char* Shape = "shape";
 constexpr const char* From = "from";
 constexpr const char* To = "to";
@@ -555,10 +556,25 @@ void LookReader::ReadLayer(const OrderedJson& marked, const std::string& field, 
             layer.scrollingMesh = mesh;
         }
     }
+    if (const auto lightMap = json.find(Keys::LightMap); lightMap != json.end())
+    {
+        if (!lightMap->is_boolean())
+        {
+            AddFatal(field + "." + Keys::LightMap, "must be true or false");
+        }
+        else if (layer.kind != LayerKind::Reflection)
+        {
+            AddFatal(field + "." + Keys::LightMap, "is only for a reflection");
+        }
+        else
+        {
+            layer.lightMap = lightMap->get<bool>();
+        }
+    }
     WarnAboutUnknownKeys(json,
                          {Keys::Kind, Keys::Motion, Keys::Where, Keys::Blend, Keys::Meshes, Keys::OnlyWhen,
                           Keys::Texture, Keys::Opacity, Keys::GlowMesh, Keys::GlowStrength, Keys::ScrollU,
-                          Keys::ScrollV, Keys::Light, Keys::ScrollingMesh},
+                          Keys::ScrollV, Keys::Light, Keys::ScrollingMesh, Keys::LightMap},
                          field);
 }
 
@@ -1270,6 +1286,10 @@ OrderedJson WriteLayer(const Layer& layer)
     if (layer.scrollingMesh)
     {
         json[Keys::ScrollingMesh] = *layer.scrollingMesh;
+    }
+    if (layer.lightMap)
+    {
+        json[Keys::LightMap] = true;
     }
     PutEachItem(json, layer.eachItem,
                 {Keys::Kind, Keys::Motion, Keys::Where, Keys::Blend, Keys::Meshes, Keys::OnlyWhen, Keys::Texture,

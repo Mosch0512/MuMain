@@ -1138,6 +1138,12 @@
   <data name="Tinting debuff" xml:space="preserve">
     <value>Färbender Debuff (Gift, Frost, Blow of Destruction)</value>
   </data>
+  <data name="Light map" xml:space="preserve">
+    <value>Lichtkarte</value>
+  </data>
+  <data name="Light map tooltip" xml:space="preserve">
+    <value>Die Spiegelung beleuchtet das Mesh als Lichtkarte, wie das zweite Chrom des Drakan.</value>
+  </data>
   <data name="Effect types" xml:space="preserve">
     <value>Effekttypen</value>
   </data>

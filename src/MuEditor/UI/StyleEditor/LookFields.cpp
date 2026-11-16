@@ -1319,6 +1319,11 @@ bool Layer(Data::Looks::Layer& layer, const std::vector<LookPart>& parts)
     changed |= ValueField(Text::ScrollV, layer.scrollV, Text::LayerScrollTooltip, false);
     changed |= OptionalMeshField(Text::ScrollingMesh, layer.scrollingMesh, &Text::KeptFromTheModel, parts,
                                  Text::LayerScrollingMeshTooltip);
+    if (layer.kind == LayerKind::Reflection)
+    {
+        changed |= ImGui::Checkbox(Text::LightMap, &layer.lightMap);
+        Tip(Text::LightMapTooltip);
+    }
     changed |= OnlyWhenFields(layer.onlyWhen, parts);
     changed |= EachItemBoxes(layer.eachItem, {{"meshes", &Text::Meshes},
                                               {"texture", &Text::Texture},

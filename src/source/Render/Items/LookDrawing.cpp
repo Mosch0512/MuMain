@@ -73,9 +73,13 @@ int LayerFlags(const Layer& layer, int renderType)
     {
         return RENDER_BRIGHT;
     }
-    const int flags = layer.kind == LayerKind::Texture     ? RENDER_TEXTURE
-                      : layer.kind == LayerKind::FlatColor ? RENDER_COLOR
-                                                           : MotionFlag(layer.motion);
+    int flags = layer.kind == LayerKind::Texture     ? RENDER_TEXTURE
+                : layer.kind == LayerKind::FlatColor ? RENDER_COLOR
+                                                     : MotionFlag(layer.motion);
+    if (layer.lightMap)
+    {
+        flags |= RENDER_LIGHTMAP;
+    }
     return layer.blend == Blend::Glow ? flags | RENDER_BRIGHT : flags;
 }
 

@@ -242,6 +242,8 @@ struct Layer
     // The mesh that scrolls while this layer draws (BMD::StreamMesh): drawn without the light of the scene, at full
     // opacity. Without one the model's stays.
     std::optional<int> scrollingMesh;
+    // A reflection that lights the mesh as a light map (RENDER_LIGHTMAP, MN8): the Drakan's second chrome.
+    bool lightMap = false;
     OnlyWhen onlyWhen;
     EachItemFields eachItem;
 

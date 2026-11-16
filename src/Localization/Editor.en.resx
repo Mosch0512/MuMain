@@ -1132,6 +1132,12 @@
   <data name="Tinting debuff" xml:space="preserve">
     <value>Tinting debuff (poison, freeze, Blow of Destruction)</value>
   </data>
+  <data name="Light map" xml:space="preserve">
+    <value>Light map</value>
+  </data>
+  <data name="Light map tooltip" xml:space="preserve">
+    <value>The reflection lights the mesh as a light map, as the Drakan's second chrome.</value>
+  </data>
   <data name="Effect types" xml:space="preserve">
     <value>Effect types</value>
   </data>

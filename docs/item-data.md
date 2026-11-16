@@ -1647,6 +1647,7 @@ drawing hands the look.
 | `meshes` | Left out: every mesh, with the model's texture scripts, without the item's hidden mesh; `"allEvenHidden"`: every mesh, the hidden one too; `[0, 2]`: those meshes; `{"allBut": [2]}`: every mesh but those; `"none"`: no mesh, a layer that draws nothing, the default of a layer the values of some items turn on |
 | `texture` | A texture file under `Data` (`Effect/Chrome01.jpg`) instead of the mesh's own: a `.jpg` or a `.tga`, which the game reads from its `.OZJ` or `.OZT` file |
 | `light` | The light the layer is drawn in: `[red, green, blue]`, or `{"tint": [red, green, blue]}`, the item's light times those; each a number or a shape. `{"brightness": 0.8}` is the item's light scaled so its brightest channel is 0.8 (a grey for a black light). `{"timesOpacity": [red, green, blue]}` is the color times the drawing's opacity, as the monsters' glow passes dim as they fade. It stays for the layers after it, and `{"tint": [1, 1, 1]}` is the item's light again. Left out: the light the layer before left |
+| `lightMap` | `true`: a reflection that lights the mesh as a light map, as the Drakan's second chrome. Left out: false |
 | `opacity` | A number, a shape, or `"drawing"`: the drawing's opacity |
 | `glowMesh` | The mesh drawn glowing: a mesh number, `"none"` or `"all"` |
 | `glowStrength`, `scrollU`, `scrollV` | A number or a shape |
