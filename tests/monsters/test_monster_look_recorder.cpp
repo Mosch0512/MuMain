@@ -27,37 +27,52 @@ using Data::Maps::MapRef;
 using Data::Monsters::MonsterDefinition;
 using Data::Monsters::MonsterSetup;
 
-// The maps the number is drawn on: those its entry places it on (D61). A number the server places without a map in
-// the data (Doppelganger's) is drawn on MU_MONSTER_LOOK_MAP=<map> while its lines are written or compared, then on the
-// maps its baseline lines name; else on map 0.
-std::vector<MapRef> MapsOf(const MonsterDefinition& monster,
-                           const std::map<std::string, std::string>* baseline = nullptr)
-{
-    if (!monster.maps.empty())
-        return monster.maps;
-    if (const char* map = std::getenv("MU_MONSTER_LOOK_MAP"))
-        return {MapRef{.map = std::stoi(map)}};
-    if (baseline == nullptr)
-        return {MapRef{}};
-    std::vector<MapRef> maps;
-    const std::string prefix = std::to_string(monster.number) + " on map ";
-    for (auto line = baseline->lower_bound(prefix); line != baseline->end() && line->first.starts_with(prefix); ++line)
-    {
-        const std::string rest = line->first.substr(prefix.size());
-        MapRef map{.map = std::stoi(rest)};
-        if (const std::size_t stage = rest.find(" stage "); stage != std::string::npos && stage < rest.find(','))
-            map.stage = std::stoi(rest.substr(stage + 7));
-        if (std::ranges::find(maps, map) == maps.end())
-            maps.push_back(map);
-    }
-    return maps.empty() ? std::vector<MapRef>{MapRef{}} : maps;
-}
-
 bool NamesLook(const MonsterSetup& setup)
 {
     if (setup.renderStyle || setup.effect)
         return true;
     return std::ranges::any_of(setup.stateVariants, [](const auto& state) { return NamesLook(state.setup); });
+}
+
+// The maps the number is drawn on: those its entry places it on (D61), and those of its map variants that name a
+// look (Crywolf's green chrome on monsters placed elsewhere). A number is also drawn on MU_MONSTER_LOOK_MAP=<map>
+// while its lines are written or compared (Doppelganger's numbers, which the server places without a map in the
+// data), then on the maps its baseline lines name. Without any of them, on map 0.
+std::vector<MapRef> MapsOf(const MonsterDefinition& monster,
+                           const std::map<std::string, std::string>* baseline = nullptr)
+{
+    std::vector<MapRef> maps;
+    const auto add = [&maps](const MapRef& map)
+    {
+        if (std::ranges::find(maps, map) == maps.end())
+            maps.push_back(map);
+    };
+    for (const MapRef& map : monster.maps)
+        add(map);
+    for (const auto& variant : monster.mapVariants)
+    {
+        if (NamesLook(variant.setup))
+        {
+            for (const MapRef& map : variant.maps)
+                add(map);
+        }
+    }
+    if (const char* map = std::getenv("MU_MONSTER_LOOK_MAP"))
+        add(MapRef{.map = std::stoi(map)});
+    if (baseline != nullptr)
+    {
+        const std::string prefix = std::to_string(monster.number) + " on map ";
+        for (auto line = baseline->lower_bound(prefix); line != baseline->end() && line->first.starts_with(prefix);
+             ++line)
+        {
+            const std::string rest = line->first.substr(prefix.size());
+            MapRef map{.map = std::stoi(rest)};
+            if (const std::size_t stage = rest.find(" stage "); stage != std::string::npos && stage < rest.find(','))
+                map.stage = std::stoi(rest.substr(stage + 7));
+            add(map);
+        }
+    }
+    return maps.empty() ? std::vector<MapRef>{MapRef{}} : maps;
 }
 
 // Whether the number draws with a look of the data: its entry, a map variant, a state variant or its model names one.

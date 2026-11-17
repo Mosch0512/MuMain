@@ -1394,6 +1394,8 @@ bool M34CryWolf1st::RenderCryWolf1stMonsterObjectMesh(const OBJECT* o, DrawLook&
         return true;
     }
     break;
+    // Zaikan (Tantallos' model with SubType 1) only: the other monsters on the green chrome models name
+    // crywolfGreenChrome on this map (RenderStyles.json), which draws before this code.
     case MODEL_TANTALLOS:
     {
         Vector(0.6f, 0.8f, 0.6f, b->BodyLight);
@@ -1409,37 +1411,9 @@ bool M34CryWolf1st::RenderCryWolf1stMonsterObjectMesh(const OBJECT* o, DrawLook&
         return true;
     }
     break;
-    case MODEL_BLOODY_WOLF:
-    {
-        Vector(0.6f, 0.8f, 0.6f, b->BodyLight);
-        b->BeginRender(look.alpha);
-        for (int i = 0; i < Models[o->Type].NumMeshs; i++)
-        {
-            b->RenderMesh(i, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                          look.blendMeshV);
-            b->RenderMesh(i, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                          look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-        }
-        b->EndRender();
-        return true;
-    }
-    break;
-    case MODEL_BEAM_KNIGHT:	//318
-    {
-        Vector(0.6f, 0.8f, 0.6f, b->BodyLight);
-        b->BeginRender(look.alpha);
-        for (int i = 0; i < Models[o->Type].NumMeshs; i++)
-        {
-            b->RenderMesh(i, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                          look.blendMeshV);
-            b->RenderMesh(i, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                          look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-        }
-        b->EndRender();
-        return true;
-    }
-    break;
-    case MODEL_DRAGON_:	//319
+    // The Red Dragon event's dragons flying over this map (GOBoid.cpp, EnableEvent): boids, which have no monster
+    // look. The Red Dragon and Dragon monsters name crywolfGreenChrome here.
+    case MODEL_DRAGON_:
     {
         Vector(0.6f, 0.8f, 0.6f, b->BodyLight);
         b->BeginRender(look.alpha);

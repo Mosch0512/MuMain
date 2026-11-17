@@ -474,7 +474,10 @@ drawn on top), Ash Slaughterer, and Blood and Cruel Blood Assassin (not drawn
 while they die) name theirs too, as do Doppelganger's Slaughterer and Furious
 Slaughterer (`doppelgangerSlaughterer`). Its Ice Walker (531) and Larva (532)
 name their retextured looks on their numbers, as the Ice Walker and Larva of
-the other maps share their models. A texture
+the other maps share their models. On Crywolf (map 34) a map variant of the
+Red Dragon, Dragon, Tantalos, Bloody Wolf, Beam Knight and Death Beam Knight
+names `crywolfGreenChrome`: their meshes in a green light with a chrome over
+each. A texture
 a map loads (the Erohim's wing) is drawn from where the map loaded it while the
 hero is on that map: the looks find their textures again when a map loads. A
 monster drawn with a
@@ -721,8 +724,11 @@ Fire Golem is Devil Square 5's boss and plays the generic pattern there):
 [Models](#model-fields): Devil Square 5–7 is 32, `{"map": 9, "stage": 2}` is
 Devil Square 2). A map or stage in two variants of a monster is a fatal
 problem, and a variant without `attacks` or a setup field changes nothing
-(a warning). A monster without `attacks` of its own plays the variant's on
-its maps and the generic pattern elsewhere.
+(a warning). A variant on a map where none of its numbers appears (their
+`maps`) is a warning too, unless it names only looks: a map's own look of
+the monster, as Crywolf's green chrome, is kept for a server that places it
+there. A monster without `attacks` of its own plays the variant's on its maps
+and the generic pattern elsewhere.
 
 A variant's [setup fields](#setup-at-spawn) replace the monster's one by one
 on its maps; the monster's other fields stay (the Cursed Wizard has a

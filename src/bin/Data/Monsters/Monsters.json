@@ -838,6 +838,12 @@
       "kind": "monster",
       "model": "MONSTER_MODEL_DRAGON",
       "soundSet": "Red Dragon",
+      "mapVariants": [
+        {
+          "maps": [34],
+          "renderStyle": "crywolfGreenChrome"
+        }
+      ],
       "scale": 1.3,
       "boundingBox": {
         "max": [
@@ -866,6 +872,12 @@
       "kind": "monster",
       "model": "MONSTER_MODEL_DRAGON",
       "soundSet": "Red Dragon",
+      "mapVariants": [
+        {
+          "maps": [34],
+          "renderStyle": "crywolfGreenChrome"
+        }
+      ],
       "appear": {
         "action": "stop2",
         "fadeIn": false,
@@ -1111,6 +1123,12 @@
       "kind": "monster",
       "model": "MONSTER_MODEL_TANTALLOS",
       "soundSet": "Tantalos",
+      "mapVariants": [
+        {
+          "maps": [34],
+          "renderStyle": "crywolfGreenChrome"
+        }
+      ],
       "scale": 1.8,
       "glowMesh": 2,
       "equipment": {
@@ -1174,6 +1192,12 @@
       "kind": "monster",
       "model": "MONSTER_MODEL_BLOODY_WOLF",
       "soundSet": "Bloody wolf",
+      "mapVariants": [
+        {
+          "maps": [34],
+          "renderStyle": "crywolfGreenChrome"
+        }
+      ],
       "scale": 2.2,
       "spawnEffects": [
         {
@@ -1196,6 +1220,12 @@
       "kind": "monster",
       "model": "MONSTER_MODEL_BEAM_KNIGHT",
       "soundSet": "Beam Knight",
+      "mapVariants": [
+        {
+          "maps": [34],
+          "renderStyle": "crywolfGreenChrome"
+        }
+      ],
       "scale": 1.5,
       "spawnEffects": [
         {
@@ -1240,6 +1270,12 @@
       "kind": "monster",
       "model": "MONSTER_MODEL_BEAM_KNIGHT",
       "soundSet": "Beam Knight",
+      "mapVariants": [
+        {
+          "maps": [34],
+          "renderStyle": "crywolfGreenChrome"
+        }
+      ],
       "scale": 1.9,
       "glowMesh": -2,
       "spawnEffects": [
