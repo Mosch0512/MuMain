@@ -709,6 +709,7 @@
       "slot": "MONSTER_MODEL_DEATH_SPIRIT",
       "file": "Data/Monster/Monster94.bmd",
       "textureFolders": ["Monster"],
+      "renderStyle": "deathSpirit",
       "namedBones": {"Monster94_zx": 27, "Monster94_zx01": 28}
     },
     {

@@ -641,6 +641,8 @@ bool M37Kanturu1st::RenderKanturu1stMonsterObjectMesh(const OBJECT* o, DrawLook&
 {
     switch (o->Type)
     {
+    // The Golden Satyros (497) only: the Satyros names satyros on its entry (Monsters.json), which draws before this
+    // code; the Golden Satyros keeps it while its golden overlay is model code.
     case MODEL_SATYROS:
     {
         vec3_t Light;

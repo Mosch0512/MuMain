@@ -39,7 +39,6 @@ namespace SEASON3A
         bool AttackEffectBalgasBarrackMonster(CHARACTER* c, OBJECT* o, BMD* b);
         bool MoveBalgasBarrackMonsterVisual(CHARACTER* c, OBJECT* o, BMD* b);
         void MoveBalgasBarrackBlurEffect(CHARACTER* c, OBJECT* o, BMD* b);
-        bool RenderMonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b);
         bool UpdateBalgasBarrackMonsterEffects(CHARACTER* c, OBJECT* o, BMD* b);
     };
 }

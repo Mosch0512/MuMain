@@ -4213,6 +4213,7 @@
       "model": "MONSTER_MODEL_SATYROS",
       "soundSet": "Satyros",
       "scale": 1.3,
+      "renderStyle": "satyros",
       "numbers": [
         {"number": 353, "maps": [37]}
       ]

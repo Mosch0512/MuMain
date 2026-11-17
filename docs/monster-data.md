@@ -463,14 +463,16 @@ Wolf and Kentauros (the Berserk and Gigantis glows left out while they die,
 `"notAnimation": "die"`), Persona, Twin Tail (green while it dies), the Blade
 Hunter (`bladeHunter`: its blade glow left out while it dies, and its body
 drawn glowing once it has faded to 0.8, `"opacityAtMost": 0.8`) and the Maya
-hands, the Erohim, Kanturu's gate and the Nightmare's skull soldier, and the
+hands, the Death Spirit (`deathSpirit`: its third mesh at most 0.3 opaque), the Erohim, Kanturu's gate and the Nightmare's skull soldier, and the
 Crywolf and Balgass barracks' Balgass, Soram and Dark Elf (Trainee Soldier), and Karutan's Bone Scorpion,
 Crypta, Crypos, Condra and Narcondra (their glows, and all of Condra and
 Narcondra, left out while they die), and the Empire Guardian's Erkanne,
 Galia, Quartermaster, Knight Commander and Grand Wizard (green while it dies),
 and its Castle Gates 2 and 4 and Stone Statue (`goneWhenDying`: not drawn while
 they die). Jerint (505) names `jerint` on its entry, as Jerint the Assistant
-shares its model and keeps the model's plain look. Raymond (`raymond`) and the
+shares its model and keeps the model's plain look; the Satyros names `satyros`
+on its entry too, as the Golden Satyros shares its model and keeps its drawing
+in code while its golden overlay is model code. Raymond (`raymond`) and the
 PK Field's Zombie Fighter and Resurrected Gladiator (`zombieFighter`, their glow
 drawn on top), Ash Slaughterer, and Blood and Cruel Blood Assassin (not drawn
 while they die) name theirs too, as do Doppelganger's Slaughterer and Furious

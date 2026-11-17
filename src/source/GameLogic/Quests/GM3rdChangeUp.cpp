@@ -288,7 +288,7 @@ bool SEASON3A::CGM3rdChangeUp::RenderObjectMesh(const OBJECT* o, DrawLook& look,
             return true;
         }
     }
-    return RenderMonsterObjectMesh(o, look, b);
+    return false;
 }
 
 void SEASON3A::CGM3rdChangeUp::RenderAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
@@ -635,48 +635,6 @@ void SEASON3A::CGM3rdChangeUp::MoveBalgasBarrackBlurEffect(CHARACTER* c, OBJECT*
     }
     break;
     }
-}
-
-bool SEASON3A::CGM3rdChangeUp::RenderMonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
-{
-    switch (o->Type)
-    {
-    case MODEL_DEATH_SPIRIT:
-    {
-        // The model keeps its own scrolling mesh after this drawing (ML-P7).
-        const char streamMesh = b->StreamMesh;
-        b->BeginRender(look.alpha);
-        static float aaa = 0.f;
-        aaa += 0.1f;
-        if (aaa > 1.0f)
-            aaa = 0.f;
-        for (int i = 0; i < Models[o->Type].NumMeshs; i++)
-        {
-            if (i == 2)
-            {
-                if (look.alpha > 0.3f)
-                    look.alpha = 0.3f;
-
-                look.blendMesh = -2;
-                b->EndRender();
-                b->BeginRender(look.alpha);
-                Models[o->Type].StreamMesh = i;
-            }
-            else
-                look.blendMesh = -1;
-
-            look.blendMeshU = (int)WorldTime % 10000 * 0.0005f;
-            b->RenderMesh(i, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                          look.blendMeshV);
-        }
-        b->EndRender();
-        b->StreamMesh = streamMesh;
-        look.alpha = 1.0f;
-        return true;
-    }
-    break;
-    }
-    return false;
 }
 
 bool SEASON3A::CGM3rdChangeUp::UpdateBalgasBarrackMonsterEffects(CHARACTER* c, OBJECT* o, BMD* b)

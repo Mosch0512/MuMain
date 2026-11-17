@@ -416,6 +416,14 @@
       ]
     },
     {
+      "name": "deathSpirit",
+      "layers": [
+        {"kind": "texture", "meshes": [0, 1], "glowMesh": "none", "scrollU": {"shape": "ramp", "from": 0, "to": 5, "seconds": 10}},
+        {"kind": "texture", "meshes": [2], "onlyWhen": {"opacityAbove": 0.3}, "opacity": 0.3, "glowMesh": "all", "scrollU": {"shape": "ramp", "from": 0, "to": 5, "seconds": 10}, "scrollingMesh": 2},
+        {"kind": "texture", "meshes": [2], "onlyWhen": {"opacityAtMost": 0.3}, "glowMesh": "all", "scrollU": {"shape": "ramp", "from": 0, "to": 5, "seconds": 10}, "scrollingMesh": 2}
+      ]
+    },
+    {
       "name": "demonicStick",
       "layers": [
         {"kind": "texture", "blend": "asDrawing", "meshes": "allEvenHidden", "opacity": "drawing"},
@@ -1361,6 +1369,15 @@
       "layers": [
         {"kind": "texture", "meshes": {"allBut": [1]}, "opacity": "drawing"},
         {"kind": "texture", "blend": "glow", "meshes": [1]}
+      ]
+    },
+    {
+      "name": "satyros",
+      "layers": [
+        {"kind": "texture"},
+        {"kind": "texture", "blend": "glow", "meshes": [1], "opacity": 1, "glowMesh": 0, "scrollV": {"shape": "scroll", "perSecond": 0.5}, "scrollingMesh": 1},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [3], "texture": "Effect/Chrome01.jpg", "opacity": 1, "glowMesh": 0, "scrollV": {"shape": "scroll", "perSecond": 1}},
+        {"kind": "texture", "blend": "glow", "meshes": [4], "opacity": 1, "glowMesh": 2, "scrollU": {"shape": "scroll", "perSecond": 0.1}, "scrollV": {"shape": "scroll", "perSecond": -0.5}, "light": {"fromRed": [{"shape": "wave", "from": 0, "to": 1, "seconds": 6.283185}, {"shape": "wave", "from": 0, "to": 1, "seconds": 6.283185}, {"shape": "wave", "from": 0, "to": 1, "seconds": 6.283185}]}}
       ]
     },
     {

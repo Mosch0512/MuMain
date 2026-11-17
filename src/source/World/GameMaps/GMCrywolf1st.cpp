@@ -1363,40 +1363,6 @@ bool M34CryWolf1st::RenderCryWolf1stMonsterObjectMesh(const OBJECT* o, DrawLook&
 {
     switch (o->Type)
     {
-    case MODEL_DEATH_SPIRIT:
-    {
-        // The model keeps its own scrolling mesh after this drawing (ML-P7).
-        const char streamMesh = b->StreamMesh;
-        b->BeginRender(look.alpha);
-        static float aaa = 0.f;
-        aaa += 0.1f;
-        if (aaa > 1.0f)
-            aaa = 0.f;
-        for (int i = 0; i < Models[o->Type].NumMeshs; i++)
-        {
-            if (i == 2)
-            {
-                if (look.alpha > 0.3f)
-                    look.alpha = 0.3f;
-
-                look.blendMesh = -2;
-                b->EndRender();
-                b->BeginRender(look.alpha);
-                Models[o->Type].StreamMesh = i;
-            }
-            else
-                look.blendMesh = -1;
-
-            look.blendMeshU = (int)WorldTime % 10000 * 0.0005f;
-            b->RenderMesh(i, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                          look.blendMeshV);
-        }
-        b->EndRender();
-        b->StreamMesh = streamMesh;
-        look.alpha = 1.0f;
-        return true;
-    }
-    break;
     // Zaikan (Tantallos' model with SubType 1) only: the other monsters on the green chrome models name
     // crywolfGreenChrome on this map (RenderStyles.json), which draws before this code.
     case MODEL_TANTALLOS:
