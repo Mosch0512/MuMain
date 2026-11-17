@@ -643,6 +643,8 @@ bool SEASON3A::CGM3rdChangeUp::RenderMonsterObjectMesh(const OBJECT* o, DrawLook
     {
     case MODEL_DEATH_SPIRIT:
     {
+        // The model keeps its own scrolling mesh after this drawing (ML-P7).
+        const char streamMesh = b->StreamMesh;
         b->BeginRender(look.alpha);
         static float aaa = 0.f;
         aaa += 0.1f;
@@ -668,6 +670,7 @@ bool SEASON3A::CGM3rdChangeUp::RenderMonsterObjectMesh(const OBJECT* o, DrawLook
                           look.blendMeshV);
         }
         b->EndRender();
+        b->StreamMesh = streamMesh;
         look.alpha = 1.0f;
         return true;
     }

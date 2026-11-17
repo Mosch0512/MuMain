@@ -645,6 +645,8 @@ bool M37Kanturu1st::RenderKanturu1stMonsterObjectMesh(const OBJECT* o, DrawLook&
     {
         vec3_t Light;
         VectorCopy(b->BodyLight, Light);
+        // The model keeps its own scrolling mesh after this drawing (ML-P7).
+        const char streamMesh = b->StreamMesh;
         b->BeginRender(1.f);
         b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
                       look.hiddenMesh);
@@ -659,6 +661,7 @@ bool M37Kanturu1st::RenderKanturu1stMonsterObjectMesh(const OBJECT* o, DrawLook&
         b->RenderMesh(4, RENDER_TEXTURE | RENDER_BRIGHT, 1.f, 2, look.blendMeshLight, WorldTime * 0.0001f,
                       -WorldTime * 0.0005f);
         b->EndRender();
+        b->StreamMesh = streamMesh;
         return true;
     }
     break;
