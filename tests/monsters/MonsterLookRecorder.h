@@ -34,7 +34,8 @@ struct DrawSituation
 };
 
 // The situations a monster of the model in `slot` is drawn in: standing, walking, attacking and dying (the actions
-// its model has), at another clock time, poisoned, and fading.
+// its model has), at another clock time, poisoned, and fading; a model whose drawing changes as it fades while it dies
+// (the Blade Hunter's) also dying and fading.
 std::vector<DrawSituation> DrawSituations(int slot);
 
 // Draws the character as the game draws it and records the drawing; the character's object and model are as they

@@ -83,6 +83,7 @@ constexpr BasicTexture BasicTextures[] = {
     {L"Monster\\Snake1.jpg", BITMAP_DOPPELGANGER_SNAKE01, GL_CLAMP_TO_EDGE},
     {L"Effect\\Shiny02.jpg", BITMAP_SHINY + 1, GL_CLAMP_TO_EDGE},
     {L"Monster\\King11.jpg", BITMAP_WHITE_WIZARD, GL_CLAMP_TO_EDGE},
+    {L"Monster\\bladeeff2_r.jpg", BITMAP_BLADEHUNTER_EFFECT, GL_CLAMP_TO_EDGE},
     {L"Monster\\illumi_R.jpg", BITMAP_TWINTAIL_EFFECT, GL_CLAMP_TO_EDGE},
     {L"Monster\\prsona_R.jpg", BITMAP_PRSONA_EFFECT, GL_CLAMP_TO_EDGE},
     {L"Monster\\prsonass_R.jpg", BITMAP_PRSONA_EFFECT2, GL_CLAMP_TO_EDGE},
@@ -151,6 +152,8 @@ std::vector<DrawSituation> DrawSituations(int slot)
     situations.push_back({.worldTime = PinnedWorldTime + 700.5});
     situations.push_back({.worldTime = PinnedWorldTime, .buff = eDeBuff_Poison});
     situations.push_back({.worldTime = PinnedWorldTime, .alpha = 0.5f});
+    if (slot == MODEL_BLADE_HUNTER && MONSTER01_DIE < actions)
+        situations.push_back({.action = MONSTER01_DIE, .frame = 1.5f, .worldTime = PinnedWorldTime, .alpha = 0.5f});
     return situations;
 }
 

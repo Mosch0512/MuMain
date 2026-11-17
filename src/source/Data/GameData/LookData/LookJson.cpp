@@ -73,6 +73,8 @@ constexpr const char* Buff = "buff";
 constexpr const char* WithoutBuff = "withoutBuff";
 constexpr const char* Animation = "animation";
 constexpr const char* NotAnimation = "notAnimation";
+constexpr const char* OpacityAbove = "opacityAbove";
+constexpr const char* OpacityAtMost = "opacityAtMost";
 constexpr const char* EachItem = "eachItem";
 constexpr const char* Default = "default";
 constexpr const char* DrawingOpacity = "drawingOpacity";
@@ -728,13 +730,28 @@ void LookReader::ReadOnlyWhen(const OrderedJson& json, const std::string& field,
         }
         *target = action;
     }
+    for (const auto& [key, target] : {std::pair{Keys::OpacityAbove, &onlyWhen.opacityAbove},
+                                      std::pair{Keys::OpacityAtMost, &onlyWhen.opacityAtMost}})
+    {
+        const auto opacity = entry->find(key);
+        if (opacity == entry->end())
+        {
+            continue;
+        }
+        if (!opacity->is_number() || opacity->get<double>() < 0.0 || opacity->get<double>() > 1.0)
+        {
+            AddFatal(whenField + "." + key, "must be an opacity from 0 to 1");
+            continue;
+        }
+        *target = opacity->get<double>();
+    }
     if (entry->empty())
     {
         AddIssue(ItemDataIssueSeverity::Warning, whenField, "sets no condition: the layer always draws");
     }
     WarnAboutUnknownKeys(*entry,
                          {Keys::Place, Keys::Level, Keys::HiddenMesh, Keys::Buff, Keys::WithoutBuff, Keys::Animation,
-                          Keys::NotAnimation},
+                          Keys::NotAnimation, Keys::OpacityAbove, Keys::OpacityAtMost},
                          whenField);
 }
 
@@ -1234,6 +1251,14 @@ OrderedJson WriteOnlyWhen(const OnlyWhen& onlyWhen)
     if (onlyWhen.notAnimation)
     {
         json[Keys::NotAnimation] = Monsters::GetMonsterAnimationName(*onlyWhen.notAnimation);
+    }
+    if (onlyWhen.opacityAbove)
+    {
+        json[Keys::OpacityAbove] = *onlyWhen.opacityAbove;
+    }
+    if (onlyWhen.opacityAtMost)
+    {
+        json[Keys::OpacityAtMost] = *onlyWhen.opacityAtMost;
     }
     return json;
 }

@@ -126,6 +126,16 @@
       ]
     },
     {
+      "name": "bladeHunter",
+      "layers": [
+        {"kind": "texture", "onlyWhen": {"notAnimation": "die"}},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "onlyWhen": {"notAnimation": "die"}, "texture": "Monster/bladeeff2_r.jpg", "glowMesh": 0, "glowStrength": {"shape": "wave", "from": 0, "to": 2, "seconds": 3.141592653589793}},
+        {"kind": "texture", "onlyWhen": {"animation": "die", "opacityAbove": 0.8}},
+        {"kind": "texture", "blend": "glow", "onlyWhen": {"animation": "die", "opacityAtMost": 0.8}},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [0], "onlyWhen": {"animation": "die"}, "texture": "Effect/Chrome01.jpg"}
+      ]
+    },
+    {
       "name": "bloodAssassin",
       "layers": [
         {"kind": "texture", "meshes": [0], "onlyWhen": {"notAnimation": "die"}},

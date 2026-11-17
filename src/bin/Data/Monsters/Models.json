@@ -837,6 +837,7 @@
       "file": "Data/Monster/monster111.bmd",
       "textureFolders": ["Monster"],
       "animations": {"attack1": 0.23, "attack2": 0.23, "die": 0.2},
+      "renderStyle": "bladeHunter",
       "namedBones": {"BLADE_L_HAND": 12, "BOX1": 54, "BOX2": 55}
     },
     {

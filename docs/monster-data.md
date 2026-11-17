@@ -460,7 +460,9 @@ Blossom spirit and the Seed Master, the Drakan (`drakan`), and the Lizard
 Warrior, Fire Golem, Queen Bee, Poison Golem and Axe Warrior; Aida's stone
 golems, death riders and Hell Maine, and Kanturu's Berserk, Gigantis, Splinter
 Wolf and Kentauros (the Berserk and Gigantis glows left out while they die,
-`"notAnimation": "die"`), Persona, Twin Tail (green while it dies) and the Maya
+`"notAnimation": "die"`), Persona, Twin Tail (green while it dies), the Blade
+Hunter (`bladeHunter`: its blade glow left out while it dies, and its body
+drawn glowing once it has faded to 0.8, `"opacityAtMost": 0.8`) and the Maya
 hands, the Erohim, Kanturu's gate and the Nightmare's skull soldier, and the
 Crywolf and Balgass barracks' Balgass, Soram and Dark Elf (Trainee Soldier), and Karutan's Bone Scorpion,
 Crypta, Crypos, Condra and Narcondra (their glows, and all of Condra and

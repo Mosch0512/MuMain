@@ -331,6 +331,22 @@
 352 on map 37, stop1 at frame 0, 1234567.25 ms, buff 55	4 ebd26097f903b87b ebd26097f903b87b ebd26097f903b87b ebd26097f903b87b ebd26097f903b87b
 352 on map 37, stop1 at frame 0, 1235267.75 ms	4 9c5d387f77e49c6b 9c5d387f77e49c6b 9c5d387f77e49c6b 9c5d387f77e49c6b 9c5d387f77e49c6b
 352 on map 37, walk at frame 1.5, 1234567.25 ms	4 9c5d387f77e49c6b 9c5d387f77e49c6b 9c5d387f77e49c6b 9c5d387f77e49c6b 9c5d387f77e49c6b
+354 on map 37, attack1 at frame 1.5, 1234567.25 ms	2 3c5b1c91feaef6c3 bc8c1ce28df8b48e bc8c1ce28df8b48e 3c5b1c91feaef6c3 3c5b1c91feaef6c3
+354 on map 37, die at frame 1.5, 1234567.25 ms	2 fc1fbb467b714ae8 fc1fbb467b714ae8 fc1fbb467b714ae8 fc1fbb467b714ae8 fc1fbb467b714ae8
+354 on map 37, die at frame 1.5, 1234567.25 ms, alpha 0.5	2 00dbef0de6d66c4f 00dbef0de6d66c4f 00dbef0de6d66c4f 00dbef0de6d66c4f 00dbef0de6d66c4f
+354 on map 37, stop1 at frame 0, 1234567.25 ms	2 3c5b1c91feaef6c3 bc8c1ce28df8b48e bc8c1ce28df8b48e 3c5b1c91feaef6c3 3c5b1c91feaef6c3
+354 on map 37, stop1 at frame 0, 1234567.25 ms, alpha 0.5	2 2190374a849d0f7d 8cb5571492bf7924 8cb5571492bf7924 2190374a849d0f7d 2190374a849d0f7d
+354 on map 37, stop1 at frame 0, 1234567.25 ms, buff 55	2 1f7dc8c61e88d4f9 49abb52938484006 49abb52938484006 1f7dc8c61e88d4f9 1f7dc8c61e88d4f9
+354 on map 37, stop1 at frame 0, 1235267.75 ms	2 1554792b399385a8 1554792b399385a8 d4bd31fd1f1a99b7 1554792b399385a8 1554792b399385a8
+354 on map 37, walk at frame 1.5, 1234567.25 ms	2 3c5b1c91feaef6c3 bc8c1ce28df8b48e bc8c1ce28df8b48e 3c5b1c91feaef6c3 3c5b1c91feaef6c3
+354 on map 39, attack1 at frame 1.5, 1234567.25 ms	2 3c5b1c91feaef6c3 bc8c1ce28df8b48e bc8c1ce28df8b48e 3c5b1c91feaef6c3 3c5b1c91feaef6c3
+354 on map 39, die at frame 1.5, 1234567.25 ms	2 fc1fbb467b714ae8 fc1fbb467b714ae8 fc1fbb467b714ae8 fc1fbb467b714ae8 fc1fbb467b714ae8
+354 on map 39, die at frame 1.5, 1234567.25 ms, alpha 0.5	2 00dbef0de6d66c4f 00dbef0de6d66c4f 00dbef0de6d66c4f 00dbef0de6d66c4f 00dbef0de6d66c4f
+354 on map 39, stop1 at frame 0, 1234567.25 ms	2 3c5b1c91feaef6c3 bc8c1ce28df8b48e bc8c1ce28df8b48e 3c5b1c91feaef6c3 3c5b1c91feaef6c3
+354 on map 39, stop1 at frame 0, 1234567.25 ms, alpha 0.5	2 2190374a849d0f7d 8cb5571492bf7924 8cb5571492bf7924 2190374a849d0f7d 2190374a849d0f7d
+354 on map 39, stop1 at frame 0, 1234567.25 ms, buff 55	2 1f7dc8c61e88d4f9 49abb52938484006 49abb52938484006 1f7dc8c61e88d4f9 1f7dc8c61e88d4f9
+354 on map 39, stop1 at frame 0, 1235267.75 ms	2 1554792b399385a8 1554792b399385a8 d4bd31fd1f1a99b7 1554792b399385a8 1554792b399385a8
+354 on map 39, walk at frame 1.5, 1234567.25 ms	2 3c5b1c91feaef6c3 bc8c1ce28df8b48e bc8c1ce28df8b48e 3c5b1c91feaef6c3 3c5b1c91feaef6c3
 355 on map 37, attack1 at frame 1.5, 1234567.25 ms	6 1ba7b00c5bfbc2ef 1ba7b00c5bfbc2ef 1ba7b00c5bfbc2ef f32f14c136d92a46 1ba7b00c5bfbc2ef
 355 on map 37, die at frame 1.5, 1234567.25 ms	6 1ba7b00c5bfbc2ef 1ba7b00c5bfbc2ef 1ba7b00c5bfbc2ef f32f14c136d92a46 1ba7b00c5bfbc2ef
 355 on map 37, stop1 at frame 0, 1234567.25 ms	6 1ba7b00c5bfbc2ef 1ba7b00c5bfbc2ef 1ba7b00c5bfbc2ef f32f14c136d92a46 1ba7b00c5bfbc2ef

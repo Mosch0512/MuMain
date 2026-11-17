@@ -217,10 +217,15 @@ struct OnlyWhen
     // must not play: a monster's glow left out while it dies.
     std::optional<int> animation;
     std::optional<int> notAnimation;
+    // The drawing's opacity is above this, or at most this (MN8): the Blade Hunter's body, drawn glowing once it has
+    // faded to 0.8 while it dies.
+    std::optional<double> opacityAbove;
+    std::optional<double> opacityAtMost;
 
     [[nodiscard]] bool IsEmpty() const
     {
-        return !place && !level && !hiddenMesh && !buff && !withoutBuff && !animation && !notAnimation;
+        return !place && !level && !hiddenMesh && !buff && !withoutBuff && !animation && !notAnimation &&
+               !opacityAbove && !opacityAtMost;
     }
     bool operator==(const OnlyWhen&) const = default;
 };

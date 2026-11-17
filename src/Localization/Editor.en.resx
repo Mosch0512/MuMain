@@ -1156,6 +1156,18 @@
   <data name="Not in animation tooltip" xml:space="preserve">
     <value>Not while the monster plays this animation: a glow left out while it dies.</value>
   </data>
+  <data name="Opacity above" xml:space="preserve">
+    <value>Opacity above</value>
+  </data>
+  <data name="Opacity above tooltip" xml:space="preserve">
+    <value>Only while the drawing is more opaque than this, from 0 to 1.</value>
+  </data>
+  <data name="Opacity at most" xml:space="preserve">
+    <value>Opacity at most</value>
+  </data>
+  <data name="Opacity at most tooltip" xml:space="preserve">
+    <value>Only once the drawing has faded to this opacity or less, from 0 to 1: a dying monster drawn glowing as it fades.</value>
+  </data>
   <data name="Effect types" xml:space="preserve">
     <value>Effect types</value>
   </data>

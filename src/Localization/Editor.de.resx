@@ -1162,6 +1162,18 @@
   <data name="Not in animation tooltip" xml:space="preserve">
     <value>Nicht während das Monster diese Animation spielt: ein Leuchten, das beim Sterben wegfällt.</value>
   </data>
+  <data name="Opacity above" xml:space="preserve">
+    <value>Deckkraft über</value>
+  </data>
+  <data name="Opacity above tooltip" xml:space="preserve">
+    <value>Nur solange die Zeichnung deckender ist als dieser Wert, von 0 bis 1.</value>
+  </data>
+  <data name="Opacity at most" xml:space="preserve">
+    <value>Deckkraft höchstens</value>
+  </data>
+  <data name="Opacity at most tooltip" xml:space="preserve">
+    <value>Erst wenn die Zeichnung auf diese Deckkraft oder weniger verblasst ist, von 0 bis 1: ein sterbendes Monster, das beim Verblassen leuchtet.</value>
+  </data>
   <data name="Effect types" xml:space="preserve">
     <value>Effekttypen</value>
   </data>

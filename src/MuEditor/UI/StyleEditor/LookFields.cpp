@@ -1207,6 +1207,31 @@ bool LevelRangeField(std::optional<std::pair<int, int>>& level)
     return changed;
 }
 
+// An opacity the drawing's must be above or at most (MN8): unset, or a number from 0 to 1.
+bool OpacityCondition(const char* label, std::optional<double>& opacity, const char* tip)
+{
+    ImGui::PushID(label);
+    bool set = opacity.has_value();
+    bool changed = ImGui::Checkbox("##Set", &set);
+    if (changed)
+    {
+        opacity = set ? std::optional<double>(0.5) : std::nullopt;
+    }
+    Tip(tip);
+    ImGui::SameLine();
+    if (opacity)
+    {
+        changed |= DragNumber(label, *opacity, 0.01f, tip, 0.0);
+        *opacity = std::min(*opacity, 1.0);
+    }
+    else
+    {
+        ImGui::TextDisabled("%s", label);
+    }
+    ImGui::PopID();
+    return changed;
+}
+
 // The item's hidden mesh the layer draws with: unset (any), none (-1) or a mesh.
 bool HiddenMeshCondition(std::optional<int>& hidden, const std::vector<LookPart>& parts)
 {
@@ -1308,6 +1333,8 @@ bool OnlyWhenFields(OnlyWhen& when, const std::vector<LookPart>& parts)
     changed |= OptionalChoice(Text::Animation, when.animation, AnimationNames(), &Text::None, Text::AnimationTooltip);
     changed |= OptionalChoice(Text::NotInAnimation, when.notAnimation, AnimationNames(), &Text::None,
                               Text::NotInAnimationTooltip);
+    changed |= OpacityCondition(Text::OpacityAbove, when.opacityAbove, Text::OpacityAboveTooltip);
+    changed |= OpacityCondition(Text::OpacityAtMost, when.opacityAtMost, Text::OpacityAtMostTooltip);
     ImGui::TreePop();
     return changed;
 }

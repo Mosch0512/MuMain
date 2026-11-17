@@ -641,35 +641,6 @@ bool M37Kanturu1st::RenderKanturu1stMonsterObjectMesh(const OBJECT* o, DrawLook&
 {
     switch (o->Type)
     {
-    case MODEL_BLADE_HUNTER:
-    {
-        if (o->CurrentAction != MONSTER01_DIE)
-        {
-            float fLumi = sinf(WorldTime * 0.002f) + 1.0f;
-            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                          look.blendMeshV, look.hiddenMesh);
-            b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 0, fLumi, look.blendMeshU, look.blendMeshV,
-                          BITMAP_BLADEHUNTER_EFFECT);
-        }
-        else
-        {
-            if (look.alpha < 0.f)
-                look.alpha = 0.f;
-
-            if (look.alpha > 0.8f)
-            {
-                b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                              look.blendMeshV, look.hiddenMesh);
-            }
-            else
-                b->RenderBody(RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                              look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-            b->RenderMesh(0, RENDER_CHROME | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                          look.blendMeshU, look.blendMeshV, BITMAP_CHROME);
-        }
-        return true;
-    }
-    break;
     case MODEL_SATYROS:
     {
         vec3_t Light;

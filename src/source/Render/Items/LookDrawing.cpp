@@ -456,6 +456,11 @@ bool Holds(const OnlyWhen& when, const BMD* b, const OBJECT* o, const DrawLook& 
     {
         return false;
     }
+    if ((when.opacityAbove && !(look.alpha > static_cast<float>(*when.opacityAbove))) ||
+        (when.opacityAtMost && look.alpha > static_cast<float>(*when.opacityAtMost)))
+    {
+        return false;
+    }
     return !when.buff || HasBuff(*when.buff, o);
 }
 
