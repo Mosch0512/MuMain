@@ -51,7 +51,8 @@ constexpr const char* BaselineHeader =
     "# How the monster looks moved from code into Data/Effects draw (MN8): one line per monster number, map and\n"
     "# situation, then the number of mesh draws and five digests of them and of what the drawing left on the model\n"
     "# (tests/data/LookRecorder.h). Written from the old code before each look moved (MU_MONSTER_LOOK_WRITE=1), so a\n"
-    "# moved look still draws as its code did.\n";
+    "# moved look still draws as its code did. The frozen and Blow of Destruction lines came after the code was gone:\n"
+    "# they are drawn with the same second body pass the code drew.\n";
 
 // The textures OpenBasicData loads at their indices before the looks find theirs, which the monsters' looks in code
 // name.
@@ -157,6 +158,9 @@ std::vector<DrawSituation> DrawSituations(int slot)
     }
     situations.push_back({.worldTime = PinnedWorldTime + 700.5});
     situations.push_back({.worldTime = PinnedWorldTime, .buff = eDeBuff_Poison});
+    // Frozen and hit by Blow of Destruction: the tint and the second body pass over it.
+    situations.push_back({.worldTime = PinnedWorldTime, .buff = eDeBuff_Freeze});
+    situations.push_back({.worldTime = PinnedWorldTime, .buff = eDeBuff_BlowOfDestruction});
     situations.push_back({.worldTime = PinnedWorldTime, .alpha = 0.5f});
     if (slot == MODEL_BLADE_HUNTER && MONSTER01_DIE < actions)
         situations.push_back({.action = MONSTER01_DIE, .frame = 1.5f, .worldTime = PinnedWorldTime, .alpha = 0.5f});

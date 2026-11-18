@@ -563,6 +563,20 @@ void TintByDebuffs(const OBJECT* o, BMD* b)
     }
 }
 
+// The second body pass of a frozen monster or one hit by Blow of Destruction, drawn over its body.
+void DrawDebuffPass(const OBJECT* o, const DrawLook& look, BMD* b)
+{
+    if (g_isCharacterBuff(o, eDeBuff_Freeze))
+    {
+        b->RenderBody(RENDER_TEXTURE, look.alpha, -2, 1.f, look.blendMeshU, look.blendMeshV, look.hiddenMesh);
+    }
+    else if (g_isCharacterBuff(o, eDeBuff_BlowOfDestruction))
+    {
+        Vector(0.3f, 0.5f, 1.f, b->BodyLight);
+        b->RenderBody(RENDER_TEXTURE, look.alpha, -2, 1.f, look.blendMeshU, look.blendMeshV, look.hiddenMesh);
+    }
+}
+
 // The maps' and the models' code that draws a body (Draw_RenderObject); false when none of it draws this one.
 bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b)
 {
@@ -1185,11 +1199,12 @@ void Draw_RenderObject(const OBJECT* o, bool Translate, int Select, bool cloaked
         }
 
         // A monster with a render style (MN8) is drawn with it, in place of the maps' and the models' code, in the
-        // tint of its debuffs as the code draws them.
+        // tint of its debuffs and with their second pass, as the code draws them.
         if (const Data::Looks::LookDefinition* style = Render::Monsters::Looks::RenderStyleOf(*o))
         {
             TintByDebuffs(o, b);
             Render::Items::Looks::DrawRenderStyle(*style, b, o, look, look.alpha, RENDER_TEXTURE);
+            DrawDebuffPass(o, look, b);
         }
         else if (o->RenderType == RENDER_DARK)
         {
@@ -2117,17 +2132,7 @@ void Draw_RenderObject(const OBJECT* o, bool Translate, int Select, bool cloaked
                     b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
                                   look.blendMeshV, look.hiddenMesh);
                 }
-                if (g_isCharacterBuff(o, eDeBuff_Freeze))
-                {
-                    b->RenderBody(RENDER_TEXTURE, look.alpha, -2, 1.f, look.blendMeshU, look.blendMeshV,
-                                  look.hiddenMesh);
-                }
-                else if (g_isCharacterBuff(o, eDeBuff_BlowOfDestruction))
-                {
-                    Vector(0.3f, 0.5f, 1.f, b->BodyLight);
-                    b->RenderBody(RENDER_TEXTURE, look.alpha, -2, 1.f, look.blendMeshU, look.blendMeshV,
-                                  look.hiddenMesh);
-                }
+                DrawDebuffPass(o, look, b);
 
                 if (o->Type == MODEL_HYDRA)
                 {
