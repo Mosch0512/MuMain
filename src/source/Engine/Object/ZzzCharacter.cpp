@@ -9825,8 +9825,8 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
         }
     }
 
-    // A monster with a render style (MN8) is drawn by it alone: none of the passes below that draw over its body, and
-    // no afterimage of the code's.
+    // A monster with a render style (MN8) is drawn by it (RenderObject), not by the code's afterimage of the
+    // Dreadfear's second attack.
     const bool styled = Render::Monsters::Looks::RenderStyleOf(*o) != nullptr;
     if (byRender == CHARACTER_RENDER_OBJ)
     {
