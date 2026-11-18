@@ -1661,7 +1661,8 @@
       "slot": "MONSTER_MODEL_DOPPELGANGER",
       "file": "Data/Monster/monster192.bmd",
       "textureFolders": ["Monster"],
-      "animations": {"stop1": 0.5, "stop2": 0.4, "walk": 0.68, "attack1": 0.5, "attack2": 0.5, "shock": 1, "die": 1.1, "appear": 0.99}
+      "animations": {"stop1": 0.5, "stop2": 0.4, "walk": 0.68, "attack1": 0.5, "attack2": 0.5, "shock": 1, "die": 1.1, "appear": 0.99},
+      "renderStyle": "doppelganger"
     },
     {
       "slot": "MONSTER_MODEL_MEDUSA",

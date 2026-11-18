@@ -465,6 +465,13 @@
       ]
     },
     {
+      "name": "doppelganger",
+      "layers": [
+        {"kind": "texture", "blend": "glow", "meshes": [0]},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [0], "opacity": 0.3}
+      ]
+    },
+    {
       "name": "doppelgangerIceWalker",
       "layers": [
         {"kind": "texture", "meshes": [0], "texture": "Monster/DGicewalker_body.jpg"},

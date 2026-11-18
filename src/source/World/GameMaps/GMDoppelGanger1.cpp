@@ -252,13 +252,6 @@ bool CGMDoppelGanger1::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
                       look.blendMeshU, -(int)WorldTime % 4000 * 0.00025f);
         b->StreamMesh = -1;
         return true;
-    case MODEL_DOPPELGANGER:
-        // Its body, in the tint of its debuffs as every monster's (ML-P18): drawn after the character, it had none.
-        b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                      look.blendMeshU, look.blendMeshV);
-        b->RenderMesh(0, RENDER_CHROME | RENDER_BRIGHT, 0.3f, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        return true;
     }
 
     return false;
