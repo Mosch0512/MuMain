@@ -5,6 +5,7 @@
 #include "MuMonsterSetupUI.h"
 
 #include "MonsterEdits.h"
+#include "MonsterLookPicker.h"
 #include "MonsterSelection.h"
 #include "MonsterSetupLists.h"
 #include "MonsterShownModel.h"
@@ -21,7 +22,6 @@
 #include "../MuEditor/UI/Common/MuEditorWindowIds.h"
 #include "../MuEditor/UI/ItemTools/ItemFieldWidgets.h"
 #include "../MuEditor/UI/ItemTools/ItemTextInput.h"
-#include "../MuEditor/UI/StyleEditor/MuStyleEditorUI.h"
 #include "Core/Globals/_define.h"
 #include "Data/GameData/ItemData/ItemJsonFormat.h"
 #include "Data/GameData/LookData/LookStore.h"
@@ -1073,43 +1073,8 @@ const std::string* MuMonsterSetupUI::ModelLookOf(std::string_view key) const
 
 bool MuMonsterSetupUI::RenderLookValue(std::string& name, bool effect)
 {
-    const Data::Looks::LookKind kind = effect ? Data::Looks::LookKind::Effect : Data::Looks::LookKind::RenderStyle;
-    bool changed = false;
-    ImGui::SetNextItemWidth(Items::Fields::ScaledWidth(Items::Fields::NumberWidth) * 2.0f);
-    if (ImGui::BeginCombo("##Value", name.c_str()))
-    {
-        if (ImGui::Selectable("none", name == "none") && name != "none")
-        {
-            name = "none";
-            changed = true;
-        }
-        for (const Data::Looks::LookDefinition& look : Data::Looks::g_LookStore.GetLooks(kind))
-        {
-            if (ImGui::Selectable(look.name.c_str(), look.name == name) && look.name != name)
-            {
-                name = look.name;
-                changed = true;
-            }
-        }
-        ImGui::EndCombo();
-    }
-    const bool known = Data::Looks::g_LookStore.Find(kind, name) != nullptr;
-    ImGui::SameLine();
-    ImGui::BeginDisabled(!known);
-    if (ImGui::SmallButton(I18N::Editor::OpenInStyleEditor))
-    {
-        if (effect)
-            g_MuStyleEditorUI.ShowEffect(name);
-        else
-            g_MuStyleEditorUI.ShowRenderStyle(name);
-    }
-    ImGui::EndDisabled();
-    if (!known && name != "none")
-    {
-        ImGui::SameLine();
-        ImGui::TextColored(WarningColor, "%s", I18N::Format(I18N::Editor::UnknownName, {name}).c_str());
-    }
-    return changed;
+    return LookPicker::Render(name, effect ? Data::Looks::LookKind::Effect : Data::Looks::LookKind::RenderStyle, "none",
+                              "none", Items::Fields::ScaledWidth(Items::Fields::NumberWidth) * 2.0f);
 }
 
 bool MuMonsterSetupUI::RenderValue(std::string_view key, MonsterSetup& setup, const std::string& undoLabel)

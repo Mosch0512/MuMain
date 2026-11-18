@@ -6,6 +6,7 @@
 
 #include "MonsterAnimationFacts.h"
 #include "MonsterEdits.h"
+#include "MonsterLookPicker.h"
 #include "MonsterModelValues.h"
 #include "MonsterSelection.h"
 #include "MonsterShownModel.h"
@@ -18,7 +19,6 @@
 #include "../MuEditor/UI/Common/MuEditorWindowIds.h"
 #include "../MuEditor/UI/ItemTools/ItemModelFiles.h"
 #include "../MuEditor/UI/ItemTools/ItemTextInput.h"
-#include "../MuEditor/UI/StyleEditor/MuStyleEditorUI.h"
 #include "Data/GameData/LookData/LookStore.h"
 #include "Data/DataHandler/MonsterData/MonsterDataHandler.h"
 #include "Data/GameData/MonsterData/MonsterAnimations.h"
@@ -339,41 +339,8 @@ void MuMonsterModelUI::RenderLooks(MonsterModelDefinition& model)
         ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted(label);
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(SearchWidth * g_MuEditorCore.GetUIScale());
-        bool changed = false;
-        if (ImGui::BeginCombo("##Look", name.empty() ? I18N::Editor::None : name.c_str()))
-        {
-            if (ImGui::Selectable(I18N::Editor::None, name.empty()) && !name.empty())
-            {
-                name.clear();
-                changed = true;
-            }
-            for (const Data::Looks::LookDefinition& each : Data::Looks::g_LookStore.GetLooks(kind))
-            {
-                if (ImGui::Selectable(each.name.c_str(), each.name == name) && each.name != name)
-                {
-                    name = each.name;
-                    changed = true;
-                }
-            }
-            ImGui::EndCombo();
-        }
-        const bool known = Data::Looks::g_LookStore.Find(kind, name) != nullptr;
-        ImGui::SameLine();
-        ImGui::BeginDisabled(!known);
-        if (ImGui::SmallButton(I18N::Editor::OpenInStyleEditor))
-        {
-            if (kind == Data::Looks::LookKind::Effect)
-                g_MuStyleEditorUI.ShowEffect(name);
-            else
-                g_MuStyleEditorUI.ShowRenderStyle(name);
-        }
-        ImGui::EndDisabled();
-        if (!known && !name.empty())
-        {
-            ImGui::SameLine();
-            RenderWarning(I18N::Format(I18N::Editor::UnknownName, {name}).c_str());
-        }
+        const bool changed =
+            LookPicker::Render(name, kind, "", I18N::Editor::None, SearchWidth * g_MuEditorCore.GetUIScale());
         if (changed)
             m_draft.AfterChange(true, StepLabelOf(model, I18N::Editor::StepWhatLooks));
         ImGui::PopID();
