@@ -1276,16 +1276,16 @@ OrderedJson WriteOnlyWhen(const OnlyWhen& onlyWhen)
     }
     if (onlyWhen.opacityAbove)
     {
-        json[Keys::OpacityAbove] = *onlyWhen.opacityAbove;
+        json[Keys::OpacityAbove] = WriteDouble(*onlyWhen.opacityAbove);
     }
     if (onlyWhen.opacityAtMost)
     {
-        json[Keys::OpacityAtMost] = *onlyWhen.opacityAtMost;
+        json[Keys::OpacityAtMost] = WriteDouble(*onlyWhen.opacityAtMost);
     }
     if (onlyWhen.cycleHalf)
     {
         OrderedJson half;
-        half[Keys::Seconds] = onlyWhen.cycleHalf->seconds;
+        half[Keys::Seconds] = WriteDouble(onlyWhen.cycleHalf->seconds);
         half[Keys::Half] = onlyWhen.cycleHalf->first ? "first" : "second";
         json[Keys::CycleHalf] = half;
     }

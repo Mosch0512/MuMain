@@ -137,6 +137,19 @@ TEST_CASE("A look's layers read every field, and write back as they were read [l
     CHECK(WriteRenderStylesJson(result.looks) == text);
 }
 
+TEST_CASE("A layer's Only when writes its whole numbers without a fraction, as the file had them [looks][files]")
+{
+    const LookDefinition fading{
+        "fading",
+        {Layer{.meshes = {{0}}, .onlyWhen = {.opacityAbove = 0, .opacityAtMost = 1}},
+         Layer{.meshes = {{1}}, .onlyWhen = {.opacityAtMost = 0.5, .cycleHalf = CycleHalf{.seconds = 2, .first = true}}}},
+        {}};
+    const std::string text = WriteRenderStylesJson({fading});
+    CHECK(text.find(R"("onlyWhen": {"opacityAbove": 0, "opacityAtMost": 1})") != std::string::npos);
+    CHECK(text.find(R"("onlyWhen": {"opacityAtMost": 0.5, "cycleHalf": {"seconds": 2, "half": "first"}})") !=
+          std::string::npos);
+}
+
 TEST_CASE("A render style's Not for and a layer's Only when read every part and write back as they were read "
           "(design L11) [looks][files]")
 {
