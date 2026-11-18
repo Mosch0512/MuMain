@@ -652,15 +652,13 @@ void LeaveItemValues(const ItemValues& values, const vec3_t modelLight, BMD* b, 
         LightLayer(*values.light, modelLight, b, moment);
     }
 }
-// Finds the texture's index, loading it when no code loaded it. A missing one is logged when `logMissing` and it wasn't
-// missing before.
-void PrepareTexture(const std::string& look, const std::string& texture, bool logMissing)
+// Takes the texture's index: that of `loaded`, the texture the game loaded already (an effect texture), or one it loads
+// now. A missing one is logged when `logMissing` and it wasn't missing before.
+void TakeTexture(const std::string& look, const std::string& texture, bool logMissing, const BITMAP_t* loaded)
 {
     const auto known = s_textures.find(texture);
     const bool missingBefore = known != s_textures.end() && known->second == BITMAP_UNKNOWN;
-    // A texture the game loaded already (an effect texture) keeps its index.
     const std::wstring file = BitmapFileName(texture);
-    const BITMAP_t* loaded = Bitmaps.FindTexture(file);
     const GLuint index = loaded != nullptr ? loaded->BitmapIndex : Bitmaps.LoadImage(file, GL_LINEAR, GL_REPEAT);
     if (index == BITMAP_UNKNOWN && logMissing && !missingBefore)
     {
@@ -668,6 +666,12 @@ void PrepareTexture(const std::string& look, const std::string& texture, bool lo
                      "Render style data error: {}: texture \"{}\" is not found; the layer is skipped", look, texture);
     }
     s_textures[texture] = index;
+}
+
+// Finds the texture's index, loading it when no code loaded it (TakeTexture).
+void PrepareTexture(const std::string& look, const std::string& texture, bool logMissing)
+{
+    TakeTexture(look, texture, logMissing, Bitmaps.FindTexture(BitmapFileName(texture)));
 }
 
 // The textures of one look that are not found yet: new names, and names missing before, whose file may have come since.
@@ -804,15 +808,20 @@ void PrepareTextures(const LookDefinition& style)
 void RefindTextures()
 {
     std::vector<std::string> names;
+    std::vector<std::wstring> files;
     names.reserve(s_textures.size());
+    files.reserve(s_textures.size());
     for (const auto& [texture, index] : s_textures)
     {
         names.push_back(texture);
+        files.push_back(BitmapFileName(texture));
     }
-    // The lowest index of a file comes first: a map's slot before the copy the looks loaded.
-    for (const std::string& texture : names)
+    // The lowest index of a file comes first: a map's slot before the copy the looks loaded. All of them are found in
+    // one pass over the textures.
+    const std::vector<BITMAP_t*> loaded = Bitmaps.FindTextures(files);
+    for (size_t place = 0; place < names.size(); ++place)
     {
-        PrepareTexture({}, texture, false);
+        TakeTexture({}, names[place], false, loaded[place]);
     }
 }
 
