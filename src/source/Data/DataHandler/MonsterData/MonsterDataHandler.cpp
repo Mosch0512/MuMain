@@ -529,6 +529,7 @@ void MonsterDataHandler::RestoreModels(std::span<const MonsterModelSnapshot> sna
         }
         m_modelsToReopen.push_back(snapshot.slot);
     }
+    NotifyModelLooksChanged();
 }
 
 bool MonsterDataHandler::SaveModels(std::vector<Items::ItemDataIssue>& issues)
@@ -675,6 +676,17 @@ void MonsterDataHandler::UseModels(std::span<const MonsterModelDefinition> model
         }
     }
     g_MonsterModelDatabase.Build(models);
+    NotifyModelLooksChanged();
+}
+
+void MonsterDataHandler::NotifyModelLooksChanged() const
+{
+    // The looks a model names for its monsters (MN8) are found when a monster is set up: the living ones take them
+    // again, as they take an entry's changes.
+    if (m_monstersChanged != nullptr)
+    {
+        m_monstersChanged(AllNumbers);
+    }
 }
 
 void MonsterDataHandler::ReopenChangedModels()
