@@ -319,6 +319,13 @@
       ]
     },
     {
+      "name": "crust",
+      "layers": [
+        {"kind": "texture", "texture": "Monster/iui03.jpg", "light": [0.4, 0.3, 0.5], "scrollingMesh": 0},
+        {"kind": "texture", "light": [0.5, 0.5, 0.5]}
+      ]
+    },
+    {
       "name": "crypos",
       "layers": [
         {"kind": "texture", "meshes": [0]},
@@ -439,6 +446,13 @@
       "layers": [
         {"kind": "texture", "blend": "asDrawing", "meshes": "allEvenHidden", "opacity": "drawing"},
         {"kind": "texture", "blend": "glow", "meshes": [1], "opacity": "drawing", "glowMesh": 1, "glowStrength": 1}
+      ]
+    },
+    {
+      "name": "devil",
+      "layers": [
+        {"kind": "texture", "light": [1, 1, 1]},
+        {"kind": "texture", "blend": "glow", "texture": "Effect/Chrome01.jpg", "light": [0.4, 0.6, 1], "scrollingMesh": 0}
       ]
     },
     {
@@ -684,11 +698,40 @@
       ]
     },
     {
+      "name": "goldenCrust",
+      "layers": [
+        {"kind": "texture", "texture": "Monster/iui03.jpg", "light": [0.4, 0.3, 0.5], "scrollingMesh": 0},
+        {"kind": "texture", "light": [0.5, 0.5, 0.5]},
+        {"kind": "reflection", "motion": "stillShine", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [1, 0.5, 0]}},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [1, 0.5, 0]}}
+      ]
+    },
+    {
+      "name": "goldenDevil",
+      "layers": [
+        {"kind": "texture", "light": [1, 1, 1]},
+        {"kind": "texture", "blend": "glow", "texture": "Effect/Chrome01.jpg", "light": [0.4, 0.6, 1], "scrollingMesh": 0},
+        {"kind": "reflection", "motion": "stillShine", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [1, 0.5, 0]}},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [1, 0.5, 0]}}
+      ]
+    },
+    {
       "name": "goldenOrSilverBox",
       "layers": [
         {"kind": "texture", "meshes": [1]},
         {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [1], "glowMesh": 1},
         {"kind": "texture", "meshes": [2]}
+      ]
+    },
+    {
+      "name": "goldenSatyros",
+      "layers": [
+        {"kind": "texture"},
+        {"kind": "texture", "blend": "glow", "meshes": [1], "opacity": 1, "glowMesh": 0, "scrollV": {"shape": "scroll", "perSecond": 0.5}, "scrollingMesh": 1},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [3], "texture": "Effect/Chrome01.jpg", "opacity": 1, "glowMesh": 0, "scrollV": {"shape": "scroll", "perSecond": 1}},
+        {"kind": "texture", "blend": "glow", "meshes": [4], "opacity": 1, "glowMesh": 2, "scrollU": {"shape": "scroll", "perSecond": 0.1}, "scrollV": {"shape": "scroll", "perSecond": -0.5}, "light": {"fromRed": [{"shape": "wave", "from": 0, "to": 1, "seconds": 6.283185}, {"shape": "wave", "from": 0, "to": 1, "seconds": 6.283185}, {"shape": "wave", "from": 0, "to": 1, "seconds": 6.283185}]}},
+        {"kind": "reflection", "motion": "stillShine", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [1, 0.5, 0]}},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [1, 0.5, 0]}}
       ]
     },
     {
@@ -1784,6 +1827,28 @@
       "layers": [
         {"kind": "texture", "light": [1, 1, 1]},
         {"kind": "reflection", "motion": "stripes", "blend": "glow", "meshes": [1]}
+      ]
+    },
+    {
+      "name": "zaikan",
+      "layers": [
+        {"kind": "texture", "blend": "glow", "meshes": [0], "texture": "Monster/bv02_2.jpg", "glowMesh": 0, "glowStrength": {"shape": "wave", "from": 0.99, "to": 1.01, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [1], "texture": "Monster/bv01_2.jpg", "glowMesh": 1, "glowStrength": {"shape": "wave", "from": 0.99, "to": 1.01, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [2], "glowMesh": 1, "glowStrength": {"shape": "wave", "from": 0.99, "to": 1.01, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [2], "glowMesh": 1, "glowStrength": {"shape": "wave", "from": 0.99, "to": 1.01, "seconds": 3.141592653589793}},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [0.5, 0.25, 0]}}
+      ]
+    },
+    {
+      "name": "zaikanCrywolfGreen",
+      "layers": [
+        {"kind": "texture", "meshes": [0], "light": [0.6, 0.8, 0.6]},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [0], "texture": "Effect/Chrome01.jpg"},
+        {"kind": "texture", "meshes": [1]},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [1], "texture": "Effect/Chrome01.jpg"},
+        {"kind": "texture", "meshes": [2]},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [2], "texture": "Effect/Chrome01.jpg"},
+        {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": "allEvenHidden", "light": {"timesOpacity": [0.5, 0.25, 0]}}
       ]
     },
     {

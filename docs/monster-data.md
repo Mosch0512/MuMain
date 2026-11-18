@@ -454,7 +454,11 @@ Axl Hero, Gigas Golem, Scout (Hero) and Werewolf (Hero). The Balrog
 model with a golden glow (`goldenChrome`: Golden Budge Dragon, Goblin, Derkon,
 Lizard King, Vepar, Tantalos, Wheel, Dark Knight, Iron Knight, Napin, Rabbit and
 the Great Golden Dragon) and the Golden Titan and Soldier (`goldenShine`) have
-theirs too. Some models name the look of all their monsters: the Phantom
+theirs too, and so do the Golden Devil, Crust and Satyros (`goldenDevil`,
+`goldenCrust`, `goldenSatyros`: their models' looks with the golden glow) and
+Zaikan (`zaikan`: its glowing skins under a faint golden chrome). Some models name the look of all their monsters: the Devil (`devil`: a
+scrolling blue chrome over its body), the Crust (`crust`: a scrolling skin
+under its body), the Phantom
 Knight (`phantomKnight`), the Kalima shop, the Werewolf Quarrel, the Cherry
 Blossom spirit and the Seed Master, the Drakan (`drakan`), and the Lizard
 Warrior, Fire Golem, Queen Bee, Poison Golem and Axe Warrior; Aida's stone
@@ -471,8 +475,8 @@ Galia, Quartermaster, Knight Commander and Grand Wizard (green while it dies),
 and its Castle Gates 2 and 4 and Stone Statue (`goneWhenDying`: not drawn while
 they die). Jerint (505) names `jerint` on its entry, as Jerint the Assistant
 shares its model and keeps the model's plain look; the Satyros names `satyros`
-on its entry too, as the Golden Satyros shares its model and keeps its drawing
-in code while its golden overlay is model code. Raymond (`raymond`) and the
+on its entry too, as the Golden Satyros shares its model and names its golden
+look. Raymond (`raymond`) and the
 PK Field's Zombie Fighter and Resurrected Gladiator (`zombieFighter`, their glow
 drawn on top), Ash Slaughterer, and Blood and Cruel Blood Assassin (not drawn
 while they die), and the Ruthless and Burning Lava Giant (`lavaGiant`,
@@ -485,7 +489,8 @@ name their retextured looks on their numbers, as the Ice Walker and Larva of
 the other maps share their models. On Crywolf (map 34) a map variant of the
 Red Dragon, Dragon, Tantalos, Bloody Wolf, Beam Knight and Death Beam Knight
 names `crywolfGreenChrome`: their meshes in a green light with a chrome over
-each. A texture
+each; Zaikan's names `zaikanCrywolfGreen`, the same with its faint golden
+chrome. A texture
 a map loads (the Erohim's wing) is drawn from where the map loaded it while the
 hero is on that map: the looks find their textures again when a map loads. A
 monster drawn with a

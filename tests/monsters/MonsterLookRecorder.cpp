@@ -80,6 +80,10 @@ constexpr BasicTexture BasicTextures[] = {
     {L"Effect\\lavagiantAa_e.jpg", BITMAP_PKMON05, GL_REPEAT},
     {L"Effect\\lavagiantBa_e.jpg", BITMAP_PKMON06, GL_REPEAT},
     {L"Effect\\raymond_sword_R.jpg", BITMAP_RAYMOND_SWORD, GL_REPEAT},
+    {L"Monster\\iui03.jpg", BITMAP_JANUSEXT, GL_REPEAT},
+    // Tantallos' model loads them (Models.json).
+    {L"Monster\\bv01_2.jpg", BITMAP_MONSTER_SKIN, GL_REPEAT},
+    {L"Monster\\bv02_2.jpg", BITMAP_MONSTER_SKIN + 1, GL_REPEAT},
     {L"Monster\\DGicewalker_body.jpg", BITMAP_DOPPELGANGER_ICEWALKER0, GL_CLAMP_TO_EDGE},
     {L"Monster\\DGicewalker_R.jpg", BITMAP_DOPPELGANGER_ICEWALKER1, GL_CLAMP_TO_EDGE},
     {L"Monster\\Snake1.jpg", BITMAP_DOPPELGANGER_SNAKE01, GL_CLAMP_TO_EDGE},

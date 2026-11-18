@@ -342,7 +342,7 @@ bool M37Kanturu1st::RenderKanturu1stObjectMesh(const OBJECT* o, DrawLook& look, 
         }
     }
 
-    return RenderKanturu1stMonsterObjectMesh(o, look, b);
+    return false;
 }
 
 void M37Kanturu1st::RenderKanturu1stAfterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
@@ -630,41 +630,6 @@ bool M37Kanturu1st::MoveKanturu1stMonsterVisual(CHARACTER* c, OBJECT* o, BMD* b)
     break;
     case MODEL_SOCCERBALL:
     {
-    }
-    break;
-    }
-
-    return false;
-}
-
-bool M37Kanturu1st::RenderKanturu1stMonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
-{
-    switch (o->Type)
-    {
-    // The Golden Satyros (497) only: the Satyros names satyros on its entry (Monsters.json), which draws before this
-    // code; the Golden Satyros keeps it while its golden overlay is model code.
-    case MODEL_SATYROS:
-    {
-        vec3_t Light;
-        VectorCopy(b->BodyLight, Light);
-        // The model keeps its own scrolling mesh after this drawing (ML-P7).
-        const char streamMesh = b->StreamMesh;
-        b->BeginRender(1.f);
-        b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                      look.hiddenMesh);
-        b->StreamMesh = 1;
-        b->RenderMesh(1, RENDER_TEXTURE | RENDER_BRIGHT, 1.f, 0, look.blendMeshLight, look.blendMeshU,
-                      WorldTime * 0.0005f);
-        b->RenderMesh(3, RENDER_CHROME | RENDER_BRIGHT, 1.f, 0, look.blendMeshLight, look.blendMeshU,
-                      WorldTime * 0.001f, BITMAP_CHROME);
-
-        float Luminosity = sinf(WorldTime * 0.001f) * 0.5f + 0.5f;
-        Vector(Light[0] * Luminosity, Light[0] * Luminosity, Light[0] * Luminosity, b->BodyLight);
-        b->RenderMesh(4, RENDER_TEXTURE | RENDER_BRIGHT, 1.f, 2, look.blendMeshLight, WorldTime * 0.0001f,
-                      -WorldTime * 0.0005f);
-        b->EndRender();
-        b->StreamMesh = streamMesh;
-        return true;
     }
     break;
     }

@@ -194,6 +194,7 @@
       "file": "Data/Monster/Monster27.bmd",
       "textureFolders": ["Monster"],
       "headBone": 6,
+      "renderStyle": "devil",
       "linkBones": [16, 25]
     },
     {
@@ -382,6 +383,7 @@
       "file": "Data/Monster/Monster53.bmd",
       "textureFolders": ["Monster"],
       "animations": {"die": 0.22},
+      "renderStyle": "crust",
       "linkBones": [36, 45]
     },
     {

@@ -24,8 +24,7 @@ namespace M37Kanturu1st
     // 몬스터 관련
     bool AttackEffectKanturu1stMonster(CHARACTER* c, OBJECT* o, BMD* b);	// 몬스터 공격 이펙트
     bool MoveKanturu1stMonsterVisual(CHARACTER* c, OBJECT* o, BMD* b);		// 몬스터 효과 업데이트
-    void MoveKanturu1stBlurEffect(CHARACTER* c, OBJECT* o, BMD* b);		// 몬스터 무기의 잔상 처리
-    bool RenderKanturu1stMonsterObjectMesh(const OBJECT* o, DrawLook& look, BMD* b); // 몬스터 오브젝트 렌더링
+    void MoveKanturu1stBlurEffect(CHARACTER* c, OBJECT* o, BMD* b);         // 몬스터 무기의 잔상 처리
     bool UpdateKanturu1stMonsterEffects(CHARACTER* c, OBJECT* o, BMD* b);
     bool RenderKanturu1stMonsterVisual(const CHARACTER* c, const OBJECT* o, BMD* b); // 몬스터 효과 렌더링
 };

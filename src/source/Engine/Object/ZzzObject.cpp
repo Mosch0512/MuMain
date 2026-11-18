@@ -605,18 +605,6 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b)
     else if (TheMapProcess().RenderObjectMesh(o, look, b))
     {
     }
-    else if (o->Type == MODEL_TANTALLOS && o->SubType == 1)
-    {
-        b->BeginRender(look.alpha);
-        float Light = sinf(WorldTime * 0.002f) * 0.01f + 1.f;
-        b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 0, Light, look.blendMeshU, look.blendMeshV,
-                      BITMAP_MONSTER_SKIN + 1);
-        b->RenderMesh(1, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 1, Light, look.blendMeshU, look.blendMeshV,
-                      BITMAP_MONSTER_SKIN);
-        b->RenderMesh(2, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 1, Light, look.blendMeshU, look.blendMeshV);
-        b->RenderMesh(2, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, 1, Light, look.blendMeshU, look.blendMeshV);
-        b->EndRender();
-    }
                                         else if (o->Type == MODEL_MAGIC_SKELETON)
                                         {
                                             b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
@@ -636,26 +624,6 @@ bool DrawBodyByCode(const OBJECT* o, DrawLook& look, BMD* b)
                                             pSideHair->Create(VertexTransform, b, o);
                                             pSideHair->Render(VertexTransform, LightTransform);
                                             pSideHair->Destroy();
-                                        }
-                                        else if (o->Type == MODEL_CRUST)
-                                        {
-                                            float Luminosity = sinf(WorldTime * 0.002f) * 0.3f + 0.5f;
-                                            Vector(Luminosity + 0.5f, 0.3f - Luminosity * 0.5f,
-                                                   -Luminosity * 0.5f + 0.5f, b->BodyLight);
-                                            // Vector(1.f,1.f,1.f,b->BodyLight);
-                                            // if ( c->Dead == 0)
-                                            {
-                                                b->StreamMesh = 0;
-                                                Vector(.4f, .3f, .5f, b->BodyLight);
-                                                b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                              look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                                                              look.hiddenMesh, BITMAP_JANUSEXT);
-                                                Vector(.5f, .5f, .5f, b->BodyLight);
-                                                b->StreamMesh = -1;
-                                            }
-                                            b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh,
-                                                          look.blendMeshLight, look.blendMeshU, look.blendMeshV,
-                                                          look.hiddenMesh);
                                         }
                                         else if (o->Type == MODEL_QUEEN_RAINER)
                                         {
@@ -1557,18 +1525,6 @@ void Draw_RenderObject(const OBJECT* o, bool Translate, int Select, bool cloaked
                               look.blendMeshV, look.hiddenMesh);
             }
 
-            else if (o->Type == MODEL_DEVIL)
-            {
-                Vector(1.f, 1.f, 1.f, b->BodyLight);
-                b->StreamMesh = -1;
-                b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                              look.blendMeshV, look.hiddenMesh);
-                Vector(0.4f, 0.6f, 1.f, b->BodyLight);
-                b->StreamMesh = 0;
-                b->RenderBody(RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
-                              look.blendMeshU, look.blendMeshV, look.hiddenMesh, BITMAP_CHROME);
-                b->StreamMesh = -1;
-            }
             else if (o->Type == MODEL_PEGASUS)
             {
                 b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,

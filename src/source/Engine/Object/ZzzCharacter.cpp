@@ -9875,28 +9875,7 @@ void RenderCharacter(const CHARACTER* c, const OBJECT* o, int Select)
         }
     }
 
-    // Zaikan and the golden monsters whose bodies are their models' code (494 to 498) glow in code still.
-    if (!styled && (c->MonsterIndex == MONSTER_ZAIKAN ||
-                    (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT && c->MonsterIndex <= MONSTER_GOLDEN_RABBIT)))
-    {
-        vec3_t vBackupBodyLight;
-
-        const float Bright = c->MonsterIndex == MONSTER_ZAIKAN ? 0.5f : 1.f;
-        if (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT)
-        {
-            VectorCopy(Models[o->Type].BodyLight, vBackupBodyLight);
-            Vector(1.f, 0.6f, 0.3f, Models[o->Type].BodyLight);
-            RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_METAL | RENDER_BRIGHT, Bright);
-        }
-
-        RenderPartObjectBodyColor(&Models[o->Type], o, o->Type, o->Alpha, RENDER_CHROME | RENDER_BRIGHT, Bright);
-
-        if (c->MonsterIndex >= MONSTER_GOLDEN_DARK_KNIGHT)
-        {
-            VectorCopy(vBackupBodyLight, Models[o->Type].BodyLight);
-        }
-    }
-    else if (c->MonsterIndex == MONSTER_ALQUAMOS)
+    if (c->MonsterIndex == MONSTER_ALQUAMOS)
     {
         // Tints the body light below.
         const float Luminosity = (float)(Random::DrawRand(o, 1) % 30 + 70) * 0.01f;
