@@ -219,6 +219,7 @@ a question below decides otherwise.
 | ML-P15 | Uninitialised values: Alquamos' attack angle, Aticles Head's sprite offset. | `ZzzCharacter.cpp:2147`, `GMEmpireGuardian2.cpp` |
 | ML-P16 | The monsters design's P10 (`ZzzCharacter.cpp:10054`) is no longer at that line; it may be ML-P1. To check. | – |
 | ML-P17 | Raymond's sword and the Blood Assassins' back are lit from the red channel through `Vector`, a macro that sets one channel after another, so green and blue read the red just set: Raymond's sword is lit `[3, 9, 9]` times the red, the Blood Assassins' back `[0.65, 0.4225, 0.4225]` and its chrome `[1.3, 1.3, 0.52]`. Meant: the light times 3, then times 0.65 and `[2, 1, 0.4]`. The move keeps them with `{"fromRed": ...}`. | `GMEmpireGuardian1.cpp` (Raymond), `GM_PK_Field.cpp` (Blood Assassins) |
+| ML-P18 | The Doppelganger (533) is never tinted by poison, freeze or Blow of Destruction on its maps: their draw hooks skip its body where the tint is set and draw it after the character, in the light without the tint. Fixed before its move (as ML-P7), so the move stays exact: the body hook draws it. | `GMDoppelGanger1.cpp` to `GMDoppelGanger4.cpp` |
 
 ## Target design
 

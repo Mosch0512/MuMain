@@ -308,6 +308,11 @@ bool CGMDoppelGanger4::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
                       look.blendMeshU, look.blendMeshV, look.hiddenMesh);
         return true;
     case MODEL_DOPPELGANGER:
+        // Its body, in the tint of its debuffs as every monster's (ML-P18): drawn after the character, it had none.
+        b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, look.alpha, look.blendMesh, look.blendMeshLight,
+                      look.blendMeshU, look.blendMeshV);
+        b->RenderMesh(0, RENDER_CHROME | RENDER_BRIGHT, 0.3f, look.blendMesh, look.blendMeshLight, look.blendMeshU,
+                      look.blendMeshV);
         return true;
     }
 
@@ -596,20 +601,6 @@ bool CGMDoppelGanger4::UpdateMonsterEffects(CHARACTER* c, OBJECT* o, BMD* b)
             }
         }
         return true;
-    }
-
-    return true;
-}
-
-bool CGMDoppelGanger4::RenderMonsterVisual(const CHARACTER* c, const OBJECT* o, BMD* b)
-{
-    switch (o->Type)
-    {
-    case MODEL_DOPPELGANGER:
-        b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, o->Alpha, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
-        b->RenderMesh(0, RENDER_CHROME | RENDER_BRIGHT, 0.3f, o->BlendMesh, o->BlendMeshLight, o->BlendMeshTexCoordU, o->BlendMeshTexCoordV);
-        return true;
-        break;
     }
 
     return true;
