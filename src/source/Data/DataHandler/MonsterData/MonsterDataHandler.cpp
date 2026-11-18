@@ -9,6 +9,7 @@
 #include "Data/DataHandler/MonsterData/MonsterModelLoader.h"
 #include "Data/DataHandler/MonsterData/MonsterSoundJsonStorage.h"
 #include "Data/DataHandler/TextFile.h"
+#include "Data/GameData/LookData/LookStore.h"
 #include "Data/GameData/MonsterData/MonsterDataValidation.h"
 #include "Data/GameData/MonsterData/MonsterDatabase.h"
 #include "Data/GameData/MonsterData/MonsterModelDatabase.h"
@@ -23,6 +24,7 @@
 #include <bitset>
 #include <chrono>
 #include <map>
+#include <set>
 
 namespace Data::Monsters
 {
@@ -50,6 +52,33 @@ void ValidateLinks(std::span<const MonsterSoundSet> sets, std::vector<Items::Ite
     }
     ValidateMonsterSoundLinks(monsters, g_MonsterModelDatabase.GetAll(), sets, GetMonstersFile().generic_string(),
                               GetMonsterSoundsFile().generic_string(), issues);
+}
+
+// The looks the monsters and their models name (MN8, ML1), once both tables are built: a name no look file has is
+// reported, and the monster is drawn without it. The look files are loaded before the monsters (OpenItems); without
+// them (tools that load only the monsters) nothing is checked.
+void ValidateLookNames(std::vector<Items::ItemDataIssue>& monsterIssues, std::vector<Items::ItemDataIssue>& modelIssues)
+{
+    if (Data::Looks::g_LookStore.GetRenderStyles().empty() && Data::Looks::g_LookStore.GetEffects().empty())
+    {
+        return;
+    }
+    const auto renderStyleExists = [](std::string_view name)
+    { return Data::Looks::g_LookStore.FindRenderStyle(name) != nullptr; };
+    const auto effectExists = [](std::string_view name)
+    { return Data::Looks::g_LookStore.FindEffect(name) != nullptr; };
+    std::vector<const MonsterDefinition*> monsters;
+    for (int number = 0; number < MonsterNumberCount; ++number)
+    {
+        const MonsterDefinition* monster = g_MonsterDatabase.Find(number);
+        if (monster != nullptr && std::find(monsters.begin(), monsters.end(), monster) == monsters.end())
+        {
+            monsters.push_back(monster);
+        }
+    }
+    ValidateMonsterLooks(monsters, renderStyleExists, effectExists, GetMonstersFile().generic_string(), monsterIssues);
+    ValidateMonsterModelLooks(g_MonsterModelDatabase.GetAll(), renderStyleExists, effectExists,
+                              GetMonsterModelsFile().generic_string(), modelIssues);
 }
 
 #ifdef _EDITOR
@@ -157,6 +186,11 @@ bool MonsterDataHandler::LoadModels(std::string& errorMessage)
     }
 
     g_MonsterModelDatabase.Build(result.models);
+    std::vector<Items::ItemDataIssue> monsterLookIssues;
+    std::vector<Items::ItemDataIssue> modelLookIssues;
+    ValidateLookNames(monsterLookIssues, modelLookIssues);
+    LogDataIssues(MonsterDataLabel, monsterLookIssues);
+    LogDataIssues(MonsterModelsLabel, modelLookIssues);
     const std::chrono::duration<double, std::milli> elapsed = std::chrono::steady_clock::now() - loadStart;
     MU_LOG_INFO(mu::log::Get("data"), "Loaded {} monster models from {} in {:.1f} ms", result.models.size(),
                 GetMonsterModelsFile().generic_string(), elapsed.count());
