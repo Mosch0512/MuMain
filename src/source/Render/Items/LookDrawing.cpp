@@ -351,12 +351,14 @@ void DrawLayer(const Layer& layer, BMD* b, const DrawLook& look, float alpha, in
     }
     const int scrolling = b->StreamMesh;
     b->StreamMesh = layer.scrollingMesh.value_or(scrolling);
+    // A layer on top draws without the depth test, which is then as it was.
+    const bool restoreDepthTest = layer.onTop && DepthTestEnable;
     if (layer.onTop)
     {
         DisableDepthTest();
     }
     DrawMeshes(layer, b, look, *draw);
-    if (layer.onTop)
+    if (restoreDepthTest)
     {
         EnableDepthTest();
     }
@@ -557,13 +559,14 @@ void DrawMeshByMesh(const LookDefinition& style, BMD* b, const OBJECT* o, const 
         const int scrolling = b->StreamMesh;
         b->StreamMesh = pass.layer->scrollingMesh.value_or(scrolling);
         const LayerDraw& draw = *pass.draw;
+        const bool restoreDepthTest = pass.layer->onTop && DepthTestEnable;
         if (pass.layer->onTop)
         {
             DisableDepthTest();
         }
         b->RenderScriptedMesh(mesh, flags, draw.opacity, draw.glowMesh, draw.glowStrength, draw.u, draw.v,
                               draw.texture);
-        if (pass.layer->onTop)
+        if (restoreDepthTest)
         {
             EnableDepthTest();
         }
