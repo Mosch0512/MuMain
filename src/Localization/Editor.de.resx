@@ -1174,6 +1174,24 @@
   <data name="Opacity at most tooltip" xml:space="preserve">
     <value>Erst wenn die Zeichnung auf diese Deckkraft oder weniger verblasst ist, von 0 bis 1: ein sterbendes Monster, das beim Verblassen leuchtet.</value>
   </data>
+  <data name="Cycle half" xml:space="preserve">
+    <value>Zyklushälfte (Sekunden)</value>
+  </data>
+  <data name="Cycle half tooltip" xml:space="preserve">
+    <value>Nur in einer Hälfte eines Zyklus der Uhr, der so viele Sekunden lang ist: die erste Hälfte, solange der Sinus des Zyklus null oder mehr ist, die zweite, solange er unter null ist. Die Lavariesen leuchten in der ersten Hälfte ihres Pulses heller.</value>
+  </data>
+  <data name="First half" xml:space="preserve">
+    <value>Erste Hälfte</value>
+  </data>
+  <data name="First half tooltip" xml:space="preserve">
+    <value>Solange der Sinus des Zyklus null oder mehr ist.</value>
+  </data>
+  <data name="Second half" xml:space="preserve">
+    <value>Zweite Hälfte</value>
+  </data>
+  <data name="Second half tooltip" xml:space="preserve">
+    <value>Solange der Sinus des Zyklus unter null ist.</value>
+  </data>
   <data name="Effect types" xml:space="preserve">
     <value>Effekttypen</value>
   </data>

@@ -1439,6 +1439,7 @@
       "file": "Data/Monster/MONSTER163.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop1": 0.28, "walk": 0.3, "attack1": 0.25, "attack2": 0.25, "shock": 0.25, "die": 0.25},
+      "renderStyle": "lavaGiant",
       "boundingBox": {"min": [-100, -80, 50], "max": [100, 70, 280]}
     },
     {
@@ -1446,6 +1447,7 @@
       "file": "Data/Monster/MONSTER164.bmd",
       "textureFolders": ["Monster"],
       "animations": {"stop1": 0.28, "walk": 0.3, "attack1": 0.25, "attack2": 0.25, "shock": 0.25, "die": 0.25},
+      "renderStyle": "burningLavaGiant",
       "boundingBox": {"min": [-100, -80, 50], "max": [100, 70, 280]}
     },
     {

@@ -1232,6 +1232,44 @@ bool OpacityCondition(const char* label, std::optional<double>& opacity, const c
     return changed;
 }
 
+// The half of a cycle of the clock the layer draws in (MN8): unset, or a cycle's seconds and its first or second half.
+bool CycleHalfCondition(std::optional<CycleHalf>& half)
+{
+    namespace Text = I18N::Editor;
+    ImGui::PushID(Text::CycleHalf);
+    bool set = half.has_value();
+    bool changed = ImGui::Checkbox("##Set", &set);
+    if (changed)
+    {
+        half = set ? std::optional<CycleHalf>(CycleHalf{.seconds = 1.0}) : std::nullopt;
+    }
+    Tip(Text::CycleHalfTooltip);
+    ImGui::SameLine();
+    if (half)
+    {
+        changed |= DragNumber(Text::CycleHalf, half->seconds, 0.01f, Text::CycleHalfTooltip, 0.001);
+        if (ImGui::RadioButton(Text::FirstHalf, half->first) && !half->first)
+        {
+            half->first = true;
+            changed = true;
+        }
+        Tip(Text::FirstHalfTooltip);
+        ImGui::SameLine();
+        if (ImGui::RadioButton(Text::SecondHalf, !half->first) && half->first)
+        {
+            half->first = false;
+            changed = true;
+        }
+        Tip(Text::SecondHalfTooltip);
+    }
+    else
+    {
+        ImGui::TextDisabled("%s", Text::CycleHalf);
+    }
+    ImGui::PopID();
+    return changed;
+}
+
 // The item's hidden mesh the layer draws with: unset (any), none (-1) or a mesh.
 bool HiddenMeshCondition(std::optional<int>& hidden, const std::vector<LookPart>& parts)
 {
@@ -1335,6 +1373,7 @@ bool OnlyWhenFields(OnlyWhen& when, const std::vector<LookPart>& parts)
                               Text::NotInAnimationTooltip);
     changed |= OpacityCondition(Text::OpacityAbove, when.opacityAbove, Text::OpacityAboveTooltip);
     changed |= OpacityCondition(Text::OpacityAtMost, when.opacityAtMost, Text::OpacityAtMostTooltip);
+    changed |= CycleHalfCondition(when.cycleHalf);
     ImGui::TreePop();
     return changed;
 }

@@ -461,6 +461,10 @@ bool Holds(const OnlyWhen& when, const BMD* b, const OBJECT* o, const DrawLook& 
     {
         return false;
     }
+    if (when.cycleHalf && (sinf(Angle(2.0 * Pi, when.cycleHalf->seconds, WorldTime)) >= 0.f) != when.cycleHalf->first)
+    {
+        return false;
+    }
     return !when.buff || HasBuff(*when.buff, o);
 }
 

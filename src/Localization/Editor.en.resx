@@ -1168,6 +1168,24 @@
   <data name="Opacity at most tooltip" xml:space="preserve">
     <value>Only once the drawing has faded to this opacity or less, from 0 to 1: a dying monster drawn glowing as it fades.</value>
   </data>
+  <data name="Cycle half" xml:space="preserve">
+    <value>Cycle half (seconds)</value>
+  </data>
+  <data name="Cycle half tooltip" xml:space="preserve">
+    <value>Only in one half of a cycle of the clock this many seconds long: the first half while the cycle's sine is at or above zero, the second while it is below. The Lava Giants glow brighter in the first half of their pulse.</value>
+  </data>
+  <data name="First half" xml:space="preserve">
+    <value>First half</value>
+  </data>
+  <data name="First half tooltip" xml:space="preserve">
+    <value>While the cycle's sine is at or above zero.</value>
+  </data>
+  <data name="Second half" xml:space="preserve">
+    <value>Second half</value>
+  </data>
+  <data name="Second half tooltip" xml:space="preserve">
+    <value>While the cycle's sine is below zero.</value>
+  </data>
   <data name="Effect types" xml:space="preserve">
     <value>Effect types</value>
   </data>

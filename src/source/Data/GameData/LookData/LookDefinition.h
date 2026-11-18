@@ -202,6 +202,16 @@ enum class LookBuff
     TintingDebuff,
 };
 
+// One half of a cycle of the clock (MN8): the first half while the sine of the clock over `seconds` is at or above
+// zero, the second while it is below.
+struct CycleHalf
+{
+    double seconds = 0.0;
+    bool first = true;
+
+    bool operator==(const CycleHalf&) const = default;
+};
+
 // When a layer draws (design L11): each part that is set must hold, otherwise the layer is skipped.
 struct OnlyWhen
 {
@@ -221,11 +231,13 @@ struct OnlyWhen
     // faded to 0.8 while it dies.
     std::optional<double> opacityAbove;
     std::optional<double> opacityAtMost;
+    // The clock is in this half of a cycle (MN8): the Lava Giants glow brighter in the first half of their pulse.
+    std::optional<CycleHalf> cycleHalf;
 
     [[nodiscard]] bool IsEmpty() const
     {
         return !place && !level && !hiddenMesh && !buff && !withoutBuff && !animation && !notAnimation &&
-               !opacityAbove && !opacityAtMost;
+               !opacityAbove && !opacityAtMost && !cycleHalf;
     }
     bool operator==(const OnlyWhen&) const = default;
 };

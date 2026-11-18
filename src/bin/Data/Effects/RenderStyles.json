@@ -178,6 +178,17 @@
       ]
     },
     {
+      "name": "burningLavaGiant",
+      "layers": [
+        {"kind": "texture", "meshes": [1, 2]},
+        {"kind": "texture", "meshes": [0]},
+        {"kind": "texture", "meshes": [0], "onlyWhen": {"cycleHalf": {"seconds": 6.283185307179586, "half": "second"}}, "texture": "Effect/lavagiantAa_e.jpg", "opacity": 1, "glowMesh": 0, "glowStrength": {"shape": "bounce", "from": 0, "to": 1, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "onlyWhen": {"cycleHalf": {"seconds": 6.283185307179586, "half": "first"}}, "texture": "Effect/lavagiantAa_e.jpg", "opacity": 1, "glowMesh": 0, "glowStrength": {"shape": "bounce", "from": 0, "to": 1, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "onlyWhen": {"cycleHalf": {"seconds": 6.283185307179586, "half": "first"}}, "texture": "Effect/lavagiantAa_e.jpg", "opacity": 1, "glowMesh": 0, "glowStrength": {"shape": "bounce", "from": 0, "to": 1, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "onlyWhen": {"cycleHalf": {"seconds": 6.283185307179586, "half": "first"}}, "texture": "Effect/lavagiantAa_e.jpg", "opacity": 1, "glowMesh": 0, "glowStrength": {"shape": "bounce", "from": 0, "to": 1, "seconds": 3.141592653589793}}
+      ]
+    },
+    {
       "name": "capeOfEmperor",
       "layers": [
         {"kind": "texture", "onlyWhen": {"place": "inventory", "level": [0, 2]}, "light": [1, 1, 1]},
@@ -906,6 +917,17 @@
         {"kind": "texture", "meshes": [1]},
         {"kind": "texture", "meshes": [2]},
         {"kind": "reflection", "motion": "slowDrift", "blend": "glow", "meshes": [2]}
+      ]
+    },
+    {
+      "name": "lavaGiant",
+      "layers": [
+        {"kind": "texture", "meshes": [1, 2]},
+        {"kind": "texture", "meshes": [0]},
+        {"kind": "texture", "meshes": [0], "onlyWhen": {"cycleHalf": {"seconds": 6.283185307179586, "half": "second"}}, "texture": "Effect/lavagiantBa_e.jpg", "opacity": 1, "glowMesh": 0, "glowStrength": {"shape": "bounce", "from": 0, "to": 1, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "onlyWhen": {"cycleHalf": {"seconds": 6.283185307179586, "half": "first"}}, "texture": "Effect/lavagiantBa_e.jpg", "opacity": 1, "glowMesh": 0, "glowStrength": {"shape": "bounce", "from": 0, "to": 1, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "onlyWhen": {"cycleHalf": {"seconds": 6.283185307179586, "half": "first"}}, "texture": "Effect/lavagiantBa_e.jpg", "opacity": 1, "glowMesh": 0, "glowStrength": {"shape": "bounce", "from": 0, "to": 1, "seconds": 3.141592653589793}},
+        {"kind": "texture", "blend": "glow", "meshes": [0], "onlyWhen": {"cycleHalf": {"seconds": 6.283185307179586, "half": "first"}}, "texture": "Effect/lavagiantBa_e.jpg", "opacity": 1, "glowMesh": 0, "glowStrength": {"shape": "bounce", "from": 0, "to": 1, "seconds": 3.141592653589793}}
       ]
     },
     {

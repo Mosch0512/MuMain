@@ -475,7 +475,10 @@ on its entry too, as the Golden Satyros shares its model and keeps its drawing
 in code while its golden overlay is model code. Raymond (`raymond`) and the
 PK Field's Zombie Fighter and Resurrected Gladiator (`zombieFighter`, their glow
 drawn on top), Ash Slaughterer, and Blood and Cruel Blood Assassin (not drawn
-while they die) name theirs too, as do Doppelganger's Slaughterer and Furious
+while they die), and the Ruthless and Burning Lava Giant (`lavaGiant`,
+`burningLavaGiant`: their lava pulses, three glows in the first half of a
+6.28-second cycle and one plain draw in the second, `"cycleHalf"`) name theirs
+too, as do Doppelganger's Slaughterer and Furious
 Slaughterer (`doppelgangerSlaughterer`). Its Ice Walker (531) and Larva (532)
 name their retextured looks on their numbers, as the Ice Walker and Larva of
 the other maps share their models. On Crywolf (map 34) a map variant of the

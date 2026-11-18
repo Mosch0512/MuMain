@@ -75,6 +75,8 @@ constexpr const char* Animation = "animation";
 constexpr const char* NotAnimation = "notAnimation";
 constexpr const char* OpacityAbove = "opacityAbove";
 constexpr const char* OpacityAtMost = "opacityAtMost";
+constexpr const char* CycleHalf = "cycleHalf";
+constexpr const char* Half = "half";
 constexpr const char* EachItem = "eachItem";
 constexpr const char* Default = "default";
 constexpr const char* DrawingOpacity = "drawingOpacity";
@@ -745,13 +747,34 @@ void LookReader::ReadOnlyWhen(const OrderedJson& json, const std::string& field,
         }
         *target = opacity->get<double>();
     }
+    if (const auto half = entry->find(Keys::CycleHalf); half != entry->end())
+    {
+        const std::string halfField = whenField + "." + Keys::CycleHalf;
+        const auto seconds = half->is_object() ? half->find(Keys::Seconds) : half->end();
+        const auto which = half->is_object() ? half->find(Keys::Half) : half->end();
+        if (!half->is_object() || seconds == half->end() || !seconds->is_number() || !(seconds->get<double>() > 0.0))
+        {
+            AddFatal(halfField + "." + Keys::Seconds, "must be a cycle's seconds above 0");
+        }
+        else if (which == half->end() || !which->is_string() ||
+                 (which->get<std::string>() != "first" && which->get<std::string>() != "second"))
+        {
+            AddFatal(halfField + "." + Keys::Half, "must be \"first\" or \"second\"");
+        }
+        else
+        {
+            onlyWhen.cycleHalf =
+                CycleHalf{.seconds = seconds->get<double>(), .first = which->get<std::string>() == "first"};
+            WarnAboutUnknownKeys(*half, {Keys::Seconds, Keys::Half}, halfField);
+        }
+    }
     if (entry->empty())
     {
         AddIssue(ItemDataIssueSeverity::Warning, whenField, "sets no condition: the layer always draws");
     }
     WarnAboutUnknownKeys(*entry,
                          {Keys::Place, Keys::Level, Keys::HiddenMesh, Keys::Buff, Keys::WithoutBuff, Keys::Animation,
-                          Keys::NotAnimation, Keys::OpacityAbove, Keys::OpacityAtMost},
+                          Keys::NotAnimation, Keys::OpacityAbove, Keys::OpacityAtMost, Keys::CycleHalf},
                          whenField);
 }
 
@@ -1259,6 +1282,13 @@ OrderedJson WriteOnlyWhen(const OnlyWhen& onlyWhen)
     if (onlyWhen.opacityAtMost)
     {
         json[Keys::OpacityAtMost] = *onlyWhen.opacityAtMost;
+    }
+    if (onlyWhen.cycleHalf)
+    {
+        OrderedJson half;
+        half[Keys::Seconds] = onlyWhen.cycleHalf->seconds;
+        half[Keys::Half] = onlyWhen.cycleHalf->first ? "first" : "second";
+        json[Keys::CycleHalf] = half;
     }
     return json;
 }

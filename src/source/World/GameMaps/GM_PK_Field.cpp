@@ -427,13 +427,7 @@ bool CGM_PK_Field::RenderObjectMesh(const OBJECT* o, DrawLook& look, BMD* b)
         return false;
     }
 
-    if (o->Type >= MODEL_ZOMBIE_FIGHTER && o->Type <= MODEL_BURNING_LAVA_GIANT)
-    {
-        RenderMonster(o, look, b);
-
-        return true;
-    }
-    else if (o->Type == 15)
+    if (o->Type == 15)
     {
         b->StreamMesh = 0;
         b->RenderBody(RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
@@ -784,61 +778,6 @@ bool CGM_PK_Field::UpdateMonsterEffects(CHARACTER* c, OBJECT* o, BMD* b)
         }
     }
     return true;
-    }
-    return false;
-}
-
-bool CGM_PK_Field::RenderMonster(const OBJECT* o, DrawLook& look, BMD* b)
-{
-    if (!gMapManager.IsPKField())
-    {
-        return false;
-    }
-
-    switch (o->Type)
-    {
-    case MODEL_LAVA_GIANT:
-    case MODEL_BURNING_LAVA_GIANT:
-    {
-        b->RenderMesh(1, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-        b->RenderMesh(2, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                      look.blendMeshV);
-
-        float fBlendMeshLight = 0.0f;
-        fBlendMeshLight = (sinf(WorldTime * 0.001f));
-
-        switch (o->Type)
-        {
-        case MODEL_LAVA_GIANT:
-        case MODEL_BURNING_LAVA_GIANT:
-        {
-            float fAlpha = 1.0f;
-            b->RenderMesh(0, RENDER_TEXTURE, look.alpha, look.blendMesh, look.blendMeshLight, look.blendMeshU,
-                          look.blendMeshV);
-
-            int iTexture = (o->Type == MODEL_LAVA_GIANT) ? BITMAP_PKMON06 : BITMAP_PKMON05;
-
-            if (fBlendMeshLight < 0)
-            {
-                //fBlendMeshLight = fabs(fBlendMeshLight);
-                fBlendMeshLight = -(fBlendMeshLight);
-                // b->RenderMesh(0,RENDER_TEXTURE|RENDER_DARK, fAlpha,
-                // 0,fBlendMeshLight,look.blendMeshU,look.blendMeshV, iTexture);
-                b->RenderMesh(0, RENDER_TEXTURE, fAlpha, 0, fBlendMeshLight, look.blendMeshU, look.blendMeshV,
-                              iTexture);
-            }
-            else
-            {
-                for (int i = 0; i < 3; ++i)
-                    b->RenderMesh(0, RENDER_TEXTURE | RENDER_BRIGHT, fAlpha, 0, fBlendMeshLight, look.blendMeshU,
-                                  look.blendMeshV, iTexture);
-            }
-        }
-        break;
-        }
-    }
-        return true;
     }
     return false;
 }
