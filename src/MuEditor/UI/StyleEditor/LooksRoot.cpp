@@ -102,7 +102,9 @@ bool LooksRoot::IsCode(const std::string& name) const
 
 int LooksRoot::CountUsers(const std::string& name)
 {
-    return m_kind == Data::Looks::LookKind::Effect ? m_counts.Effect(name) : m_counts.RenderStyle(name);
+    // The items' models and the monsters that name it (MN8): a look only monsters name is used too.
+    const int items = m_kind == Data::Looks::LookKind::Effect ? m_counts.Effect(name) : m_counts.RenderStyle(name);
+    return items + m_monsterUses.Count(name, m_kind);
 }
 
 void LooksRoot::Update() const

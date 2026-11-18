@@ -5,6 +5,7 @@
 #include "Data/GameData/MonsterData/MonsterModelDefinition.h"
 
 #include <functional>
+#include <map>
 #include <set>
 #include <string>
 #include <string_view>
@@ -55,11 +56,13 @@ using LookExists = std::function<bool(std::string_view name)>;
 void ValidateMonsterLooks(std::span<const MonsterDefinition* const> monsters, const LookExists& renderStyleExists,
                           const LookExists& effectExists, const std::string& source,
                           std::vector<Items::ItemDataIssue>& issues);
-// The names of the render styles (or with `effects`, the effects) the monsters
-// and models name, on the entries, their map and state variants and the
-// models; "none" names none. Data Checks counts them as users of the looks.
-std::set<std::string> CollectMonsterLookNames(std::span<const MonsterDefinition* const> monsters,
-                                              std::span<const MonsterModelDefinition* const> models, bool effects);
+// How many monster entries and models name each render style (or with
+// `effects`, each effect): on the entry, its map and state variants, or the
+// model; an entry naming a look in several places counts once. "none" names
+// none. Data Checks and the Style Editor count them as users of the looks.
+std::map<std::string, int, std::less<>> CountMonsterLookUses(std::span<const MonsterDefinition* const> monsters,
+                                                             std::span<const MonsterModelDefinition* const> models,
+                                                             bool effects);
 
 // The same for the looks the models name for their monsters.
 void ValidateMonsterModelLooks(std::span<const MonsterModelDefinition* const> models,

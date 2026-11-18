@@ -4,6 +4,7 @@
 
 #include "../MuEditor/UI/Common/NamedTreeRoot.h"
 #include "../MuEditor/UI/ItemTools/ItemLookUseCounts.h"
+#include "MonsterLookUses.h"
 #include "Data/GameData/LookData/LookDefinition.h"
 
 #include <functional>
@@ -62,6 +63,7 @@ private:
     mutable std::vector<std::string> m_names;
     mutable int m_version = -1;
     Items::ItemLookUseCounts m_counts;
+    MonsterLookUses m_monsterUses;
     std::function<bool(const std::string&)> m_unapplied;
 };
 } // namespace MuEditor::Looks

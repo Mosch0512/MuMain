@@ -11,6 +11,7 @@
 #include "Data/DataHandler/MonsterData/MonsterJsonStorage.h"
 #include "Data/DataHandler/TextFile.h"
 #include "Data/GameData/MonsterData/MonsterDatabase.h"
+#include "UI/StyleEditor/LooksRoot.h"
 
 #include <algorithm>
 #include <array>
@@ -110,6 +111,30 @@ TEST_CASE("Monster table: the editor sets and removes one number in place [data]
     g_MonsterDatabase.Set(Monster(-1, "Nobody"));
     g_MonsterDatabase.Remove(1024);
     CHECK(g_MonsterDatabase.GetVersion() == version);
+}
+
+// A look only monsters name has users (MN8): the Style Editor keeps it from being renamed or removed, and Data Checks
+// does not call it unused.
+TEST_CASE("The Style Editor counts the monsters that name a look among its users [data][monsters][editor][looks]")
+{
+    MonsterDefinition golden = Monster(2, "Golden Budge Dragon");
+    golden.setup.renderStyle = "monsterOnlyLook";
+    MonsterDefinition plain = Monster(3, "Larva");
+    plain.mapVariants.push_back({.maps = {{.map = 34}}});
+    plain.mapVariants.back().setup.renderStyle = "monsterOnlyLook";
+    plain.mapVariants.back().setup.effect = "monsterOnlyEffect";
+    const std::array monsters = {golden, plain};
+    g_MonsterDatabase.Build(monsters, "en");
+
+    MuEditor::Looks::LooksRoot styles(Data::Looks::LookKind::RenderStyle);
+    MuEditor::Looks::LooksRoot effects(Data::Looks::LookKind::Effect);
+    CHECK(styles.CountUsers("monsterOnlyLook") == 2);
+    CHECK(effects.CountUsers("monsterOnlyEffect") == 1);
+    CHECK(styles.CountUsers("monsterOnlyEffect") == 0);
+
+    // A change of the monsters counts again.
+    g_MonsterDatabase.Remove(2);
+    CHECK(styles.CountUsers("monsterOnlyLook") == 1);
 }
 
 TEST_CASE("Monster data: the editor reads monsters as snapshots and restores them exactly [data][monsters][editor]")

@@ -5,6 +5,7 @@
 #include "RenderStyleCheckArea.h"
 
 #include "LookEdits.h"
+#include "MonsterLookUses.h"
 #include "MuStyleEditorUI.h"
 
 #include "../MuEditor/Core/MuEditorCore.h"
@@ -17,9 +18,6 @@
 #include "Data/GameData/ItemData/ItemModelSlots.h"
 #include "Data/GameData/ItemData/ItemType.h"
 #include "Data/GameData/LookData/LookJson.h"
-#include "Data/GameData/MonsterData/MonsterDataValidation.h"
-#include "Data/GameData/MonsterData/MonsterDatabase.h"
-#include "Data/GameData/MonsterData/MonsterModelDatabase.h"
 #include "I18N/All.h"
 #include "Render/Models/ZzzBMD.h"
 #include "imgui.h"
@@ -170,18 +168,12 @@ private:
     // The names of the checked looks in their order, at the last check.
     std::vector<std::string> m_lookNames;
 };
-// Whether a monster or monster model names the look (MN8), as the monster tools have them.
+// Whether a monster or monster model names the look (MN8), as the monster tools have them; counted once for all the
+// looks of a check.
 bool MonsterUses(const std::string& name, Data::Looks::LookKind kind)
 {
-    std::vector<const Data::Monsters::MonsterDefinition*> monsters;
-    for (int number = 0; number < Data::Monsters::MonsterNumberCount; ++number)
-    {
-        if (const Data::Monsters::MonsterDefinition* monster = g_MonsterDatabase.Find(number))
-            monsters.push_back(monster);
-    }
-    return Data::Monsters::CollectMonsterLookNames(monsters, g_MonsterModelDatabase.GetAll(),
-                                                   kind == Data::Looks::LookKind::Effect)
-        .contains(name);
+    static MonsterLookUses uses;
+    return uses.Count(name, kind) > 0;
 }
 } // namespace
 

@@ -258,14 +258,16 @@ void ValidateMonsterLooks(std::span<const MonsterDefinition* const> monsters, co
     }
 }
 
-std::set<std::string> CollectMonsterLookNames(std::span<const MonsterDefinition* const> monsters,
-                                              std::span<const MonsterModelDefinition* const> models, bool effects)
+std::map<std::string, int, std::less<>> CountMonsterLookUses(std::span<const MonsterDefinition* const> monsters,
+                                                             std::span<const MonsterModelDefinition* const> models,
+                                                             bool effects)
 {
-    std::set<std::string> names;
+    std::map<std::string, int, std::less<>> uses;
+    std::set<std::string, std::less<>> named;
     const auto add = [&](const std::optional<std::string>& name)
     {
         if (name && *name != NoneLook)
-            names.insert(*name);
+            named.insert(*name);
     };
     const auto addStates = [&](const MonsterSetup& setup)
     {
@@ -275,17 +277,20 @@ std::set<std::string> CollectMonsterLookNames(std::span<const MonsterDefinition*
     };
     for (const MonsterDefinition* monster : monsters)
     {
+        named.clear();
         addStates(monster->setup);
         for (const MonsterMapVariant& variant : monster->mapVariants)
             addStates(variant.setup);
+        for (const std::string& name : named)
+            ++uses[name];
     }
     for (const MonsterModelDefinition* model : models)
     {
         const std::string& name = effects ? model->effect : model->renderStyle;
         if (!name.empty())
-            names.insert(name);
+            ++uses[name];
     }
-    return names;
+    return uses;
 }
 
 void ValidateMonsterModelLooks(std::span<const MonsterModelDefinition* const> models,

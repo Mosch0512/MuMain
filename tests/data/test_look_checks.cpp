@@ -244,7 +244,7 @@ TEST_CASE("The shipped render styles name textures that exist, and items or mons
                                       .monsterUses =
                                           [&](const std::string& name, LookKind kind)
                                       {
-                                          return Data::Monsters::CollectMonsterLookNames(monsterEntries, modelEntries,
+                                          return Data::Monsters::CountMonsterLookUses(monsterEntries, modelEntries,
                                                                                          kind == LookKind::Effect)
                                               .contains(name);
                                       }};
