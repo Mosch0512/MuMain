@@ -3934,6 +3934,12 @@
       "name": {"en": "Scout", "es": "Explorador", "pt": "Batedor"},
       "kind": "monster",
       "model": "MONSTER_MODEL_SCOUT",
+      "mapVariants": [
+        {
+          "maps": [34],
+          "renderStyle": "scoutHero"
+        }
+      ],
       "scale": 1.2,
       "numbers": [
         {"number": 318}
