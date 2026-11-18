@@ -234,8 +234,7 @@ void CheckLookName(const std::optional<std::string>& name, const char* field, co
 } // namespace
 
 void ValidateMonsterLooks(std::span<const MonsterDefinition* const> monsters, const LookExists& renderStyleExists,
-                          const LookExists& effectExists, const std::string& source,
-                          std::vector<ItemDataIssue>& issues)
+                          const LookExists& effectExists, const std::string& source, std::vector<ItemDataIssue>& issues)
 {
     for (const MonsterDefinition* monster : monsters)
     {

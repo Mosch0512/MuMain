@@ -647,7 +647,8 @@ void ReadModelFields(const OrderedJson& json, MonsterModelDefinition& model, Mod
     for (const auto& [key, name] :
          {std::pair{Keys::RenderStyle, &model.renderStyle}, std::pair{Keys::Effect, &model.effect}})
     {
-        if (const auto look = json.find(key); look != json.end() && ReadText(*look, key, *name, issues) && name->empty())
+        if (const auto look = json.find(key);
+            look != json.end() && ReadText(*look, key, *name, issues) && name->empty())
         {
             issues.Fatal(key, "must be the name of a look");
         }

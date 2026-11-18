@@ -426,8 +426,7 @@ void LookReader::ReadEffectParts(const OrderedJson& json, const std::string& fie
     {
         if (json.contains(part))
         {
-            AddFatal(field + "." + part,
-                     "is a part of render styles; an effect does what comes before the drawing");
+            AddFatal(field + "." + part, "is a part of render styles; an effect does what comes before the drawing");
         }
     }
     if (const auto before = json.find(Keys::ValuesBefore); before != json.end())

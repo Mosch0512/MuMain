@@ -29,15 +29,14 @@ bool LoadLooks(LookKind kind, std::string& errorMessage)
     LogDataIssues(effects ? EffectDataLabel : RenderStyleDataLabel, result.issues);
     if (Items::HasFatal(result.issues))
     {
-        errorMessage =
-            DescribeFatalIssues(effects ? EffectDataName : RenderStyleDataName, directory, result.issues);
+        errorMessage = DescribeFatalIssues(effects ? EffectDataName : RenderStyleDataName, directory, result.issues);
         return false;
     }
     const size_t count = result.looks.size();
     g_LookStore.SetLooks(kind, std::move(result.looks));
     const std::chrono::duration<double, std::milli> elapsed = std::chrono::steady_clock::now() - loadStart;
-    MU_LOG_INFO(mu::log::Get("data"), "Loaded {} {} from {} in {:.1f} ms", count,
-                effects ? "effects" : "render styles", directory.string(), elapsed.count());
+    MU_LOG_INFO(mu::log::Get("data"), "Loaded {} {} from {} in {:.1f} ms", count, effects ? "effects" : "render styles",
+                directory.string(), elapsed.count());
     return true;
 }
 } // namespace
