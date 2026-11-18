@@ -1399,9 +1399,11 @@ bool Layer(Data::Looks::Layer& layer, const std::vector<LookPart>& parts)
     bool changed = false;
     if (Choice(Text::Kind, layer.kind, KindNames(), Text::LayerKindTooltip))
     {
-        // A texture layer has no motion and no place under the holes; the file leaves them out.
+        // A texture layer has no motion, no place under the holes and no light map; the file leaves them out, and
+        // a light map on another kind of layer is refused when the file loads.
         layer.motion = Motion::SlowDrift;
         layer.where = Where::Over;
+        layer.lightMap = false;
         changed = true;
     }
     if (layer.kind == LayerKind::Reflection)
