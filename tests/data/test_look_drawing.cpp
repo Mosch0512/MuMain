@@ -665,6 +665,20 @@ TEST_CASE("A layer can be only for a character without a buff (design L11) [look
     sword.object.m_BuffMap.UnRegisterBuff(eBuff_InfinityArrow);
 }
 
+TEST_CASE("A layer's opacity conditions read the drawing's opacity, as its light times the opacity does [looks]")
+{
+    const LookStoreScope looks({{"fading",
+                                 {Layer{.meshes = {{0}}, .onlyWhen = {.opacityAbove = 0.8}},
+                                  Layer{.meshes = {{1}}, .onlyWhen = {.opacityAtMost = 0.8}}},
+                                 {}}});
+    TestSword sword("fading");
+    DrawLook look;
+    look.alpha = 1.f;
+    CHECK(Meshes(sword.Draw(look, 0.5f)) == std::vector<int>{1});
+    look.alpha = 0.5f;
+    CHECK(Meshes(sword.Draw(look, 1.f)) == std::vector<int>{0});
+}
+
 TEST_CASE("A look can leave a light on the model, a color or a tint of the light it was handed (design L46) "
           "[looks]")
 {

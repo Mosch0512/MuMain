@@ -434,8 +434,9 @@ bool AtPlace(Place place, const BMD* b)
     return false;
 }
 
-// Whether a layer's Only when holds in this drawing (design L11).
-bool Holds(const OnlyWhen& when, const BMD* b, const OBJECT* o, const DrawLook& look)
+// Whether a layer's Only when holds in this drawing (design L11). The opacity conditions read the drawing's opacity
+// (`alpha`), the one a light times the opacity is dimmed by.
+bool Holds(const OnlyWhen& when, const BMD* b, const OBJECT* o, const DrawLook& look, float alpha)
 {
     if (when.place && !AtPlace(*when.place, b))
     {
@@ -458,8 +459,8 @@ bool Holds(const OnlyWhen& when, const BMD* b, const OBJECT* o, const DrawLook& 
     {
         return false;
     }
-    if ((when.opacityAbove && !(look.alpha > static_cast<float>(*when.opacityAbove))) ||
-        (when.opacityAtMost && look.alpha > static_cast<float>(*when.opacityAtMost)))
+    if ((when.opacityAbove && !(alpha > static_cast<float>(*when.opacityAbove))) ||
+        (when.opacityAtMost && alpha > static_cast<float>(*when.opacityAtMost)))
     {
         return false;
     }
@@ -529,7 +530,7 @@ void DrawMeshByMesh(const LookDefinition& style, BMD* b, const OBJECT* o, const 
     std::array<float, 3> found{modelLight[0], modelLight[1], modelLight[2]};
     for (const Layer& layer : style.layers)
     {
-        if (!Holds(layer.onlyWhen, b, o, look))
+        if (!Holds(layer.onlyWhen, b, o, look, alpha))
         {
             continue;
         }
@@ -702,8 +703,8 @@ bool DrawRenderStyle(const LookDefinition& style, BMD* b, const OBJECT* o, DrawL
     vec3_t modelLight;
     VectorCopy(b->BodyLight, modelLight);
     const bool meshByMesh =
-        std::ranges::any_of(style.layers, [b, o, &look](const Layer& layer)
-                            { return layer.where == Where::UnderHoles && Holds(layer.onlyWhen, b, o, look); });
+        std::ranges::any_of(style.layers, [b, o, &look, alpha](const Layer& layer)
+                            { return layer.where == Where::UnderHoles && Holds(layer.onlyWhen, b, o, look, alpha); });
     if (meshByMesh)
     {
         DrawMeshByMesh(style, b, o, look, alpha, renderType, modelLight, moment);
@@ -713,7 +714,7 @@ bool DrawRenderStyle(const LookDefinition& style, BMD* b, const OBJECT* o, DrawL
         // A layer without a light of its own keeps the one on the model, as the looks in code drew.
         for (const Layer& layer : style.layers)
         {
-            if (!Holds(layer.onlyWhen, b, o, look))
+            if (!Holds(layer.onlyWhen, b, o, look, alpha))
             {
                 continue;
             }
@@ -751,7 +752,7 @@ void ApplyItemEffect(const LookDefinition& effect, BMD* b, const OBJECT* o, Draw
     for (const ValuesBefore& entry : effect.valuesBefore)
     {
         look.level = level;
-        if (!Holds(entry.onlyWhen, b, o, look))
+        if (!Holds(entry.onlyWhen, b, o, look, alpha))
         {
             continue;
         }
