@@ -57,11 +57,13 @@ goes. The tooltip snapshot and the item stat tests are the proof.
   Fenrir, Dark Horse and Horn of Dinorant options; which items can have
   which group (links in the item files); the option exchange file; the
   option editor; the tooltip's option lines.
-- **Split (O1):** phase 9 is done in two parts with phase 10 between them.
-  **9a** is the file format, the loader, the item links, the attribute
-  names and the groups phase 10 needs (ancient option, ancient bonus) plus
-  the plain ones (luck, additional option, excellent). **9b** is the rest
-  (wings, harmony, guardian, sockets, pets) and the tooltip's option lines.
+- **Split (O1):** phase 9 is done in two parts. **9a** is the file format,
+  the loader, the item links, the attribute names and the groups phase 10
+  needs (ancient option, ancient bonus) plus the plain ones (luck,
+  additional option, excellent). **9b** is the rest (wings, harmony,
+  guardian, sockets, pets) and the tooltip's option lines. Both come before
+  phase 10, except the option exchange (9a6), which comes last, after
+  phase 10 (changed 2026-11-20).
 - **Not an option:** the skill. OpenMU has no option type for it
   (`Item.HasSkill` and `ItemDefinition.Skill`); it stays the item's `skill`
   field.
@@ -77,7 +79,7 @@ the rule that holds.
 
 | D | Topic | Decision |
 |---|---|---|
-| O1 | Order | Phase 9a, then phase 10 (item sets), then phase 9b. In OpenMU an item set's options are an `ItemOptionDefinition` (type `AncientOption`) and the per-item ancient bonus is one too (`ItemOfItemSet.BonusOption`), so phase 10 builds on the format of 9a instead of a format of its own that 9a would replace. |
+| O1 | Order | Phase 9a, then phase 10 (item sets), then phase 9b. In OpenMU an item set's options are an `ItemOptionDefinition` (type `AncientOption`) and the per-item ancient bonus is one too (`ItemOfItemSet.BonusOption`), so phase 10 builds on the format of 9a instead of a format of its own that 9a would replace. **Changed (2026-11-20):** all of phase 9 but the exchange comes before phase 10: 9a, then 9b, then phase 10, then the option exchange (9a6), OpenMU's side (C) and this document's removal (9b7). Phase 10 still builds on 9a's format; the exchange is done once every group's format is settled. Until phase 10 the set options' tooltip lines stay in code after 9b6 |
 | O2 | Starting point | Written from scratch. No branch or pull request started phase 9 (sven-n/MuMain and Mosch0512/MuMain searched on 2026-11-04). |
 | O3 | Guardian flag | sven-n/MuMain#966 is merged before the guardian options move, so that the 380 lines the move compares are the ones a server item shows. |
 | O4 | This document | Deleted by its last task, after its lasting content has moved into the docs. |
@@ -96,7 +98,7 @@ the rule that holds.
 | O17 | Option lines in the tooltip (Q-O13, 2026-11-04) | Layout lines, one per option type, as D72 planned: `{"options": "guardian", "color": "redPurple", "bold": true}` expands into the item's options of that type, each with its text from `OptionTexts.json` (O8). Order, colours, bold and blank rows use what layout lines already have (`when`, `colors`, empty lines with states such as `hasGuardianOptions`, `hasHarmonyOptions` and `harmonyActive`). The `default` layout gets today's order at the `options` marker: guardian, harmony, ancient bonus, wing, the skill lines (no option, they stay code: `{"code": "skillLines"}`), luck, additional option, excellent; the Horn of Fenrir before `afterOptions` and the sockets after the expiry lines, where the code writes them today. The tooltip snapshot shows the output is the same, and its variants grow with each group (380, sockets, wing option types, ancient bonus levels, Fenrir and Dinorant). Layout variants can hide or move a type, and the tooltip editor (#815 step 6) edits these lines like the others. **Changed (2026-11-06, O29):** `fixed` options follow excellent, where the Wizard's rings are today (section 9) |
 | O18 | The editor (Q-O14, 2026-11-04) | One window, **Item Options**, in the Items group (Windows > Items), built like Item Formulas: the definitions as a list with search, a type filter and how many items use each; the picked definition's name (D17), type, Server box (O16) and options with attribute, value and text, edited on a copy and taken with Apply after the save checks; value editors that fit the type (a level grid for harmony, one row per element for sockets) and **Fill levels** (O11); its users (D26: a used definition cannot be removed, a rename updates the links, Copy makes a variant). Tabs **Rules** (`OptionRules.json`, O15) and **Texts** (`OptionTexts.json` in the names grid `NamesGrid`, O8). Item Basics gets the item's option links with a picker, marking a list that differs from the rules. Item Tooltip's controls grow with each group (option level and type, harmony option and level, 380, sockets, ancient bonus level). Every change is one step of the undo history; Save Items writes the files |
 | O19 | The exchange (Q-O15, 2026-11-04) | A file of its own for the definitions (D11, D14): `formatVersion`, `source`, `gameVersion` and `definitions` in the shape of the client files (O5 to O7, O11, O16), from MuEditor's Export, Import and Update from server and OpenMU's `GET api/items/options/exchange` (phase C). The item exchange gets the field `options` (the item's links, O15), written by an OpenMU `ItemExchangeField`. Client-only and never exchanged: the `text` names, `OptionTexts.json` and `OptionRules.json`. Every import shows a diff per definition and field, as phase 7; `Sync/KnownDifferences.json` gets an `options` list ~~(P5 to P7, P14, P16; O12, O21, O22)~~. Links to a definition the client does not have are refused, so options are imported before items. Phase 10's item sets follow the same pattern. **Changed (2026-11-06, O27 to O30):** definitions are matched through OpenMU's labels (O27); the Horn of Fenrir is one definition as on the server (O28); OpenMU's definitions whose options have no type are the client's type `fixed` (O29); no known differences are shipped (O30); OpenMU's import updates options in place (P24) |
-| O20 | Pull requests (Q-O16, 2026-11-04) | The finer split of "Pull requests": one concern per pull request, 9a in six (format and luck, additional option, excellent, ancient bonus, editor, exchange) plus the luck fix, then phase 10, then 9b in seven (wings, harmony, guardian, sockets, pets and specials, the tooltip lines, the docs). Each move proves itself with the tooltip snapshot, its variants added per group, and the stat tests. **Changed (2026-11-06):** four fixes of their own join them: the option slots before 9a1 (O23), excellent level / 20 after 9a3 (O26), the stale bold before 9a4 (O31), and the Wizard's Ring right after 9b5 (O26) |
+| O20 | Pull requests (Q-O16, 2026-11-04) | The finer split of "Pull requests": one concern per pull request, 9a in six (format and luck, additional option, excellent, ancient bonus, editor, exchange) plus the luck fix, then phase 10, then 9b in seven (wings, harmony, guardian, sockets, pets and specials, the tooltip lines, the docs). Each move proves itself with the tooltip snapshot, its variants added per group, and the stat tests. **Changed (2026-11-06):** four fixes of their own join them: the option slots before 9a1 (O23), excellent level / 20 after 9a3 (O26), the stale bold before 9a4 (O31), and the Wizard's Ring right after 9b5 (O26). **Changed (2026-11-20, O1):** the order is 9a1 to 9a5, 9b1 to 9b6, phase 10, then the exchange (9a6), phase C and the docs (9b7) |
 | O21 | The Zen option (Q-O17, 2026-11-04) | `excellentDefense` option 1 is `moneyAmountRate` +30 %, as the client's text and the Season 6 guides (P14); OpenMU's 40 is a known difference of the option exchange and named in the OpenMU issue. Confirmed by the review: the decompiled Season 6 server returns 30 ("season4 changed"), an older one 40, so 40 is the value from before Season 4 (review, 2026-11-06). |
 | O22 | Excellent level / 20 (Q-O18, 2026-11-04) | Configurable through the data: the option's `per` term names the attribute it divides, `level` (the hero's level) or `totalLevel` (level plus master level, OpenMU's `TotalLevel`), and Item Options lets the user pick it. The shipped data writes `level`, the client's behaviour today (P16), so nothing changes; OpenMU's `TotalLevel` is a known difference of the option exchange, and an import from a server that keeps `TotalLevel` shows it in the diff like any other value. **Changed (2026-11-06, O26):** the move ships `level` (nothing changes), and a fix right after 9a3 switches the data to `totalLevel`, rounded down, as the Season 6 servers compute it; the character window then shows +30 instead of +20 for a hero of level 400 with 200 master levels. |
 | O23 | Option slots (R1, 2026-11-05) | An item keeps up to 16 option slots: a fix of its own before 9a1 raises `MAX_ITEM_SPECIAL` (8, `_define.h:342`) to 16 and writes every slot through one checked helper (P17), with a test of a weapon with skill, luck, an additional option and all six excellent options. A slot past the 16th is dropped and logged once per item type. It is no part of #966, which is about the guardian flag. |
@@ -1223,9 +1225,10 @@ details in `docs/item-data.md`.
 
 ## Pull requests
 
-From O20. Each move is compared with the old code before the old code goes:
-the tooltip snapshot (with variants added for each group) and the stat tests
-stay the same.
+From O20, in the order they come (changed 2026-11-20, O1: 9b before phase
+10, the option exchange last). Each move is compared with the old code
+before the old code goes: the tooltip snapshot (with variants added for each
+group) and the stat tests stay the same.
 
 | PR | Contents | Waits for |
 |---|---|---|
@@ -1240,9 +1243,6 @@ stay the same.
 | fix | A tooltip starts with no bold rows and no colours, all 98 rows (`MaxTextListRows`, O31, P29) | – (before 9a4) |
 | 9a4 | The ancient bonus definitions (the type `ancientOption` known, no definitions; phase 10 adds them); `attackType` picks the bonus until phase 10 (O14) | 9a1, the bold fix |
 | 9a5 | Item Options (O18), the links in Item Basics, Item Tooltip's controls for the groups so far, the control API's tooltip item builder (`ControlCommandsQuery.cpp:715-742`) | 9a1 to 9a4 |
-| 9a6 | The option exchange file with OpenMU's labels (O27) and the item field `options` (O19); an OpenMU issue for OpenMU's own errors (O26) | 9a5 |
-| C | OpenMU: the endpoint and the import page (phase C, OpenMU repository); options changed in place (P24) | 9a6 |
-| 10 | Item sets (a design of its own) | 9a4 |
 | 9b1 | Wings: the additional options per wing (O10), the second and third tier wing options | 9a3 |
 | 9b2 | Jewel of Harmony (`JewelOfHarmonyOption_<lang>.bmd`) | 9a1 |
 | 9b3 | Guardian (380), the 380 part of `ItemAddOption.bmd` (O13) | 9a1, sven-n/MuMain#966 |
@@ -1250,7 +1250,10 @@ stay the same.
 | 9b5 | Pets and specials: Horn of Fenrir (one definition, O28), Dark Horse, Horn of Dinorant, the Wizard's and skeleton rings (`fixed`, O29) | 9a3, the bold fix |
 | fix | The Wizard's Ring has its bonus at +0 only (O26, P25) | 9b5 |
 | 9b6 | The tooltip's option lines as layout lines per type (O17) | 9b1 to 9b5 |
-| 9b7 | What stays true into `docs/item-data.md`; the items design's D13 and phase 11 changed (O13); this document deleted | 9b6 |
+| 10 | Item sets (a design of its own) | 9a4 (comes after 9b6) |
+| 9a6 | The option exchange file with OpenMU's labels (O27) and the item field `options` (O19); an OpenMU issue for OpenMU's own errors (O26) | 9a5 (comes after phase 10) |
+| C | OpenMU: the endpoint and the import page (phase C, OpenMU repository); options changed in place (P24) | 9a6 |
+| 9b7 | What stays true into `docs/item-data.md`; the items design's D13 and phase 11 changed (O13); this document deleted | C |
 
 ## Open questions
 
