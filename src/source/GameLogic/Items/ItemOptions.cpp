@@ -211,20 +211,16 @@ int GetAdditionalOptionLevel(const ITEM& item)
 
 int CountAdditionalOptionLevel(int itemType, int optionLevel, int optionType)
 {
-    return CountAdditionalOptionLevel(g_ItemDatabase.GetOptionLinks(itemType),
-                                      g_ItemDatabase.GetSlot(itemType) == Data::Items::ItemSlot::Wings, optionLevel,
-                                      optionType);
+    return CountAdditionalOptionLevel(g_ItemDatabase.GetOptionLinks(itemType), optionLevel, optionType);
 }
 
-int CountAdditionalOptionLevel(std::span<const Data::Items::ItemOptionIndex> links, bool wing, int optionLevel,
-                               int optionType)
+int CountAdditionalOptionLevel(std::span<const Data::Items::ItemOptionIndex> links, int optionLevel, int optionType)
 {
     if (optionLevel <= 0)
     {
         return 0;
     }
     // One pass over the links: the ground label asks every frame for each item on the ground.
-    bool linksOption = false;
     const Data::Items::ItemOptionDatabase& options = g_ItemDatabase.GetOptions();
     for (const Data::Items::ItemOptionIndex link : links)
     {
@@ -233,7 +229,6 @@ int CountAdditionalOptionLevel(std::span<const Data::Items::ItemOptionIndex> lin
         {
             continue;
         }
-        linksOption = true;
         for (const ItemOption& option : definition.options)
         {
             if (IsAdditionalOptionSent(optionType, option))
@@ -244,9 +239,9 @@ int CountAdditionalOptionLevel(std::span<const Data::Items::ItemOptionIndex> lin
             }
         }
     }
-    // The wings' option is still code and counts at its option level; the Horn of Dinorant's option level is three
-    // option flags (SetItemAttributes), no level, until it moves into data (9b5).
-    return !linksOption && wing ? optionLevel : 0;
+    // Without an additional option definition, no level: the Horn of Dinorant's option level is three option flags
+    // (SetItemAttributes) until it moves into data (9b5).
+    return 0;
 }
 
 bool DamageOptionRaisesWizardry(const ITEM& item)

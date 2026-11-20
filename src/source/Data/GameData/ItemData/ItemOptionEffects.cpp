@@ -23,9 +23,11 @@ struct EffectRow
 // (GameLogic::Combat::GetHeroCriticalDamageRate). The additional options write theirs. A magic sword's option
 // (baseDamageBonus) is one slot, AT_IMPROVE_DAMAGE, as before, which the stat code adds to the wizardry damage too;
 // its definition shows two lines.
-constexpr std::array<EffectRow, 28> EffectRows = {{
+constexpr std::array<EffectRow, 29> EffectRows = {{
     {ItemOptionType::Luck, "criticalDamageChance", ItemOptionAdd::Percent, {AT_LUCK, true}},
     {ItemOptionType::Option, "physicalBaseDmg", ItemOptionAdd::Add, {AT_IMPROVE_DAMAGE, true}},
+    // The wings' damage adds after the other additions on OpenMU (AddFinal); in the client the same slot.
+    {ItemOptionType::Option, "physicalBaseDmg", ItemOptionAdd::AddFinal, {AT_IMPROVE_DAMAGE, true}},
     {ItemOptionType::Option, "baseDamageBonus", ItemOptionAdd::Add, {AT_IMPROVE_DAMAGE, true, true}},
     {ItemOptionType::Option, "wizardryBaseDmg", ItemOptionAdd::Add, {AT_IMPROVE_MAGIC, true}},
     {ItemOptionType::Option, "curseBaseDmg", ItemOptionAdd::Add, {AT_IMPROVE_CURSE, true}},
