@@ -236,6 +236,18 @@ TEST_CASE("Buffs: a power-up's term on a hero attribute the client doesn't read 
                         "no hero attribute lvl"));
 }
 
+TEST_CASE("Buffs: a power-up added another way than add is a warning [data][buffs]")
+{
+    BuffDefinition buff = SealOfAscension();
+    buff.powerUps[0].add = Data::Items::ItemOptionAdd::Percent;
+    std::vector<ItemDataIssue> issues;
+    Data::Buffs::ValidateBuffs(std::vector<BuffDefinition>{buff}, {}, "Buffs.json", issues);
+
+    INFO(Messages(issues));
+    REQUIRE(issues.size() == 1);
+    CHECK(HasIssueAbout(issues, ItemDataIssueSeverity::Warning, "buffs[0].powerUps[0]", "percent is read but"));
+}
+
 TEST_CASE("Buffs: a file without a list of buffs or of a newer format is fatal [data][buffs]")
 {
     const ReadResult noList = Read(R"({ "formatVersion": 1 })");

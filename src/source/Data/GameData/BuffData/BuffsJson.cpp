@@ -473,6 +473,13 @@ void ValidateBuffs(std::span<const BuffDefinition> buffs, std::span<const size_t
                                    std::string(Keys::PowerUps) + "[" + std::to_string(index) + "]." + Keys::Attribute),
                          buff.powerUps[index].attribute + " is no attribute a buff can raise (BuffAttributes.h)");
             }
+            if (buff.powerUps[index].add != Items::ItemOptionAdd::Add)
+            {
+                AddIssue(issues, ItemDataIssueSeverity::Warning, source,
+                         BuffField(entry, std::string(Keys::PowerUps) + "[" + std::to_string(index) + "]"),
+                         std::string(Items::ItemOptionAddKeys[static_cast<size_t>(buff.powerUps[index].add)]) +
+                             " is read but the client adds every buff value as add: the value counts as a flat bonus");
+            }
             const std::vector<Items::ItemOptionTerm>& terms = buff.powerUps[index].value.per;
             for (size_t term = 0; term < terms.size(); ++term)
             {
