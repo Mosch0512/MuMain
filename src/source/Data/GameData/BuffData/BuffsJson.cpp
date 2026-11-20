@@ -211,6 +211,12 @@ private:
         {
             return false;
         }
+        if (!value.per.empty())
+        {
+            // A computed value stops at what an option slot holds (65535 s, about 18 hours), below the longest
+            // duration, and a countdown can't follow the hero's attributes anyway.
+            return Fail(Keys::Duration, "must be a number of seconds without per terms");
+        }
         duration = std::move(value);
         return true;
     }

@@ -26,6 +26,7 @@ int GetPowerUpValue(int buffNumber, size_t index)
 
 int GetDuration(const Data::Buffs::BuffDefinition& buff)
 {
-    return buff.duration ? Items::ComputeOptionValue(*buff.duration, NoLevel) : 0;
+    // Buffs.json allows no terms here, so the value is never stopped at an option slot's 65535.
+    return buff.duration ? buff.duration->At(NoLevel) : 0;
 }
 } // namespace GameLogic::Buffs

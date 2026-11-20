@@ -203,6 +203,9 @@ TEST_CASE("Buffs: wrong values are fatal and name the entry and field [data][buf
                    R"(, "duration": {"values": [1800]} })",
                "buffs[0].duration", "one number, not a list");
     fatalAbout(R"({ "number": 1, "name": "a", "kind": "buff", "group": 1)" + tail +
+                   R"(, "duration": {"values": 1800, "per": [{"attribute": "level", "times": 60}]} })",
+               "buffs[0].duration", "without per terms");
+    fatalAbout(R"({ "number": 1, "name": "a", "kind": "buff", "group": 1)" + tail +
                    R"(, "powerUps": [{"attribute": "defenseBase", "add": {"values": [60, 70]}}] })",
                "buffs[0].powerUps[0].add", "one number, not a list");
 }
