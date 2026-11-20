@@ -53,8 +53,9 @@ editor's Data Checks (area **Buffs**,
 
 The values and durations of the 45 buffs that items give (scrolls, elixirs,
 seals, the Jack O'Lantern and cherry blossom items, talismans) are Webzen's
-Season 6 numbers, as the item add option table (`ItemAddOption.bmd`) had them;
-that table now holds only the guardian (380) options. The character stats, the
+Season 6 numbers, as the item add option table (`ItemAddOption.bmd`) has them.
+The file is unchanged, but the client reads only its guardian (380) options
+now; a test checks that every item buff keeps its row. The character stats, the
 Scroll of Battle's critical damage rate, the countdown of an item buff without
 a time from the server and the item tooltips read them from here; an item's
 tooltip shows its buff's first value as `{addOptionValue1}`, the second as
