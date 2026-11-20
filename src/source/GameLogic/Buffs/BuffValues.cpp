@@ -9,7 +9,7 @@ namespace GameLogic::Buffs
 {
 namespace
 {
-// A buff's value has no item level: its list, if any, is read at level 0.
+// A buff has no item level: its values are constants (Buffs.json rejects a list).
 constexpr int NoLevel = 0;
 } // namespace
 

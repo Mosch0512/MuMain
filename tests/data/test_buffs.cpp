@@ -198,6 +198,13 @@ TEST_CASE("Buffs: wrong values are fatal and name the entry and field [data][buf
     fatalAbout(R"({ "number": 1, "name": "a", "kind": "buff", "group": 1)" + tail +
                    R"(, "powerUps": [{"add": {"values": 1}}] })",
                "buffs[0].powerUps[0].attribute", "letters and digits");
+    // A list is one value per item level, and a buff has none.
+    fatalAbout(R"({ "number": 1, "name": "a", "kind": "buff", "group": 1)" + tail +
+                   R"(, "duration": {"values": [1800]} })",
+               "buffs[0].duration", "one number, not a list");
+    fatalAbout(R"({ "number": 1, "name": "a", "kind": "buff", "group": 1)" + tail +
+                   R"(, "powerUps": [{"attribute": "defenseBase", "add": {"values": [60, 70]}}] })",
+               "buffs[0].powerUps[0].add", "one number, not a list");
 }
 
 TEST_CASE("Buffs: a power-up of an attribute no buff can raise is an error [data][buffs]")

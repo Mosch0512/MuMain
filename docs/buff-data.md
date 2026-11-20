@@ -73,7 +73,9 @@ tooltip shows its buff's first value as `{addOptionValue1}`, the second as
   is `BuffAttributes.h`; another name is an error.
 - **Numbers.** As Webzen's data gives them: a rate in percent
   (`experienceRate` 150 is 150 %), the auras' value per level of the hero
-  (`{"values": 0, "per": [{"attribute": "level", "times": 10}]}`).
+  (`{"values": 0, "per": [{"attribute": "level", "times": 10}]}`). Each is one
+  number: a list (`[1800]`) is one value per item level, and a buff has none,
+  so a list stops the game.
 - **No duration.** The cash shop's scrolls and seals (Scroll of Quickness,
   Scroll of Defense, Seal of Wealth) have none: Webzen's server takes their
   time from the purchase, so only the time the server sends shows.

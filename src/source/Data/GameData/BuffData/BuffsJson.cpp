@@ -190,6 +190,12 @@ private:
             },
             [&](const std::string& unknown, const std::string& message)
             { AddIssue(m_issues, ItemDataIssueSeverity::Warning, m_source, unknown, message); }, maximum);
+        if (valid && value.isList)
+        {
+            // A list holds one value per item level from level 1, and a buff has no item level.
+            AddFatal(field, "its values must be one number, not a list: a buff has no item level");
+            return false;
+        }
         return valid;
     }
 
