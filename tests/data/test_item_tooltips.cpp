@@ -577,6 +577,35 @@ TEST_CASE("Every item buff keeps the values and duration of its item's add optio
     CHECK(itemBuffs == 45);
 }
 
+// The auras (13/104 and 13/105) add their row's value per level of the hero; the value is computed from the hero's
+// level as the table holds it, so a term's attribute name has to be resolved when the table is built.
+TEST_CASE("An aura's value is its row's value times the hero's level [data][items][buffs]")
+{
+    ClientDataScope client(ClientDirectory);
+    std::string errorMessage;
+    REQUIRE(g_ItemDataHandler.Load(errorMessage));
+    TooltipDataScope data;
+    HeroScope hero;
+    MakeNewDarkWizard(hero.Hero());
+    hero.Hero().Level = 150;
+
+    for (const int itemType : {ITEMINDEX(13, 104), ITEMINDEX(13, 105)})
+    {
+        CAPTURE(itemType);
+        const Data::Buffs::BuffDefinition* buff =
+            g_BuffDatabase.FindByItem(itemType / MAX_ITEM_INDEX, itemType % MAX_ITEM_INDEX);
+        REQUIRE(buff != nullptr);
+        REQUIRE(buff->powerUps.size() == 1);
+        const Data::Items::ItemOptionValue& value = buff->powerUps.front().value;
+        CHECK(value.At(0) == 0);
+        REQUIRE(value.per.size() == 1);
+        CHECK(value.per.front().heroAttribute == Data::Items::ItemOptionTermAttribute::Level);
+        const int rowValue = g_pItemAddOptioninfo->GetItemAddOtioninfo(itemType).m_byValue1;
+        REQUIRE(rowValue != 0);
+        CHECK(GameLogic::Buffs::GetPowerUpValue(*buff, 0) == rowValue * 150);
+    }
+}
+
 // The character stats read an item buff's value from the buff they check; each is the buff of the item whose row
 // they read before.
 TEST_CASE("The stats read each item buff's value from the buff of its item [data][items][buffs]")
