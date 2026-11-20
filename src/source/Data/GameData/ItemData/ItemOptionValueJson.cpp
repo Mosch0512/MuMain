@@ -20,12 +20,6 @@ constexpr const char* Divisor = "divisor";
 const KeySet ValueFields = {ValueKey::Values, ValueKey::PerLevel, ValueKey::Per};
 const KeySet TermFields = {ValueKey::Attribute, ValueKey::Times, ValueKey::Divisor};
 
-void ReadWholeNumber(const OrderedJson& json, const std::string& field, int minimum, int maximum, int& value,
-                     const ReportProblem& fatal)
-{
-    ReadWholeNumberInRange(json, field, minimum, maximum, value, fatal);
-}
-
 void ReadTerms(const OrderedJson& json, const std::string& field, std::vector<ItemOptionTerm>& terms,
                const ReportProblem& fatal, const ReportProblem& warning)
 {
@@ -56,11 +50,12 @@ void ReadTerms(const OrderedJson& json, const std::string& field, std::vector<It
         }
         else if (times != entry.end())
         {
-            ReadWholeNumber(*times, termField + "." + ValueKey::Times, 1, MaxOptionValue, term.times, fatal);
+            ReadWholeNumberInRange(*times, termField + "." + ValueKey::Times, 1, MaxOptionValue, term.times, fatal);
         }
         else
         {
-            ReadWholeNumber(*divisor, termField + "." + ValueKey::Divisor, 1, MaxOptionValue, term.divisor, fatal);
+            ReadWholeNumberInRange(*divisor, termField + "." + ValueKey::Divisor, 1, MaxOptionValue, term.divisor,
+                                   fatal);
         }
         WarnAboutUnknownKeys(entry, TermFields, termField + ".", warning);
         terms.push_back(std::move(term));
@@ -91,7 +86,7 @@ void ReadOptionValue(const OrderedJson& json, const std::string& field, ItemOpti
     if (!value.isList)
     {
         int constant = 0;
-        ReadWholeNumber(*values, field + "." + ValueKey::Values, 0, maximum, constant, fatal);
+        ReadWholeNumberInRange(*values, field + "." + ValueKey::Values, 0, maximum, constant, fatal);
         value.values = {constant};
     }
     else
@@ -99,8 +94,8 @@ void ReadOptionValue(const OrderedJson& json, const std::string& field, ItemOpti
         for (size_t index = 0; index < values->size(); ++index)
         {
             int entry = 0;
-            ReadWholeNumber((*values)[index], field + "." + ValueKey::Values + "[" + std::to_string(index) + "]", 0,
-                            maximum, entry, fatal);
+            ReadWholeNumberInRange((*values)[index], field + "." + ValueKey::Values + "[" + std::to_string(index) + "]",
+                                   0, maximum, entry, fatal);
             value.values.push_back(entry);
         }
     }
