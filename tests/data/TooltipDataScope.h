@@ -3,6 +3,7 @@
 #include "Data/DataHandler/BuffData/BuffStorage.h"
 #include "Data/DataHandler/MonsterData/MonsterDataHandler.h"
 #include "Data/GameData/BuffData/BuffDatabase.h"
+#include "doctest.h"
 #include "Data/DataHandler/SkillData/SkillDataHandler.h"
 #include "Engine/Object/ZzzInfomation.h"
 #include "GameLogic/Buffs/w_BuffStateSystem.h"
@@ -49,7 +50,14 @@ public:
         g_pUIJewelHarmonyinfo = JewelHarmonyInfo::MakeInfo();
         g_pItemAddOptioninfo = ItemAddOptioninfo::MakeInfo();
         m_previousBuffs = g_BuffDatabase.GetAll();
-        g_BuffDatabase.Build(Data::Buffs::LoadBuffsFile(Data::Buffs::GetBuffsFile()).buffs, "en");
+        m_previousBuffLocale = g_BuffDatabase.GetDisplayLocale();
+        const Data::Buffs::BuffsLoadResult buffs = Data::Buffs::LoadBuffsFile(Data::Buffs::GetBuffsFile());
+        // A broken Buffs.json shows here, not as wrong values in the tests after it.
+        for (const Data::Items::ItemDataIssue& issue : buffs.issues)
+        {
+            CHECK_MESSAGE(issue.severity == Data::Items::ItemDataIssueSeverity::Warning, issue.ToString());
+        }
+        g_BuffDatabase.Build(buffs.buffs, "en");
         // The time texts of the elixirs and seals (g_StringTime).
         if (!g_BuffSystem)
         {
@@ -68,7 +76,7 @@ public:
         delete g_pItemAddOptioninfo;
         g_pUIJewelHarmonyinfo = m_previousHarmony;
         g_pItemAddOptioninfo = m_previousAddOptions;
-        g_BuffDatabase.Build(m_previousBuffs, "en");
+        g_BuffDatabase.Build(m_previousBuffs, m_previousBuffLocale);
         if (m_skills != nullptr)
         {
             SkillAttribute = nullptr;
@@ -83,5 +91,6 @@ private:
     JewelHarmonyInfo* m_previousHarmony = nullptr;
     ItemAddOptioninfo* m_previousAddOptions = nullptr;
     std::vector<Data::Buffs::BuffDefinition> m_previousBuffs;
+    std::string m_previousBuffLocale;
     bool m_madeBuffSystem = false;
 };

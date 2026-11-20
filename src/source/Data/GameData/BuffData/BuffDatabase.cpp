@@ -97,6 +97,7 @@ void BuffDatabase::Build(std::span<const BuffDefinition> buffs, std::string_view
 
 void BuffDatabase::SetDisplayLocale(std::string_view locale)
 {
+    m_locale = locale;
     m_texts.clear();
     m_texts.reserve(m_buffs.size());
     for (const BuffDefinition& buff : m_buffs)

@@ -30,6 +30,11 @@ public:
     void Build(std::span<const BuffDefinition> buffs, std::string_view locale);
     // Builds the texts in another language.
     void SetDisplayLocale(std::string_view locale);
+    // The language the texts are in.
+    const std::string& GetDisplayLocale() const
+    {
+        return m_locale;
+    }
 
     const std::vector<BuffDefinition>& GetAll() const
     {
@@ -61,6 +66,7 @@ private:
 
     std::vector<BuffDefinition> m_buffs;
     std::vector<BuffDisplayTexts> m_texts;
+    std::string m_locale;
     // The index in m_buffs by number, or NoBuff.
     std::array<int, MaxBuffNumber + 1> m_indices{};
     // Each buff's family as the lowest buff number in it, or NoBuff for none; by index in m_buffs.
