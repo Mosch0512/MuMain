@@ -9,7 +9,7 @@
 // an error when Buffs.json loads (ValidateBuffs). See docs/buff-data.md, "Values".
 namespace Data::Buffs
 {
-inline constexpr std::array<std::string_view, 28> BuffAttributes = {
+inline constexpr auto BuffAttributes = std::to_array<std::string_view>({
     // OpenMU's Stats.
     "attackSpeedAny",
     "baseDamageBonus",
@@ -40,7 +40,7 @@ inline constexpr std::array<std::string_view, 28> BuffAttributes = {
     "vulcanusItemDropRate",
     "partyExperienceBonus",
     "vitalityBonus",
-};
+});
 
 constexpr bool IsBuffAttribute(std::string_view name)
 {
