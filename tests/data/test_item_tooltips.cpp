@@ -464,7 +464,7 @@ TEST_CASE("A requirement reduced to 0 still shows [data][items][tooltip]")
     SetItemTooltipTextMeasure(nullptr);
 }
 
-TEST_CASE("An item's add option values come from its add option [data][items][tooltip]")
+TEST_CASE("An item's tooltip shows the values and duration of its buff [data][items][tooltip]")
 {
     ClientDataScope client(ClientDirectory);
     std::string errorMessage;
@@ -473,7 +473,8 @@ TEST_CASE("An item's add option values come from its add option [data][items][to
     HeroScope hero;
     MakeNewDarkWizard(hero.Hero());
 
-    // The Seal of Healing (13/62): its experience rate and life recovery, and how long it lasts.
+    // The Seal of Healing (13/62): its experience rate and life recovery, and how long it lasts, as its add option row
+    // has them.
     ITEM seal;
     FillItemFromParameters(seal, Engine::Items::TooltipSnapshot::FullItemParameters(13, 62));
     const ITEM_ADD_OPTION& addOption = g_pItemAddOptioninfo->GetItemAddOtioninfo(seal.Type);
