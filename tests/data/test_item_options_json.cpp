@@ -122,6 +122,52 @@ TEST_CASE("An option's value is a constant, or one value per level whose last on
     CHECK(perLevel.At(7) == 16);
 }
 
+TEST_CASE("Wing options read the excellent byte's bits and can take their value by the item's level [data][items]")
+{
+    constexpr const char* WingFile = R"({
+  "formatVersion": 1,
+  "definitions": [
+    {
+      "name": "secondTierWing",
+      "type": "wing",
+      "displayName": {
+        "en": "Second tier wing options"
+      },
+      "options": [
+        {"number": 1, "attribute": "maximumHealth", "add": {"levelType": "itemLevel", "values": [50, 55, 60]}, "text": "wingMaxHp"},
+        {"number": 5, "attribute": "attackSpeedAny", "add": {"values": 5}, "text": "increaseAttackSpeed"}
+      ]
+    }
+  ]
+}
+)";
+    std::vector<ItemOptionDefinition> definitions;
+    std::vector<ItemDataIssue> issues;
+    ReadItemOptionsJson(WingFile, "Options/Wings.json", "Wings.json", definitions, issues);
+    CHECK(issues.empty());
+    REQUIRE(definitions.size() == 1);
+    const ItemOptionDefinition& wing = definitions[0];
+    CHECK(wing.type == ItemOptionType::Wing);
+    REQUIRE(wing.options.size() == 2);
+    const ItemOptionValue& health = wing.options[0].value;
+    CHECK(health.levelType == ItemOptionLevelType::ItemLevel);
+    // From the item's level 0; above the list its last entry.
+    CHECK(health.At(0) == 50);
+    CHECK(health.At(2) == 60);
+    CHECK(health.At(15) == 60);
+    CHECK(wing.options[1].value.levelType == ItemOptionLevelType::OptionLevel);
+    CHECK(WriteItemOptionsJson(definitions) == WingFile);
+
+    // A wing option is a bit of the excellent byte: 1 to 6.
+    CHECK(HasIssue(ReadDefinition(R"({"name": "wing", "type": "wing", "displayName": {"en": "Wing"}, "options": [)"
+                                  R"({"number": 7, "attribute": "maximumHealth", "add": {"values": 5}}]})"),
+                   ItemDataIssueSeverity::Fatal, "definitions[0].options[0].number"));
+    CHECK(HasIssue(ReadDefinition(R"({"name": "wing", "type": "wing", "displayName": {"en": "Wing"}, "options": [)"
+                                  R"({"number": 1, "attribute": "maximumHealth", )"
+                                  R"("add": {"levelType": "heroLevel", "values": 5}}]})"),
+                   ItemDataIssueSeverity::Fatal, "definitions[0].options[0].add.levelType"));
+}
+
 TEST_CASE("Option definition file errors stop the start [data][items]")
 {
     using Severity = ItemDataIssueSeverity;
@@ -132,7 +178,7 @@ TEST_CASE("Option definition file errors stop the start [data][items]")
     };
 
     fatal(R"({"type": "luck", "displayName": {"en": "Luck"}, )" + std::string(LuckOption) + "}", "definitions[0].name");
-    fatal(R"({"name": "luck", "type": "wing", "displayName": {"en": "Luck"}, )" + std::string(LuckOption) + "}",
+    fatal(R"({"name": "luck", "type": "harmony", "displayName": {"en": "Luck"}, )" + std::string(LuckOption) + "}",
           "definitions[0].type");
     fatal(R"({"name": "luck", "type": "luck", )" + std::string(LuckOption) + "}", "definitions[0].displayName");
     fatal(R"({"name": "luck", "type": "luck", "displayName": {"de": "Glück"}, )" + std::string(LuckOption) + "}",

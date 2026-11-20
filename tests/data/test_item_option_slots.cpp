@@ -605,6 +605,49 @@ TEST_CASE("An additional option turns on only for its number [data][items]")
     }
 }
 
+// The second and third tier wings' and the capes' options are bits of the excellent byte (their wing definitions), the
+// HP, mana and command by the item's + level, before the other slots as CalcWingOptions wrote them.
+TEST_CASE("A wing's options in the excellent byte come from its wing definition [data][items]")
+{
+    ClientDataScope client(ClientDirectory);
+    I18N::SetLocale("en");
+    std::string errorMessage;
+    REQUIRE(g_ItemDataHandler.Load(errorMessage));
+    HeroScope hero;
+
+    const auto wing = [](int type, int level, BYTE excellentFlags)
+    {
+        ItemCreationParams params{};
+        params.Group = type / MAX_ITEM_INDEX;
+        params.Number = type % MAX_ITEM_INDEX;
+        params.Level = static_cast<BYTE>(level);
+        params.WithLuck = true;
+        params.HasExcellentOption = true;
+        params.ExcellentFlags = excellentFlags;
+        ITEM item;
+        FillItemFromParameters(item, params);
+        return item;
+    };
+
+    const ITEM spirits = wing(ITEM_WINGS_OF_SPIRITS, 7, 0x1F);
+    CHECK(DefinitionSlots(spirits) == std::vector<OptionSlot>{{AT_IMPROVE_HP_MAX, 85},
+                                                              {AT_IMPROVE_MP_MAX, 85},
+                                                              {AT_ONE_PERCENT_DAMAGE, 3},
+                                                              {AT_IMPROVE_AG_MAX, 50},
+                                                              {AT_IMPROVE_ATTACK_SPEED, 5},
+                                                              {AT_LUCK, 5}});
+    // The Cape of Fighter has the first three only; the Cape of Lord's fourth is its command.
+    CHECK(DefinitionSlots(wing(ITEM_CAPE_OF_FIGHTER, 0, 0x18)).size() == 1);
+    CHECK(DefinitionSlots(wing(ITEM_CAPE_OF_LORD, 15, 0x08)).front() == OptionSlot{AT_SET_OPTION_IMPROVE_CHARISMA, 85});
+    CHECK(DefinitionSlots(wing(ITEM_WING_OF_STORM, 0, 0x0F)) == std::vector<OptionSlot>{{AT_ONE_PERCENT_DAMAGE, 5},
+                                                                                        {AT_DAMAGE_REFLECTION, 5},
+                                                                                        {AT_RECOVER_FULL_LIFE, 5},
+                                                                                        {AT_RECOVER_FULL_MANA, 5},
+                                                                                        {AT_LUCK, 5}});
+    // The first tier wings read nothing from the byte.
+    CHECK(DefinitionSlots(wing(ITEM_WINGS_OF_SATAN, 0, 0x01)) == std::vector<OptionSlot>{{AT_LUCK, 5}});
+}
+
 // A wing's additional option is the one of its definition with the option type the server sends as its number, as
 // OpenMU numbers them (Wings.cs): a type the wing has no option for gives none.
 TEST_CASE("A wing's additional option follows the option type the server sends [data][items]")

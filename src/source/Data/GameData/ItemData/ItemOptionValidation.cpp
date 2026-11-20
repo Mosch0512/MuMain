@@ -200,7 +200,14 @@ void ValidateItemOptionLinks(std::span<const ItemDefinition> items, const ItemOp
         const bool byteMeansOther = ExcellentByteMeansOther(item);
         const bool linksExcellent = std::any_of(links.begin(), links.end(), [&options](ItemOptionIndex link)
                                                 { return options.Get(link).type == ItemOptionType::Excellent; });
-        if (byteMeansOther && linksExcellent)
+        const bool linksWing = std::any_of(links.begin(), links.end(), [&options](ItemOptionIndex link)
+                                           { return options.Get(link).type == ItemOptionType::Wing; });
+        if (linksWing && linksExcellent)
+        {
+            issues.push_back({ItemDataIssueSeverity::Error, "", item.group, item.number, OptionsField,
+                              "links excellent and wing options, which both read the excellent byte"});
+        }
+        else if (byteMeansOther && linksExcellent)
         {
             issues.push_back(
                 {ItemDataIssueSeverity::Error, "", item.group, item.number, OptionsField,

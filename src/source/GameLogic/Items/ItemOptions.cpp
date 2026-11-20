@@ -35,6 +35,7 @@ bool IsTurnedOn(const ITEM& item, ItemOptionType type)
     case ItemOptionType::Option:
         return item.OptionLevel > 0;
     case ItemOptionType::Excellent:
+    case ItemOptionType::Wing:
         return item.ExcellentFlags != 0;
     default:
         return false;
@@ -48,7 +49,7 @@ bool IsAdditionalOptionSent(int optionType, const ItemOption& option)
     return option.number == optionType;
 }
 
-// Whether the excellent byte turns the excellent option on: its bit number - 1.
+// Whether the excellent byte turns the excellent or wing option on: its bit number - 1.
 bool IsExcellentBitSet(BYTE excellentFlags, const ItemOption& option)
 {
     return option.number >= 1 && option.number <= Data::Items::MaxExcellentOptionNumber &&
@@ -64,6 +65,7 @@ bool IsOptionTurnedOn(const ITEM& item, ItemOptionType type, const ItemOption& o
     case ItemOptionType::Option:
         return IsAdditionalOptionSent(item.OptionType, option);
     case ItemOptionType::Excellent:
+    case ItemOptionType::Wing:
         return IsExcellentBitSet(item.ExcellentFlags, option);
     case ItemOptionType::Luck:
         return true;
@@ -113,10 +115,14 @@ std::optional<OptionSource> FindValidSource(const ITEM& item, int slot)
     return source;
 }
 
-// The level the option's value is taken at: the additional option's level, else the constant's. The ancient bonus
-// takes no option slot; FindAncientBonus takes its value at the bonus level.
-int GetOptionLevel(const ITEM& item, ItemOptionType type)
+// The level the option's value is taken at: the item's + level for a value by it, else the additional option's level,
+// else the constant's. The ancient bonus takes no option slot; FindAncientBonus takes its value at the bonus level.
+int GetOptionLevel(const ITEM& item, ItemOptionType type, const ItemOption& option)
 {
+    if (option.value.levelType == Data::Items::ItemOptionLevelType::ItemLevel)
+    {
+        return item.Level;
+    }
     return type == ItemOptionType::Option ? item.OptionLevel : LevelOfTypesWithoutLevels;
 }
 } // namespace
@@ -142,9 +148,9 @@ void AddLinkedOptions(ITEM& item, ItemOptionType type)
                 continue;
             }
             const Data::Items::ItemOptionEffect& effect = options.GetEffect(link, option);
-            const int value = effect.writesValue
-                                  ? ComputeOptionValue(definition.options[option].value, GetOptionLevel(item, type))
-                                  : 0;
+            const ItemOption& linked = definition.options[option];
+            const int value =
+                effect.writesValue ? ComputeOptionValue(linked.value, GetOptionLevel(item, type, linked)) : 0;
             AddOptionSlot(item, effect.effect, value, {link, static_cast<std::uint16_t>(option)});
         }
     }
@@ -287,7 +293,8 @@ int ComputeOptionValue(const Data::Items::ItemOptionValue& value, int level)
 
 int GetSlotOptionValue(const ITEM& item, const SlotOption& slotOption)
 {
-    return ComputeOptionValue(slotOption.option->value, GetOptionLevel(item, slotOption.definition->type));
+    return ComputeOptionValue(slotOption.option->value,
+                              GetOptionLevel(item, slotOption.definition->type, *slotOption.option));
 }
 
 int GetCurrentSlotValue(const ITEM& item, int slot)
@@ -305,7 +312,7 @@ int GetCurrentSlotValue(const ITEM& item, int slot)
         const ItemOption& option = definition.options[source->option];
         if (!option.value.per.empty() && options.GetEffect(source->definition, source->option).writesValue)
         {
-            return ComputeOptionValue(option.value, GetOptionLevel(item, definition.type));
+            return ComputeOptionValue(option.value, GetOptionLevel(item, definition.type, option));
         }
     }
     return item.SpecialValue[slot];

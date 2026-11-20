@@ -278,77 +278,6 @@ ActionSkillType GetSkillByBook(int Type)
     }
 }
 
-void CalcWingOptions(ITEM* ip)
-{
-    if (GameLogic::Items::IsSecondTierWingExceptCape(ip))
-    {
-        if (ip->ExcellentFlags & 0x01)
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_IMPROVE_HP_MAX, 50 + ip->Level * 5);
-        }
-        if ((ip->ExcellentFlags >> 1) & 0x01)
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_IMPROVE_MP_MAX, 50 + ip->Level * 5);
-        }
-        if ((ip->ExcellentFlags >> 2) & 0x01)
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_ONE_PERCENT_DAMAGE, 3);
-        }
-        if ((ip->ExcellentFlags >> 3) & 0x01)
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_IMPROVE_AG_MAX, 50);
-        }
-        if ((ip->ExcellentFlags >> 4) & 0x01)
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_IMPROVE_ATTACK_SPEED, 5);
-        }
-    }
-    else if (ip->Type == ITEM_CAPE_OF_LORD
-        || ip->Type == ITEM_CAPE_OF_FIGHTER)
-    {
-        if (ip->ExcellentFlags & 0x01)
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_IMPROVE_HP_MAX, 50 + ip->Level * 5);
-        }
-
-        if ((ip->ExcellentFlags >> 1) & 0x01)
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_IMPROVE_MP_MAX, 50 + ip->Level * 5);
-        }
-
-        if ((ip->ExcellentFlags >> 2) & 0x01)
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_ONE_PERCENT_DAMAGE, 3);
-        }
-
-        if ((ip->ExcellentFlags >> 3) & 0x01
-            && (ip->Type != ITEM_CAPE_OF_FIGHTER)
-        )
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_SET_OPTION_IMPROVE_CHARISMA, 10 + ip->Level * 5);
-        }
-    }
-    else if (GameLogic::Items::IsThirdTierWing(ip))
-    {
-        if (ip->ExcellentFlags & 0x01)
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_ONE_PERCENT_DAMAGE, 5);
-        }
-        if ((ip->ExcellentFlags >> 1) & 0x01)
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_DAMAGE_REFLECTION, 5);
-        }
-        if ((ip->ExcellentFlags >> 2) & 0x01)
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_RECOVER_FULL_LIFE, 5);
-        }
-        if ((ip->ExcellentFlags >> 3) & 0x01)
-        {
-            GameLogic::Items::AddOptionSlot(*ip, AT_RECOVER_FULL_MANA, 5);
-        }
-    }
-}
-
 // The Wizard's rings' options; the excellent options come from the definitions the item links.
 void CalcWizardsRingOptions(ITEM* ip)
 {
@@ -398,7 +327,8 @@ void SetItemAttributes(ITEM* ip)
 
     ip->SpecialNum = 0;
 
-    CalcWingOptions(ip);
+    // The wings' options in the excellent byte, before the skill as the tooltip shows them.
+    GameLogic::Items::AddLinkedOptions(*ip, Data::Items::ItemOptionType::Wing);
 
     if (ip->HasSkill)
     {
