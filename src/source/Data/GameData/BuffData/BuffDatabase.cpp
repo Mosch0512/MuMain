@@ -56,12 +56,22 @@ void BuffDatabase::Build(std::span<const BuffDefinition> buffs, std::string_view
         }
     }
     m_indices.fill(NoBuff);
+    m_itemBuffs.clear();
     for (size_t index = 0; index < m_buffs.size(); ++index)
     {
-        const int number = m_buffs[index].number;
-        if (number >= 0 && number <= MaxBuffNumber)
+        const BuffDefinition& buff = m_buffs[index];
+        if (buff.number >= 0 && buff.number <= MaxBuffNumber)
         {
-            m_indices[number] = static_cast<int>(index);
+            m_indices[buff.number] = static_cast<int>(index);
+        }
+        if (buff.item)
+        {
+            const auto [entry, added] =
+                m_itemBuffs.emplace(ItemKey(buff.item->group, buff.item->number), static_cast<int>(index));
+            if (!added && buff.number < m_buffs[entry->second].number)
+            {
+                entry->second = static_cast<int>(index);
+            }
         }
     }
     std::map<std::string_view, int> lowestNumbers;
@@ -103,16 +113,8 @@ void BuffDatabase::SetDisplayLocale(std::string_view locale)
 
 const BuffDefinition* BuffDatabase::FindByItem(int group, int number) const
 {
-    const BuffDefinition* found = nullptr;
-    for (const BuffDefinition& buff : m_buffs)
-    {
-        if (buff.item && buff.item->group == group && buff.item->number == number &&
-            (found == nullptr || buff.number < found->number))
-        {
-            found = &buff;
-        }
-    }
-    return found;
+    const auto found = m_itemBuffs.find(ItemKey(group, number));
+    return found != m_itemBuffs.end() ? &m_buffs[found->second] : nullptr;
 }
 
 const BuffDefinition* BuffDatabase::Find(int number) const

@@ -6,6 +6,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 namespace Data::Buffs
@@ -52,12 +53,21 @@ private:
 
     BuffDatabase();
 
+    // The key of an item in m_itemBuffs.
+    static constexpr int ItemKey(int group, int number)
+    {
+        return (group << 16) | (number & 0xFFFF);
+    }
+
     std::vector<BuffDefinition> m_buffs;
     std::vector<BuffDisplayTexts> m_texts;
     // The index in m_buffs by number, or NoBuff.
     std::array<int, MaxBuffNumber + 1> m_indices{};
     // Each buff's family as the lowest buff number in it, or NoBuff for none; by index in m_buffs.
     std::vector<int> m_families;
+    // The index in m_buffs of the buff each item gives (the lowest number of several), by ItemKey: the item tooltips
+    // ask every frame.
+    std::unordered_map<int, int> m_itemBuffs;
 };
 } // namespace Data::Buffs
 

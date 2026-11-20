@@ -435,6 +435,18 @@ TEST_CASE("Buffs: an item that gives two buffs finds the lower number, whatever 
     CHECK(loader->GetBuffIndex(ITEMINDEX(13, 43)) == 29);
     CHECK(loader->GetBuffType(ITEMINDEX(13, 43)) == 29);
     CHECK(loader->GetBuffIndex(ITEMINDEX(13, 44)) == -1);
+    REQUIRE(g_BuffDatabase.FindByItem(13, 43) != nullptr);
+    CHECK(g_BuffDatabase.FindByItem(13, 43)->number == 29);
+    CHECK(g_BuffDatabase.FindByItem(13, 44) == nullptr);
+}
+
+TEST_CASE("Buffs: a new table forgets the items of the old one [data][buffs]")
+{
+    {
+        const BuffTableScope table({SealOfAscension()}, "en");
+        CHECK(g_BuffDatabase.FindByItem(13, 43) != nullptr);
+    }
+    CHECK(g_BuffDatabase.FindByItem(13, 43) == nullptr);
 }
 
 TEST_CASE("Buffs: the shipped file keeps the strip rules of the old client's code [data][buffs]")
