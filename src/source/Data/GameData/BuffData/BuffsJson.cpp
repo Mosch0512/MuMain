@@ -6,6 +6,7 @@
 
 #include "Core/Globals/_define.h"
 #include "Data/GameData/ItemData/ItemJsonCommon.h"
+#include "Data/GameData/ItemData/ItemOptionEffects.h"
 #include "Data/GameData/ItemData/ItemOptionValueJson.h"
 #include "Data/GameData/ItemData/ItemOptionsJson.h"
 
@@ -471,6 +472,19 @@ void ValidateBuffs(std::span<const BuffDefinition> buffs, std::span<const size_t
                          BuffField(entry,
                                    std::string(Keys::PowerUps) + "[" + std::to_string(index) + "]." + Keys::Attribute),
                          buff.powerUps[index].attribute + " is no attribute a buff can raise (BuffAttributes.h)");
+            }
+            const std::vector<Items::ItemOptionTerm>& terms = buff.powerUps[index].value.per;
+            for (size_t term = 0; term < terms.size(); ++term)
+            {
+                if (Items::FindItemOptionTermAttribute(terms[term].attribute) == Items::ItemOptionTermAttribute::Unread)
+                {
+                    AddIssue(
+                        issues, ItemDataIssueSeverity::Warning, source,
+                        BuffField(entry, std::string(Keys::PowerUps) + "[" + std::to_string(index) + "]." +
+                                             Items::ItemOptionAddKeys[static_cast<size_t>(buff.powerUps[index].add)] +
+                                             ".per[" + std::to_string(term) + "].attribute"),
+                        "the client reads no hero attribute " + terms[term].attribute + ": the term adds nothing");
+                }
             }
         }
     }

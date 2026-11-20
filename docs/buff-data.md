@@ -70,7 +70,8 @@ tooltip shows its buff's first value as `{addOptionValue1}`, the second as
   attribute (`defenseBase`, `attackSpeedAny`, `experienceRate`), else a name
   of Webzen's add option (`disableExperience`, `mobility`,
   `vulcanusItemDropRate`, `partyExperienceBonus`, `vitalityBonus`). The list
-  is `BuffAttributes.h`; another name is an error.
+  is `BuffAttributes.h`; another name is an error. A `per` term on a hero
+  attribute the client doesn't read is a warning: the term adds nothing.
 - **Numbers.** As Webzen's data gives them: a rate in percent
   (`experienceRate` 150 is 150 %), the auras' value per level of the hero
   (`{"values": 0, "per": [{"attribute": "level", "times": 10}]}`). Each is one
