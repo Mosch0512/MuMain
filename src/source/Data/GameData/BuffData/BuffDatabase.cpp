@@ -3,6 +3,7 @@
 #include "BuffDatabase.h"
 
 #include "Core/Utilities/StringUtils.h"
+#include "Data/GameData/ItemData/ItemOptionEffects.h"
 
 #include <algorithm>
 #include <map>
@@ -42,6 +43,18 @@ BuffDatabase::BuffDatabase()
 void BuffDatabase::Build(std::span<const BuffDefinition> buffs, std::string_view locale)
 {
     m_buffs.assign(buffs.begin(), buffs.end());
+    for (BuffDefinition& buff : m_buffs)
+    {
+        // The values computed every frame read the terms' hero attributes, never their names.
+        if (buff.duration)
+        {
+            Items::ResolveTermAttributes(*buff.duration);
+        }
+        for (BuffPowerUp& powerUp : buff.powerUps)
+        {
+            Items::ResolveTermAttributes(powerUp.value);
+        }
+    }
     m_indices.fill(NoBuff);
     for (size_t index = 0; index < m_buffs.size(); ++index)
     {
@@ -86,6 +99,20 @@ void BuffDatabase::SetDisplayLocale(std::string_view locale)
         }
         m_texts.push_back(std::move(texts));
     }
+}
+
+const BuffDefinition* BuffDatabase::FindByItem(int group, int number) const
+{
+    const BuffDefinition* found = nullptr;
+    for (const BuffDefinition& buff : m_buffs)
+    {
+        if (buff.item && buff.item->group == group && buff.item->number == number &&
+            (found == nullptr || buff.number < found->number))
+        {
+            found = &buff;
+        }
+    }
+    return found;
 }
 
 const BuffDefinition* BuffDatabase::Find(int number) const

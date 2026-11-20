@@ -36,6 +36,9 @@ public:
     }
     // The buff of that number, or nullptr.
     const BuffDefinition* Find(int number) const;
+    // The buff the item gives, or nullptr. Of several (13/43 gives 29 and 40) the lowest number, as the old buff info
+    // (by number) had it, whatever the file's order.
+    const BuffDefinition* FindByItem(int group, int number) const;
     // Its texts in the display language, or nullptr.
     const BuffDisplayTexts* FindTexts(int number) const;
 

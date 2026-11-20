@@ -12,6 +12,7 @@
 #include "I18N/All.h"
 #include "Data/DataHandler/MonsterData/MonsterDataHandler.h"
 #include "Data/DataHandler/SkillData/SkillDataHandler.h"
+#include "Data/GameData/BuffData/BuffDatabase.h"
 #include "Data/GameData/ItemData/ItemDatabase.h"
 #include "Data/GameData/ItemData/ItemDescriptionPlaceholders.h"
 #include "Data/GameData/ItemData/ItemModelSlots.h"
@@ -22,6 +23,7 @@
 #include "Engine/Object/ItemTooltipSnapshot.h"
 #include "Engine/Object/ItemTooltipValues.h"
 #include "Engine/Object/ZzzInventory.h"
+#include "GameLogic/Buffs/BuffValues.h"
 #include "GameLogic/Items/CSItemOption.h"
 #include "GameLogic/Items/ItemAddOptioninfo.h"
 #include "GameLogic/Skills/SkillManager.h"
@@ -44,8 +46,10 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <set>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifdef MU_ENABLE_CONTROL_SOCKET
@@ -484,6 +488,128 @@ TEST_CASE("An item's add option values come from its add option [data][items][to
         Engine::Items::TooltipValues::GetItemTooltipText(values, "addOptionDuration");
     REQUIRE(duration.has_value());
     CHECK_FALSE(duration->empty());
+}
+
+// The values and durations of the buffs that items give moved from the item add option table (ItemAddOption.bmd) to
+// Data/Buffs/Buffs.json (buffs design B13). They are Webzen's Season 6 numbers, so every item buff keeps its item's
+// row: its options in their order, under the names of Webzen's add option codes (zTeam's S6 ItemAddOption.h, IGCN's for
+// 60 to 68), and its time.
+TEST_CASE("Every item buff keeps the values and duration of its item's add option row [data][items][buffs]")
+{
+    ClientDataScope client(ClientDirectory);
+    std::string errorMessage;
+    REQUIRE(g_ItemDataHandler.Load(errorMessage));
+    TooltipDataScope data;
+    HeroScope hero;
+    MakeNewDarkWizard(hero.Hero());
+
+    const std::map<int, std::string> names = {
+        {1, "attackSpeedAny"},
+        {2, "baseDamageBonus"},
+        {3, "defenseBase"},
+        {4, "maximumHealth"},
+        {5, "maximumMana"},
+        {6, "experienceRate"},
+        {7, "bonusItemDropRate"},
+        {8, "disableExperience"},
+        {9, "totalStrength"},
+        {10, "totalAgility"},
+        {11, "totalVitality"},
+        {12, "totalEnergy"},
+        {13, "totalLeadership"},
+        {14, "physicalBaseDmg"},
+        {15, "wizardryBaseDmg"},
+        {16, "mobility"},
+        {53, "healthRecoveryMultiplier"},
+        {54, "manaRecoveryMultiplier"},
+        {55, "criticalDamageChance"},
+        {56, "excellentDamageChance"},
+        {60, "vulcanusExperienceRate"},
+        {61, "vulcanusItemDropRate"},
+        {62, "deathPenaltyProtection"},
+        {63, "itemDurabilityProtection"},
+        {65, "vitalityBonus"},
+        {66, "maximumAbility"},
+        {67, "maximumShield"},
+        {68, "partyExperienceBonus"},
+    };
+    // Webzen's level options: the auras add their value per level of the hero.
+    const std::set<int> perLevel = {66, 67};
+    int itemBuffs = 0;
+    for (const Data::Buffs::BuffDefinition& buff : g_BuffDatabase.GetAll())
+    {
+        if (!buff.item)
+        {
+            continue;
+        }
+        CAPTURE(buff.number);
+        const ITEM_ADD_OPTION& row =
+            g_pItemAddOptioninfo->GetItemAddOtioninfo(ITEMINDEX(buff.item->group, buff.item->number));
+        const std::array<std::pair<int, int>, 2> options = {
+            {{row.m_byOption1, row.m_byValue1}, {row.m_byOption2, row.m_byValue2}}};
+        size_t powerUp = 0;
+        for (const auto& [option, value] : options)
+        {
+            // A row's value without an option (the Jack O'Lantern items' second) adds nothing.
+            if (option == 0)
+            {
+                continue;
+            }
+            REQUIRE(powerUp < buff.powerUps.size());
+            const Data::Buffs::BuffPowerUp& entry = buff.powerUps[powerUp];
+            CHECK(entry.attribute == names.at(option));
+            if (perLevel.contains(option))
+            {
+                REQUIRE(entry.value.per.size() == 1);
+                CHECK(entry.value.per.front().attribute == "level");
+                CHECK(entry.value.per.front().times == value);
+            }
+            else
+            {
+                CHECK(entry.value == Data::Items::ItemOptionValue{{value}});
+            }
+            ++powerUp;
+        }
+        CHECK(powerUp == buff.powerUps.size());
+        CHECK(GameLogic::Buffs::GetDuration(buff) == static_cast<int>(row.m_Time));
+        ++itemBuffs;
+    }
+    CHECK(itemBuffs == 45);
+}
+
+// The character stats read an item buff's value from the buff they check; each is the buff of the item whose row
+// they read before.
+TEST_CASE("The stats read each item buff's value from the buff of its item [data][items][buffs]")
+{
+    ClientDataScope client(ClientDirectory);
+    std::string errorMessage;
+    REQUIRE(g_ItemDataHandler.Load(errorMessage));
+    TooltipDataScope data;
+
+    const std::array<std::pair<eBuffState, int>, 12> readers = {{
+        {eBuff_EliteScroll2, ITEM_SCROLL_OF_DEFENSE},
+        {eBuff_EliteScroll3, ITEM_SCROLL_OF_WRATH},
+        {eBuff_EliteScroll4, ITEM_SCROLL_OF_WIZARDRY},
+        {eBuff_Hellowin2, ITEM_JACK_OLANTERN_WRATH},
+        {eBuff_Hellowin3, ITEM_JACK_OLANTERN_CRY},
+        {eBuff_CherryBlossom_Petal, ITEM_CHERRY_BLOSSOM_FLOWER_PETAL},
+        {eBuff_SecretPotion1, ITEM_ELIXIR_OF_STRENGTH},
+        {eBuff_SecretPotion2, ITEM_ELIXIR_OF_AGILITY},
+        {eBuff_SecretPotion3, ITEM_ELIXIR_OF_HEALTH},
+        {eBuff_SecretPotion4, ITEM_ELIXIR_OF_ENERGY},
+        {eBuff_SecretPotion5, ITEM_ELIXIR_OF_CONTROL},
+        {eBuff_Scroll_Battle, ITEM_SCROLL_OF_BATTLE},
+    }};
+    for (const auto& [buffNumber, itemType] : readers)
+    {
+        CAPTURE(static_cast<int>(buffNumber));
+        const Data::Buffs::BuffDefinition* buff = g_BuffDatabase.Find(buffNumber);
+        REQUIRE(buff != nullptr);
+        REQUIRE(buff->item.has_value());
+        CHECK(ITEMINDEX(buff->item->group, buff->item->number) == itemType);
+        CHECK(GameLogic::Buffs::GetPowerUpValue(buffNumber, 0) ==
+              static_cast<int>(g_pItemAddOptioninfo->GetItemAddOtioninfo(itemType).m_byValue1));
+    }
 }
 
 // The server marks an item's guardian (380) option with one bit of its option flags and no byte of its own; such an

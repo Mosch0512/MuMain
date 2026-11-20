@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Data/DataHandler/BuffData/BuffStorage.h"
 #include "Data/DataHandler/MonsterData/MonsterDataHandler.h"
+#include "Data/GameData/BuffData/BuffDatabase.h"
 #include "Data/DataHandler/SkillData/SkillDataHandler.h"
 #include "Engine/Object/ZzzInfomation.h"
 #include "GameLogic/Buffs/w_BuffStateSystem.h"
@@ -12,12 +14,14 @@
 #include "UI/Inventory/UIJewelHarmony.h"
 
 #include <string>
+#include <vector>
 
 // The game data a tooltip reads besides the items, loaded as the game loads it (ZzzOpenData.cpp, CUIManager): the
 // skills (the orbs' and scrolls' names and damage), the socket items, the item sets, the monster list (the
 // transformation rings), the Jewel of Harmony and item add
-// option tables, and the buff system's time texts. Run in a ClientDataScope, which makes the paths relative to the
-// client. It puts back what it replaces (the language, the two tables, the buff system and the skill table it made),
+// option tables, the buffs (the values and durations of the items that give one) and the buff system's time texts. Run
+// in a ClientDataScope, which makes the paths relative to the client. It puts back what it replaces (the language, the
+// three tables, the buff system and the skill table it made),
 // but the item sets, the socket items and the monster list stay loaded for the tests after it: the game has no
 // way to unload them, and every one of these loads replaces what was there.
 class TooltipDataScope
@@ -44,6 +48,8 @@ public:
         m_previousAddOptions = g_pItemAddOptioninfo;
         g_pUIJewelHarmonyinfo = JewelHarmonyInfo::MakeInfo();
         g_pItemAddOptioninfo = ItemAddOptioninfo::MakeInfo();
+        m_previousBuffs = g_BuffDatabase.GetAll();
+        g_BuffDatabase.Build(Data::Buffs::LoadBuffsFile(Data::Buffs::GetBuffsFile()).buffs, "en");
         // The time texts of the elixirs and seals (g_StringTime).
         if (!g_BuffSystem)
         {
@@ -62,6 +68,7 @@ public:
         delete g_pItemAddOptioninfo;
         g_pUIJewelHarmonyinfo = m_previousHarmony;
         g_pItemAddOptioninfo = m_previousAddOptions;
+        g_BuffDatabase.Build(m_previousBuffs, "en");
         if (m_skills != nullptr)
         {
             SkillAttribute = nullptr;
@@ -75,5 +82,6 @@ private:
     SKILL_ATTRIBUTE* m_skills = nullptr;
     JewelHarmonyInfo* m_previousHarmony = nullptr;
     ItemAddOptioninfo* m_previousAddOptions = nullptr;
+    std::vector<Data::Buffs::BuffDefinition> m_previousBuffs;
     bool m_madeBuffSystem = false;
 };

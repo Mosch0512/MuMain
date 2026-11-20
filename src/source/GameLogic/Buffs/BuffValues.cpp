@@ -1,0 +1,31 @@
+#include "stdafx.h"
+
+#include "GameLogic/Buffs/BuffValues.h"
+
+#include "Data/GameData/BuffData/BuffDatabase.h"
+#include "GameLogic/Items/ItemOptions.h"
+
+namespace GameLogic::Buffs
+{
+namespace
+{
+// A buff's value has no item level: its list, if any, is read at level 0.
+constexpr int NoLevel = 0;
+} // namespace
+
+int GetPowerUpValue(const Data::Buffs::BuffDefinition& buff, size_t index)
+{
+    return index < buff.powerUps.size() ? Items::ComputeOptionValue(buff.powerUps[index].value, NoLevel) : 0;
+}
+
+int GetPowerUpValue(int buffNumber, size_t index)
+{
+    const Data::Buffs::BuffDefinition* buff = g_BuffDatabase.Find(buffNumber);
+    return buff != nullptr ? GetPowerUpValue(*buff, index) : 0;
+}
+
+int GetDuration(const Data::Buffs::BuffDefinition& buff)
+{
+    return buff.duration ? Items::ComputeOptionValue(*buff.duration, NoLevel) : 0;
+}
+} // namespace GameLogic::Buffs
