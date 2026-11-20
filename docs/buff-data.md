@@ -73,6 +73,13 @@ tooltip shows its buff's first value as `{addOptionValue1}`, the second as
   `vulcanusItemDropRate`, `partyExperienceBonus`, `vitalityBonus`). The list
   is `BuffAttributes.h`; another name is an error. A `per` term on a hero
   attribute the client doesn't read is a warning: the term adds nothing.
+- **The character stats.** They add up the power-ups of all the hero's buffs
+  by attribute: physical damage `physicalBaseDmg` and `baseDamageBonus`,
+  wizardry `wizardryBaseDmg` and `baseDamageBonus`, defense `defenseBase`,
+  the stats `totalStrength`, `totalAgility`, `totalVitality`, `totalEnergy`
+  and `totalLeadership`. A new buff with one of them counts without code. The
+  Seal of Strength (13/96) counts this way; the original client had no check
+  for it, so its +50 damage and +60 defense never showed.
 - **Numbers.** As Webzen's data gives them: a rate in percent
   (`experienceRate` 150 is 150 %), the auras' value per level of the hero
   (`{"values": 0, "per": [{"attribute": "level", "times": 10}]}`). Each is one

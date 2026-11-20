@@ -24,6 +24,7 @@
 #include "Engine/Object/ItemTooltipValues.h"
 #include "Engine/Object/ZzzInventory.h"
 #include "GameLogic/Buffs/BuffValues.h"
+#include "GameLogic/Buffs/w_Buff.h"
 #include "GameLogic/Items/CSItemOption.h"
 #include "GameLogic/Items/ItemAddOptioninfo.h"
 #include "GameLogic/Skills/SkillManager.h"
@@ -607,39 +608,68 @@ TEST_CASE("An aura's value is its row's value times the hero's level [data][item
     }
 }
 
-// The character stats read an item buff's value from the buff they check; each is the buff of the item whose row
-// they read before.
-TEST_CASE("The stats read each item buff's value from the buff of its item [data][items][buffs]")
+// The character stats add up the hero's buffs by attribute name. Each buff the stats checked one by one before gives
+// its item's row value under the attribute of the stat it raised, so every stat keeps its number.
+TEST_CASE("The stats read each item buff's value by the attribute of its stat [data][items][buffs]")
 {
     ClientDataScope client(ClientDirectory);
     std::string errorMessage;
     REQUIRE(g_ItemDataHandler.Load(errorMessage));
     TooltipDataScope data;
 
-    const std::array<std::pair<eBuffState, int>, 12> readers = {{
-        {eBuff_EliteScroll2, ITEM_SCROLL_OF_DEFENSE},
-        {eBuff_EliteScroll3, ITEM_SCROLL_OF_WRATH},
-        {eBuff_EliteScroll4, ITEM_SCROLL_OF_WIZARDRY},
-        {eBuff_Hellowin2, ITEM_JACK_OLANTERN_WRATH},
-        {eBuff_Hellowin3, ITEM_JACK_OLANTERN_CRY},
-        {eBuff_CherryBlossom_Petal, ITEM_CHERRY_BLOSSOM_FLOWER_PETAL},
-        {eBuff_SecretPotion1, ITEM_ELIXIR_OF_STRENGTH},
-        {eBuff_SecretPotion2, ITEM_ELIXIR_OF_AGILITY},
-        {eBuff_SecretPotion3, ITEM_ELIXIR_OF_HEALTH},
-        {eBuff_SecretPotion4, ITEM_ELIXIR_OF_ENERGY},
-        {eBuff_SecretPotion5, ITEM_ELIXIR_OF_CONTROL},
-        {eBuff_Scroll_Battle, ITEM_SCROLL_OF_BATTLE},
-    }};
-    for (const auto& [buffNumber, itemType] : readers)
+    struct Reader
     {
-        CAPTURE(static_cast<int>(buffNumber));
-        const Data::Buffs::BuffDefinition* buff = g_BuffDatabase.Find(buffNumber);
+        eBuffState buff;
+        int itemType;
+        Data::Buffs::BuffAttributeName attribute;
+    };
+    constexpr std::array<Reader, 12> readers = {{
+        {eBuff_EliteScroll2, ITEM_SCROLL_OF_DEFENSE, "defenseBase"},
+        {eBuff_EliteScroll3, ITEM_SCROLL_OF_WRATH, "physicalBaseDmg"},
+        {eBuff_EliteScroll4, ITEM_SCROLL_OF_WIZARDRY, "wizardryBaseDmg"},
+        {eBuff_Hellowin2, ITEM_JACK_OLANTERN_WRATH, "baseDamageBonus"},
+        {eBuff_Hellowin3, ITEM_JACK_OLANTERN_CRY, "defenseBase"},
+        {eBuff_CherryBlossom_Petal, ITEM_CHERRY_BLOSSOM_FLOWER_PETAL, "baseDamageBonus"},
+        {eBuff_SecretPotion1, ITEM_ELIXIR_OF_STRENGTH, "totalStrength"},
+        {eBuff_SecretPotion2, ITEM_ELIXIR_OF_AGILITY, "totalAgility"},
+        {eBuff_SecretPotion3, ITEM_ELIXIR_OF_HEALTH, "totalVitality"},
+        {eBuff_SecretPotion4, ITEM_ELIXIR_OF_ENERGY, "totalEnergy"},
+        {eBuff_SecretPotion5, ITEM_ELIXIR_OF_CONTROL, "totalLeadership"},
+        {eBuff_Scroll_Battle, ITEM_SCROLL_OF_BATTLE, "criticalDamageChance"},
+    }};
+    for (const Reader& reader : readers)
+    {
+        CAPTURE(static_cast<int>(reader.buff));
+        const Data::Buffs::BuffDefinition* buff = g_BuffDatabase.Find(reader.buff);
         REQUIRE(buff != nullptr);
         REQUIRE(buff->item.has_value());
-        CHECK(ITEMINDEX(buff->item->group, buff->item->number) == itemType);
-        CHECK(GameLogic::Buffs::GetPowerUpValue(buffNumber, 0) ==
-              static_cast<int>(g_pItemAddOptioninfo->GetItemAddOtioninfo(itemType).m_byValue1));
+        CHECK(ITEMINDEX(buff->item->group, buff->item->number) == reader.itemType);
+        Buff active;
+        active.RegisterBuff(reader.buff);
+        CHECK(GameLogic::Buffs::SumPowerUps(active, reader.attribute) ==
+              static_cast<int>(g_pItemAddOptioninfo->GetItemAddOtioninfo(reader.itemType).m_byValue1));
     }
+}
+
+// Two buffs of one attribute add up; the Seal of Strength (13/96) counts, which the stats had no check for.
+TEST_CASE("The stats add up the values of every buff the hero has by attribute [data][items][buffs]")
+{
+    ClientDataScope client(ClientDirectory);
+    std::string errorMessage;
+    REQUIRE(g_ItemDataHandler.Load(errorMessage));
+    TooltipDataScope data;
+
+    // Its buff (104) has no name in eBuffState.
+    const Data::Buffs::BuffDefinition* sealOfStrength = g_BuffDatabase.FindByItem(13, 96);
+    REQUIRE(sealOfStrength != nullptr);
+    Buff active;
+    active.RegisterBuff(eBuff_EliteScroll2);
+    active.RegisterBuff(static_cast<eBuffState>(sealOfStrength->number));
+    CHECK(GameLogic::Buffs::SumPowerUps(active, "defenseBase") == 60 + 60);
+    CHECK(GameLogic::Buffs::SumPowerUps(active, "baseDamageBonus") == 50);
+    CHECK(GameLogic::Buffs::SumPowerUps(active, "physicalBaseDmg") == 0);
+    active.UnRegisterBuff(eBuff_EliteScroll2);
+    CHECK(GameLogic::Buffs::SumPowerUps(active, "defenseBase") == 60);
 }
 
 // The server marks an item's guardian (380) option with one bit of its option flags and no byte of its own; such an

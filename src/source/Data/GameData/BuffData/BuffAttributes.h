@@ -46,4 +46,26 @@ constexpr bool IsBuffAttribute(std::string_view name)
 {
     return std::find(BuffAttributes.begin(), BuffAttributes.end(), name) != BuffAttributes.end();
 }
+
+// A name of the list, checked when the code compiles: the game code that reads an attribute names it this way, so a
+// name the list lacks doesn't build.
+class BuffAttributeName
+{
+public:
+    consteval BuffAttributeName(const char* name) : m_name(name)
+    {
+        if (!IsBuffAttribute(m_name))
+        {
+            throw "not a name of BuffAttributes";
+        }
+    }
+
+    constexpr std::string_view Get() const
+    {
+        return m_name;
+    }
+
+private:
+    std::string_view m_name;
+};
 } // namespace Data::Buffs

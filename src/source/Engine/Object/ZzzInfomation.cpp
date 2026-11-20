@@ -1864,25 +1864,10 @@ void CHARACTER_MACHINE::CalculateDamage()
                 Character.AttackDamageMaxLeft += (WORD)(Character.AttackDamageMaxLeft * ((RLevel * 2 + 1) * 0.01f) + 1);
             }
     }
-    if (g_isCharacterBuff((&Hero->Object), eBuff_EliteScroll3))
+    // The buffs' damage (Scroll of Wrath, Jack O'Lantern Wrath, the cherry blossom petal, Seal of Strength).
     {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_EliteScroll3, 0));
-        Character.AttackDamageMinRight += value;
-        Character.AttackDamageMaxRight += value;
-        Character.AttackDamageMinLeft += value;
-        Character.AttackDamageMaxLeft += value;
-    }
-    if (g_isCharacterBuff((&Hero->Object), eBuff_Hellowin2))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_Hellowin2, 0));
-        Character.AttackDamageMinRight += value;
-        Character.AttackDamageMaxRight += value;
-        Character.AttackDamageMinLeft += value;
-        Character.AttackDamageMaxLeft += value;
-    }
-    if (g_isCharacterBuff((&Hero->Object), eBuff_CherryBlossom_Petal))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_CherryBlossom_Petal, 0));
+        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("physicalBaseDmg") +
+                                             GameLogic::Buffs::GetHeroPowerUpTotal("baseDamageBonus"));
         Character.AttackDamageMinRight += value;
         Character.AttackDamageMaxRight += value;
         Character.AttackDamageMinLeft += value;
@@ -2063,21 +2048,10 @@ void CHARACTER_MACHINE::CalculateMagicDamage()
         PlusSpecialPercentOfSlot(&Character.MagicDamageMax, AT_IMPROVE_MAGIC_PERCENT, LRing);
     }
 
-    if (g_isCharacterBuff((&Hero->Object), eBuff_EliteScroll4))
+    // The buffs' wizardry (Scroll of Wizardry, Jack O'Lantern Wrath, the cherry blossom petal, Seal of Strength).
     {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_EliteScroll4, 0));
-        Character.MagicDamageMin += value;
-        Character.MagicDamageMax += value;
-    }
-    if (g_isCharacterBuff((&Hero->Object), eBuff_Hellowin2))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_Hellowin2, 0));
-        Character.MagicDamageMin += value;
-        Character.MagicDamageMax += value;
-    }
-    if (g_isCharacterBuff((&Hero->Object), eBuff_CherryBlossom_Petal))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_CherryBlossom_Petal, 0));
+        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("wizardryBaseDmg") +
+                                             GameLogic::Buffs::GetHeroPowerUpTotal("baseDamageBonus"));
         Character.MagicDamageMin += value;
         Character.MagicDamageMax += value;
     }
@@ -2392,16 +2366,8 @@ void CHARACTER_MACHINE::CalculateDefense()
         Character.Defense += (WORD)(Character.Defense * addDefense);
     }
 
-    if (g_isCharacterBuff((&Hero->Object), eBuff_EliteScroll2))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_EliteScroll2, 0));
-        Character.Defense += value;
-    }
-    if (g_isCharacterBuff((&Hero->Object), eBuff_Hellowin3))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_Hellowin3, 0));
-        Character.Defense += value;
-    }
+    // The buffs' defense (Scroll of Defense, Jack O'Lantern Cry, Seal of Strength).
+    Character.Defense += static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("defenseBase"));
     if (g_isCharacterBuff((&Hero->Object), eBuff_BlessingOfXmax))
     {
         int _Temp = 0;
@@ -2520,31 +2486,12 @@ bool CHARACTER_MACHINE::IsZeroDurability()
 
 void CHARACTER_MACHINE::CalculateBasicState()
 {
-    if (g_isCharacterBuff((&Hero->Object), eBuff_SecretPotion1))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_SecretPotion1, 0));
-        Character.AddStrength += value;
-    }
-    else if (g_isCharacterBuff((&Hero->Object), eBuff_SecretPotion2))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_SecretPotion2, 0));
-        Character.AddDexterity += value;
-    }
-    else if (g_isCharacterBuff((&Hero->Object), eBuff_SecretPotion3))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_SecretPotion3, 0));
-        Character.AddVitality += value;
-    }
-    else if (g_isCharacterBuff((&Hero->Object), eBuff_SecretPotion4))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_SecretPotion4, 0));
-        Character.AddEnergy += value;
-    }
-    else if (g_isCharacterBuff((&Hero->Object), eBuff_SecretPotion5))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_SecretPotion5, 0));
-        Character.AddCharisma += value;
-    }
+    // The elixirs' stats.
+    Character.AddStrength += static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("totalStrength"));
+    Character.AddDexterity += static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("totalAgility"));
+    Character.AddVitality += static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("totalVitality"));
+    Character.AddEnergy += static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("totalEnergy"));
+    Character.AddCharisma += static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("totalLeadership"));
     if (g_isCharacterBuff((&Hero->Object), eBuff_Hp_up_Ourforces))
     {
         WORD _AddStat = 0;
@@ -2561,31 +2508,12 @@ void CHARACTER_MACHINE::CalculateBasicState()
 
 void CHARACTER_MACHINE::getAllAddStateOnlyExValues(int& iAddStrengthExValues, int& iAddDexterityExValues, int& iAddVitalityExValues, int& iAddEnergyExValues, int& iAddCharismaExValues)
 {
-    if (g_isCharacterBuff((&Hero->Object), eBuff_SecretPotion1))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_SecretPotion1, 0));
-        iAddStrengthExValues += value;
-    }
-    else if (g_isCharacterBuff((&Hero->Object), eBuff_SecretPotion2))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_SecretPotion2, 0));
-        iAddDexterityExValues += value;
-    }
-    else if (g_isCharacterBuff((&Hero->Object), eBuff_SecretPotion3))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_SecretPotion3, 0));
-        iAddVitalityExValues += value;
-    }
-    else if (g_isCharacterBuff((&Hero->Object), eBuff_SecretPotion4))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_SecretPotion4, 0));
-        iAddEnergyExValues += value;
-    }
-    else if (g_isCharacterBuff((&Hero->Object), eBuff_SecretPotion5))
-    {
-        const WORD value = static_cast<WORD>(GameLogic::Buffs::GetPowerUpValue(eBuff_SecretPotion5, 0));
-        iAddCharismaExValues += value;
-    }
+    // The elixirs' stats.
+    iAddStrengthExValues += static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("totalStrength"));
+    iAddDexterityExValues += static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("totalAgility"));
+    iAddVitalityExValues += static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("totalVitality"));
+    iAddEnergyExValues += static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("totalEnergy"));
+    iAddCharismaExValues += static_cast<WORD>(GameLogic::Buffs::GetHeroPowerUpTotal("totalLeadership"));
 
     iAddStrengthExValues += g_SocketItemMgr.m_StatusBonus.m_iStrengthBonus;
     iAddDexterityExValues += g_SocketItemMgr.m_StatusBonus.m_iDexterityBonus;
