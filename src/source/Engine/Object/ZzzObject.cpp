@@ -6987,7 +6987,7 @@ static bool IsSparkingEventModel(const OBJECT* o)
 
 bool PartObjectSpawns(const OBJECT* o, int Type)
 {
-    return Render::Items::ItemEffects::Spawns(Type) || Render::Items::Styles::Spawns(Type) || IsSparkingEventModel(o);
+    return Render::Items::ItemEffects::Spawns(Type) || IsSparkingEventModel(o);
 }
 
 void SpawnPartObjectEffect(BMD* b, OBJECT* o, int Type, vec34_t* bones)
@@ -6995,11 +6995,6 @@ void SpawnPartObjectEffect(BMD* b, OBJECT* o, int Type, vec34_t* bones)
     if (Render::Items::ItemEffects::Spawns(Type))
     {
         Render::Items::ItemEffects::Spawn(b, o, Type, bones);
-        return;
-    }
-    if (Render::Items::Styles::Spawns(Type))
-    {
-        Render::Items::Styles::Spawn(b, o, Type, bones);
         return;
     }
     if (!IsSparkingEventModel(o))

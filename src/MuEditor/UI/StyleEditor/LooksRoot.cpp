@@ -30,8 +30,8 @@ namespace
 {
 bool ExistsInCode(Data::Looks::LookKind kind, std::string_view name)
 {
-    return kind == Data::Looks::LookKind::Effect ? Render::Items::ItemEffects::ExistsInCode(name)
-                                                     : Render::Items::Styles::ExistsInCode(name);
+    // Every effect is data since the things on bones moved into it.
+    return kind == Data::Looks::LookKind::RenderStyle && Render::Items::Styles::ExistsInCode(name);
 }
 } // namespace
 

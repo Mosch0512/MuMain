@@ -421,7 +421,8 @@ a translation in a language the game has no texts in (as for item names).
 
 Wings (capes included) and mounts with the `flying` tag let a character fly.
 An item at 0 durability does not count. Icarus requires flight equipment:
-without it the character cannot warp or move there, and in Icarus the last
+without it the character cannot warp or move there (a rule of the warp list,
+[warp-list.md](warp-list.md#equipment-rules)), and in Icarus the last
 flight equipment cannot be taken off, neither by dragging it nor by
 right-clicking it.
 
@@ -1168,7 +1169,8 @@ way, since its value comes from that member's energy and command.
 ### Option rules
 
 `Options/OptionRules.json` says which definitions an item's data gives it.
-The game does not read it: the editor writes the items' lists from it.
+The game does not read it: the editor writes the items' lists from it (Item
+Options' **Rules** tab edits it).
 
 ```json
 {
@@ -1510,10 +1512,8 @@ shine (`shineBelowPlus3`, see the glow values above).
 ```
 
 An effect is a named look in `Data/Effects/Effects.json` (see
-[Render styles and effects](#render-styles-and-effects)), or one
-still in code, listed at the end of `src/source/Render/Items/ItemEffects.cpp`;
-the game looks a name up in the file first. An effect runs every frame
-before the model is drawn and can:
+[Render styles and effects](#render-styles-and-effects)). An effect runs
+every frame before the model is drawn and can:
 
 - place sprites, particles and lightning on bones of the model, so they
   follow its animation (the Devil's Key and Invitation, Rena, the wings of
@@ -1643,7 +1643,7 @@ drawing hands the look.
 | `kind` | `texture`: the mesh's own texture, or the layer's; `reflection`: a reflection that moves over the mesh (chrome); `flatColor`: the mesh in the light alone, without a texture; `glowOnly`: the mesh's texture added as glow alone, as the monsters' glow passes draw (a mesh whose texture has an alpha channel, or the glow mesh, is not drawn) |
 | `motion` | How a reflection moves: `slowDrift` (left out), `fastSweep`, `followsLight`, `swirl`, `strongSwirl`, `stripes`, `verySlowDrift`, `oilSheen`, `stillShine` |
 | `where` | Where a reflection goes: `over` the texture (left out), or `underHoles`: on a mesh whose texture has holes, drawn before the texture, solid and on both faces, so it fills the holes (the Magic Gladiator sets); over a texture without holes, a glowing mesh and a see-through item it goes over with its blend. A look with such a layer draws mesh by mesh, every layer of a mesh before the next mesh, and the layer leaves the light as it found it |
-| `blend` | `normal` (left out), `glow` (added to what is below), `asDrawing` (the drawing's own: a doppelganger draws see-through) |
+| `blend` | `normal` (left out), `glow` (added to what is below), `darken` (darkens what is below, the Pumpkin of Luck's reflection), `asDrawing` (the drawing's own: a doppelganger draws see-through) |
 | `meshes` | Left out: every mesh, with the model's texture scripts, without the item's hidden mesh; `"allEvenHidden"`: every mesh, the hidden one too; `[0, 2]`: those meshes; `{"allBut": [2]}`: every mesh but those; `"none"`: no mesh, a layer that draws nothing, the default of a layer the values of some items turn on |
 | `texture` | A texture file under `Data` (`Effect/Chrome01.jpg`) instead of the mesh's own: a `.jpg` or a `.tga`, which the game reads from its `.OZJ` or `.OZT` file |
 | `light` | The light the layer is drawn in: `[red, green, blue]`, or `{"tint": [red, green, blue]}`, the item's light times those; each a number or a shape. `{"brightness": 0.8}` is the item's light scaled so its brightest channel is 0.8 (a grey for a black light). `{"timesOpacity": [red, green, blue]}` is the color times the drawing's opacity, as the monsters' glow passes dim as they fade. `{"fromRed": [red, green, blue]}` is the color times the red of the item's light, as Raymond's sword and the Blood Assassins were lit from the red channel alone. It stays for the layers after it, and `{"tint": [1, 1, 1]}` is the item's light again. Left out: the light the layer before left |
@@ -1689,7 +1689,10 @@ pulse their own opacity and glow strength, and `"atMost": 1.3` cuts its
 value off at a top, as the code's `min(sin(...) * 0.8f + 1.3f, 1.3f)`. Its numbers give the
 code's values exactly, so a look moved from code keeps them:
 `{"shape": "wave", "from": -0.2, "to": 1, "seconds": 6.283185}` is the
-code's `sin(WorldTime * 0.001f) * 0.6f + 0.4f`.
+code's `sin(WorldTime * 0.001f) * 0.6f + 0.4f`. A layer's opacity, glow
+strength or scroll can also be the item's value times a fixed number,
+`{"itemTimes": 1.5}`, as the Cursed Castle Water glows at 1.5 and 0.25 of
+the item's.
 
 | Shape | Fields | Value |
 |---|---|---|
@@ -1756,6 +1759,53 @@ look (a layer's `"drawing"`; the Devil's Eye draws at 2), and
 update puts on the item's object, which the ground item's next draw adds to
 its light (the Devil's Eye's pulse). A field of an entry can be one each
 item sets, which the model entry sets in `effectValues`.
+`animationSpeed` plays the item object's animation in the update at that
+speed, as the Cursed Castle Water's ground item moves; without it the update
+plays none.
+
+`onBones` lists the **things** an effect creates on the item's bones in
+every update, from the item's pose in that update: sprites, particles,
+lightning and effects of the effect catalogue, each by its name there (the
+**Effect Browser** lists them) with a `subType` number.
+
+```json
+{"name": "wingOfStorm", "onBones": [
+  {"sprite": "cloud64", "subType": 1, "bones": [9, 20, 19], "scale": 0.5, "rotation": {"shape": "scroll", "perSecond": 10}},
+  {"together": {"bones": [11, 21, 29], "chance": {"oneIn": 2, "per": "once"}},
+   "things": [{"effect": "fenrirThunder", "subType": 1, "color": [0.6, 0.6, 0.9], "chance": {"oneIn": 20, "draw": "plain"}}]}]},
+{"name": "wingsOfDarkness", "onBones": [
+  {"together": {"between": [[30, 22], [29, 21]], "chance": {"oneIn": 1}},
+   "things": [{"joint": "jointThunder", "subType": 14, "scale": 20},
+              {"joint": "jointSpirit", "subType": 4, "reversed": true, "scale": 25}]}]}
+```
+
+An entry is one thing, named by its kind (`"sprite"`, `"particle"`,
+`"joint"` for lightning, `"effect"`), with its places and values; or a group,
+`"together"` with the places and the chance its `"things"` share, so they
+come together (the Wings of Darkness' two lightnings strike at once).
+
+| Field | Values |
+|---|---|
+| `bones` | The bone numbers of the item's model the thing is created at, each once a frame; 0 to 199 |
+| `between` | Lightning only: pairs of bones, `[from, to]`, 0 to 199, the lightning goes from the first to the second |
+| `at` | `"origin"`: once at the item object's own place (Rena's spark) |
+| `subType` | The SubType the type is created with, 0 to 1000 (left out: 0) |
+| `scale` | A number or a shape (left out: 1) |
+| `color` | `[red, green, blue]`, each a number or a shape: a sprite's color, the light of a particle, lightning or effect |
+| `rotation` | A sprite's rotation in degrees, a number or a shape |
+| `reversed` | Lightning from the second bone of each pair to the first |
+| `chance` | `{"oneIn": N}`, N from 1 to 10000: once in N frames at the game's reference frame rate, the same at any frame rate; `"draw": "plain"`: a plain random draw each update, as the monster sounds draw theirs; `"per": "once"`: one roll for the entry instead of one for each bone or pair. A thing inside a group can roll its own chance after the group's (the Wing of Storm's thunder), once each time the group's holds, so it has no `"per"` |
+
+An entry names exactly one of `bones`, `between` and `at`. The checks:
+**fatal** a thing of an unknown kind, lightning at bones or a thing that
+isn't lightning between bones, places named twice or not at all, a bone,
+SubType or `oneIn` out of its range, a chance without `oneIn`, `"per"` on
+the chance of a thing inside a group or of an entry at the item's place; **error** a type the effect catalogue
+doesn't have (it is not created, and the game logs it when it loads its
+data); **warning** a bone an item's model doesn't have (about that item:
+nothing is created at it, nor lightning of a pair with it). The things are created as the game moves them, so they look as in
+the game; the Devil's Key's and Invitation's sparks sit on their bones as
+the item is scaled, as every other thing on bones.
 
 ### Shared models
 
@@ -1899,7 +1949,14 @@ shows it in the others.
   the stat profile (*By the rules* takes what the
   [profile rules](#item-stats-by-level) give; beside the list, the rule that
   gives the item its profile, or that it is picked for the item; **Item
-  Formulas** opens the profile there) and the resistances. Below the stats, what the game
+  Formulas** opens the profile there), the resistances and the item's
+  [option links](#item-options): each definition it links with its type and
+  English name (a click opens it in Item Options, **x** takes the link out),
+  a list to link another (without the links that would do nothing: a
+  second definition of a type it links, the ancient types, excellent
+  options on wings and horns), and, when the list is not the one the
+  [option rules](#option-rules) give, what they give and **Use the rules**.
+  A list that differs from the rules stays so until it is changed. Below the stats, what the game
   makes of them at each + level (damage, magic power, defense, magic
   defense, block rate), also as excellent or ancient, while a value is still
   being typed, and under that the formula of each with the item's numbers
@@ -2230,12 +2287,48 @@ The picked look shows:
   change over time.
 - The items that use the look; a click selects one.
 
-A picked **effect** shows, instead of parts and layers, its entries
-**Before drawing** in their order (**Add**, **Remove**, **Move up**, **Move
-down**), each with its Only when, the item values it sets (no light), the
-drawing's opacity, the level the item glows like and Each item sets, and the
-**Object light** as the last line. Its preview runs the edited effect on the
-picked item; Apply, Revert and the problems work as for a render style.
+A picked **effect** shows, instead of parts and layers, its lines: its
+entries **Before drawing** in their order, each with its Only when, the item
+values it sets (no light), the drawing's opacity, the level the item glows
+like and Each item sets; the **Object light**; the **Animation speed**; and
+its entries **On bones**. **Add** beside Before drawing and beside On bones
+adds an entry to that list, and **Copy**, **Move up**, **Move down** and
+**Remove** change the picked one. An entry on bones has:
+
+- where its things go: **At bones**, **Between bones** (lightning, from the
+  first bone of a pair to the second) or **At the item's place**, with its
+  bones as number fields (**+ Bone**, **+ Pair**, `x` takes one out);
+- its **Chance**: **Once in** so many frames, drawn **At the game's frame
+  rate** or **Plain**, and **Once for all** bones or pairs;
+- **Together**, a group whose things share the entry's places and chance,
+  each thing with **Its own chance**;
+- each thing's **Kind**, its **Type** from the effect catalogue (a list with
+  a filter), **SubType**, **Scale**, **Color**, a sprite's **Rotation** and
+  lightning's **From the second bone to the first**.
+
+The views of the preview show the things on bones **live**: each view runs
+its own effect (the item's, the chosen look, the edited one) in the game's
+own effect lists, so they move and fade as in the game, and the views can be
+compared. They are created at your character's place, which the world
+doesn't draw them at, and each view draws only its own. **Stop time** stops
+them too: lightning and particles hold still, sprites and lights follow the
+time slider. A view creates nothing while the game's effect lists are
+nearly full, so the game's own effects come first. The Item Model window's
+preview shows them too.
+
+**Show bones**, beside Stop time, draws the item's skeleton over each view:
+each bone a dot joined by a line to the bone it hangs on, with its number and
+name when the mouse points at it. The picked entry's bones are orange with
+their numbers, its pairs joined from start to end, and a bone the mouse
+points at in the entry's fields is ringed. **Pick in the preview**, above the
+entry's fields, makes a click on a bone's dot add the bone or take it out;
+between bones, click the start of the lightning, then its end, which adds the
+pair or, when the entry has it, takes it out. Armor has no bones of its own
+there: it is drawn on the character's skeleton, and the game creates nothing
+on bones for it.
+
+Its preview runs the edited effect on the picked item; Apply, Revert and the
+problems work as for a render style.
 
 Each change of the looks or their folders is a step of the item undo history
 and reaches the game at once. **Save Items** writes
@@ -2247,8 +2340,16 @@ problem is never written; the editor then shows the looks the game has.
 
 How the selected item is shown, for now its name in the tooltip and on the
 ground, and its [tooltip layout](#presets). The preview takes a level, skill,
-luck, an option, the excellent options and a set (one of the item's sets),
-and shows such an item's name in two rows:
+luck, the additional option's level (0 to 15, the option byte's four bits;
+off while the item links no `option` definition) and, for a definition whose
+options are numbered by it (wings), its type (0 to the highest number of
+its options), one checkbox per excellent option of the item's excellent
+definition (without one: the bits the item's name lines name as the whole
+byte, as the Horn of Fenrir's `excellentFlags=1`, `=2` and `=4` kinds, each
+named by its line; else all six bits on wings, whose own code reads the byte),
+and a set (one of the
+item's sets) with its ancient bonus level (0 to 2), and shows such an item's
+name in two rows:
 
 - **In the tooltip**: the name row its tooltip writes, bold, in the colors the
   game's tooltip has in the active UI theme (its line's color and highlight
@@ -2329,6 +2430,63 @@ The server keeps its own formulas until they are synced (see
 [Item Sync](#item-sync)), so what it checks and computes can differ from
 what changed formulas give. Items your character already has keep their
 values until they are made again.
+
+### Item Options
+
+The [option definitions](#item-options) of `Options/*.json` with their
+options, the [option rules](#option-rules) and the option texts, in three
+tabs. The files are changed on a copy (a definition, rule or text with
+changes not applied is marked with `*`) and **Apply to the options** takes
+all of it: the files are checked first (each written and read back, as Save
+Items does; a fatal problem refuses the change, the others are listed under
+the buttons), and when the change reaches items they are listed before it is
+applied: the items that link a definition whose options or texts changed,
+and the items that follow the rules and take another list with the change.
+Every change is one step of the undo history, and Save Items writes the
+definition files, `Options/OptionRules.json` and `Tooltips/OptionTexts.json`.
+While the copy has changes that are not applied, **New**, **Copy**,
+**Rename**, **Remove** and **Fill levels of … marked** wait until they are
+applied or reverted. An undo or redo of the option files while the copy has
+such changes stops **Apply to the options** (it would write the undone change
+back) until **Revert**.
+
+- **Definitions**: the definitions with a search, a type filter, how many
+  items link each (unused ones are grey) and the highest level its value
+  lists give a value of their own (`-` for constants). The picked definition
+  shows its type, file, OpenMU's labels (read-only), its display name in
+  every language, its server values (only the server reads them), and its
+  options: number (not for `luck` and `ancientBonus`), attribute (the ones
+  the client computes for the type, or another, which is warned about), how
+  it adds its value, the value (a constant, or one value per level with
+  **+**, **-** and **Fill levels** from a start level, a value there and a
+  step to a last level), its terms (`level` / 20 and the like) and the names
+  of its texts with their English text. **New** adds a definition of a type
+  with one option to fill in, **Copy** a copy without OpenMU's labels; both
+  are applied with the other changes. **Rename** renames the definition in
+  the rules and every item that links it; the four ancient bonus definitions
+  keep their names, since the items' `attackType` picks them by name (and
+  counts as a use). **Remove** works while no item and no rule uses it.
+- **Highest level per list**: the checkbox before a definition marks it, and
+  **Fill levels of … marked** makes each of their value lists end at one
+  level: a shorter list goes on by its own step (the difference of its last
+  two values), a longer one is cut. So all damage and defense lists go from
+  +16 to +28 at once (`[4, 8, 12, 16]` to `[4, … 28]`), while the jewelry
+  lists (`[1, 2, 3]`) are marked or not on their own. A level above a list's
+  end shows its last value in the game, so the levels a server sends decide
+  nothing else.
+- **Rules**: the rules in order, each with its definitions, its conditions
+  and how many items take their list from it (the selected item's rule is
+  marked). **New rule**, **Move up**, **Move down** and **Remove the rule**
+  as in Item Formulas; the picked rule's definitions (**x** takes one out,
+  the list adds one) and its conditions, with the item numbers (`0, 1,
+  41-49`) and the tags an item must not have, which only the option rules
+  have.
+- **Texts**: the texts in the names grid (names by language, missing
+  translations counted); **New text** adds one, its English text `{value}`
+  until it is written.
+
+The server keeps its own option definitions until they are synced, so what
+it adds to an item can differ from what changed definitions show.
 
 ### Item Sync
 

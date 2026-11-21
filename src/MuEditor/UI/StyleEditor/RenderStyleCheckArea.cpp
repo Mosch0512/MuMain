@@ -17,6 +17,7 @@
 #include "Data/GameData/ItemData/ItemModelDatabase.h"
 #include "Data/GameData/ItemData/ItemModelSlots.h"
 #include "Data/GameData/ItemData/ItemType.h"
+#include "Data/GameData/LookData/BoneThingTypes.h"
 #include "Data/GameData/LookData/LookJson.h"
 #include "I18N/All.h"
 #include "Render/Models/ZzzBMD.h"
@@ -51,6 +52,16 @@ bool TextureFileExists(const std::string& texture)
 int MeshCount(int itemType)
 {
     return Models[Data::Items::ToModelSlot(itemType)].NumMeshs;
+}
+
+int BoneCount(int itemType)
+{
+    return Models[Data::Items::ToModelSlot(itemType)].NumBones;
+}
+
+bool EffectTypeExists(Data::Looks::BoneThingKind kind, const std::string& type)
+{
+    return Data::Looks::FindBoneThingType(kind, type).has_value();
 }
 
 bool IsAboutAnItem(const ItemDataIssue& issue)
@@ -183,7 +194,9 @@ Data::Looks::RenderStyleCheckInput MakeEditorCheckInput()
             .partModels = g_ItemModelDatabase.GetPartModels(),
             .textureExists = TextureFileExists,
             .meshCount = MeshCount,
-            .monsterUses = MonsterUses};
+            .monsterUses = MonsterUses,
+            .typeExists = EffectTypeExists,
+            .boneCount = BoneCount};
 }
 
 std::unique_ptr<DataChecks::DataCheckArea> CreateRenderStyleCheckArea()
