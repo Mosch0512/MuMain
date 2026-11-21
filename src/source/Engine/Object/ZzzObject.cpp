@@ -563,11 +563,13 @@ void TintByDebuffs(const OBJECT* o, BMD* b)
     }
 }
 
-// The second body pass of a frozen monster or one hit by Blow of Destruction, drawn over its body.
+// The second body pass of a frozen monster or one hit by Blow of Destruction, drawn over its body in the tint of its
+// debuffs, at the monster's opacity (ML-P19): not in a light its body's drawing left behind.
 void DrawDebuffPass(const OBJECT* o, const DrawLook& look, BMD* b)
 {
     if (g_isCharacterBuff(o, eDeBuff_Freeze))
     {
+        TintByDebuffs(o, b);
         b->RenderBody(RENDER_TEXTURE, look.alpha, -2, 1.f, look.blendMeshU, look.blendMeshV, look.hiddenMesh);
     }
     else if (g_isCharacterBuff(o, eDeBuff_BlowOfDestruction))

@@ -51,8 +51,10 @@ constexpr const char* BaselineHeader =
     "# How the monster looks moved from code into Data/Effects draw (MN8): one line per monster number, map and\n"
     "# situation, then the number of mesh draws and five digests of them and of what the drawing left on the model\n"
     "# (tests/data/LookRecorder.h). Written from the old code before each look moved (MU_MONSTER_LOOK_WRITE=1), so a\n"
-    "# moved look still draws as its code did. The frozen and Blow of Destruction lines came after the code was gone:\n"
-    "# they are drawn with the same second body pass the code drew.\n";
+    "# moved look still draws as its code did. The frozen (buff 56) and Blow of Destruction (buff 86) lines came\n"
+    "# after the code was gone, so they are not the old code's: they are drawn from the data. Both debuffs draw the\n"
+    "# body and its second pass in the same blue tint at the monster's opacity (MN8 ML-P19), so a frozen line is the\n"
+    "# number's Blow of Destruction line.\n";
 
 // The textures OpenBasicData loads at their indices before the looks find theirs, which the monsters' looks in code
 // name.

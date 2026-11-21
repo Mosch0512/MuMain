@@ -141,6 +141,26 @@ TEST_CASE("The monster look recorder draws a monster the same way twice, and its
     }
 }
 
+// Frozen and hit by Blow of Destruction, a monster draws its body and the second pass over it in the same blue tint at
+// its opacity, whatever light its look's layers leave (ML-P19): the old code drew some frozen monsters' second pass
+// in the light their drawing left behind.
+TEST_CASE("A frozen monster draws as one hit by Blow of Destruction (ML-P19) [monsters][looks][recorder]")
+{
+    const std::map<std::string, std::string> baseline = MonsterRecorder::ReadBaseline();
+    int frozen = 0;
+    for (const auto& [key, digest] : baseline)
+    {
+        if (!key.ends_with(", buff 56"))
+            continue;
+        ++frozen;
+        CAPTURE(key);
+        const auto blow = baseline.find(key.substr(0, key.size() - 2) + "86");
+        REQUIRE(blow != baseline.end());
+        CHECK(digest == blow->second);
+    }
+    CHECK(frozen > 0);
+}
+
 // The baseline (tests/monsters/baseline/MonsterLookDraws.txt) holds every situation of every number with a look of
 // the data, and of every number whose drawing code was cleaned up, on each map the number is placed on, as its old
 // code drew it. MU_MONSTER_LOOK_WRITE=<numbers,
