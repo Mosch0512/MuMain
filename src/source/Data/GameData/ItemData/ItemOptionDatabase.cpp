@@ -13,9 +13,9 @@ namespace
 // options, the skill (no definition), luck, the additional option, the Dark Horse, excellent options, fixed options.
 // The ancient types follow them only for the order of a saved list (names of no definition last): they take no slot,
 // and the tooltip shows the ancient bonus above the slots' lines.
-constexpr std::array<ItemOptionType, 5> TakeOrder = {ItemOptionType::Luck, ItemOptionType::Option,
-                                                     ItemOptionType::Excellent, ItemOptionType::AncientOption,
-                                                     ItemOptionType::AncientBonus};
+constexpr std::array<ItemOptionType, 6> TakeOrder = {ItemOptionType::Wing,          ItemOptionType::Luck,
+                                                     ItemOptionType::Option,        ItemOptionType::Excellent,
+                                                     ItemOptionType::AncientOption, ItemOptionType::AncientBonus};
 
 size_t GetTakeOrder(ItemOptionType type)
 {

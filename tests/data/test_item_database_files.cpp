@@ -1938,10 +1938,11 @@ TEST_CASE("Item editor changes go into the item database [data][items][editor]")
 
     SUBCASE("a moved item's option list follows its new number")
     {
-        // The rules give luck to the Wings of Elf (12/0), not to a number of group 12 no rule names.
+        // The rules give the Wings of Elf (12/0) luck and its additional option, not a number of group 12 no rule
+        // names.
         const int emptyWingType = MakeItemType(12, 300);
         REQUIRE(g_ItemDatabase.Find(emptyWingType) == nullptr);
-        REQUIRE(g_ItemDatabase.Find(ITEM_WINGS_OF_ELF)->options == std::vector<std::string>{"luck"});
+        REQUIRE(g_ItemDatabase.Find(ITEM_WINGS_OF_ELF)->options == std::vector<std::string>{"luck", "wingsOfElf"});
         std::swap(ItemAttribute[ITEM_WINGS_OF_ELF], ItemAttribute[emptyWingType]);
         g_ItemDataHandler.OnItemsSwapped(ITEM_WINGS_OF_ELF, emptyWingType);
         CHECK(g_ItemDatabase.Find(emptyWingType)->options.empty());

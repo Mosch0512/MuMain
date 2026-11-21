@@ -34,6 +34,7 @@ constexpr const char* Number = "number";
 constexpr const char* Attribute = "attribute";
 constexpr const char* Text = "text";
 constexpr const char* Values = "values";
+constexpr const char* LevelType = "levelType";
 constexpr const char* PerLevel = "perLevel";
 constexpr const char* Per = "per";
 constexpr const char* Times = "times";
@@ -55,7 +56,9 @@ const KeySet ServerKeys = {Keys::AddsRandomly, Keys::AddChance, Keys::MaximumOpt
 const KeySet OptionKeys = {Keys::Number,         Keys::Attribute,      ItemOptionAddKeys[0],
                            ItemOptionAddKeys[1], ItemOptionAddKeys[2], Keys::Text};
 // perLevel has an error of its own, so it is no unknown field.
-const KeySet ValueKeys = {Keys::Values, Keys::PerLevel, Keys::Per};
+const KeySet ValueKeys = {Keys::LevelType, Keys::Values, Keys::PerLevel, Keys::Per};
+// The one level type besides the option's own level.
+constexpr const char* ItemLevelType = "itemLevel";
 const KeySet TermKeys = {Keys::Attribute, Keys::Times, Keys::Divisor};
 
 // Whether the options of a type have a number (OpenMU's ItemOption.Number), and whether a definition of it has one
@@ -303,6 +306,19 @@ void ItemOptionsReader::ReadValue(const OrderedJson& json, const std::string& fi
         AddFatal(field + "." + Keys::Values, "missing, or neither a number nor a list of one value per level");
         return;
     }
+    if (const auto levelType = json.find(Keys::LevelType); levelType != json.end())
+    {
+        if (levelType->is_string() && levelType->get<std::string>() == ItemLevelType)
+        {
+            value.levelType = ItemOptionLevelType::ItemLevel;
+        }
+        else
+        {
+            AddFatal(field + "." + Keys::LevelType,
+                     std::string("must be \"") + ItemLevelType +
+                         "\" (the item's + level), or left out (the option's own level)");
+        }
+    }
     value.isList = values->is_array();
     if (!value.isList)
     {
@@ -409,11 +425,13 @@ void ItemOptionsReader::ReadNumber(const OrderedJson& json, const std::string& f
         AddFatal(field + "." + Keys::Number, "missing");
         return;
     }
-    // Excellent options count from 1 (bit number - 1), an ancient set's options in the order the set gives them.
-    const int minimum = type == ItemOptionType::Excellent || type == ItemOptionType::AncientOption ? 1 : 0;
-    const int maximum = type == ItemOptionType::Option      ? MaxOptionTypeNumber
-                        : type == ItemOptionType::Excellent ? MaxExcellentOptionNumber
-                                                            : MaxNumber;
+    // Excellent and wing options count from 1 (bit number - 1), an ancient set's options in the order the set gives
+    // them.
+    const bool byteBits = type == ItemOptionType::Excellent || type == ItemOptionType::Wing;
+    const int minimum = byteBits || type == ItemOptionType::AncientOption ? 1 : 0;
+    const int maximum = type == ItemOptionType::Option ? MaxOptionTypeNumber
+                        : byteBits                     ? MaxExcellentOptionNumber
+                                                       : MaxNumber;
     ReadWholeNumber(*number, field + "." + Keys::Number, minimum, maximum, option.number);
 }
 
@@ -518,6 +536,10 @@ bool ItemOptionsReader::ReadDefinition(const OrderedJson& json, const std::strin
 OrderedJson WriteValue(const ItemOptionValue& value)
 {
     OrderedJson json;
+    if (value.levelType == ItemOptionLevelType::ItemLevel)
+    {
+        json[Keys::LevelType] = ItemLevelType;
+    }
     if (value.isList)
     {
         json[Keys::Values] = value.values;

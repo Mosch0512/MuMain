@@ -41,6 +41,7 @@ using Data::Items::ItemOption;
 using Data::Items::ItemOptionAdd;
 using Data::Items::ItemOptionDefinition;
 using Data::Items::ItemOptionFiles;
+using Data::Items::ItemOptionLevelType;
 using Data::Items::ItemOptionTerm;
 using Data::Items::ItemOptionType;
 using Data::Items::ItemOptionValue;
@@ -745,8 +746,20 @@ void CMuItemOptionsUI::RenderValue(ItemOptionValue& value, size_t option)
     else
     {
         ImGui::SameLine();
-        ImGui::TextDisabled("%s",
-                            I18N::Format(I18N::Editor::HighestLevel0, {std::to_string(value.values.size())}).c_str());
+        bool byItemLevel = value.levelType == ItemOptionLevelType::ItemLevel;
+        if (ImGui::Checkbox(I18N::Editor::ByTheItemSLevel, &byItemLevel))
+        {
+            value.levelType = byItemLevel ? ItemOptionLevelType::ItemLevel : ItemOptionLevelType::OptionLevel;
+        }
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("%s", I18N::Editor::TheListGoesByTheItemSLevel0To15NotTheOptionLevel);
+        }
+        const int firstLevel = value.FirstLevel();
+        ImGui::SameLine();
+        ImGui::TextDisabled("%s", I18N::Format(I18N::Editor::HighestLevel0,
+                                               {std::to_string(static_cast<int>(value.values.size()) + firstLevel - 1)})
+                                      .c_str());
         for (size_t level = 0; level < value.values.size(); ++level)
         {
             if (level % LevelsPerRow != 0)
@@ -762,11 +775,14 @@ void CMuItemOptionsUI::RenderValue(ItemOptionValue& value, size_t option)
             }
             if (ImGui::IsItemHovered())
             {
-                ImGui::SetTooltip("%s", I18N::Format(I18N::Editor::Level0, {std::to_string(level + 1)}).c_str());
+                ImGui::SetTooltip(
+                    "%s",
+                    I18N::Format(I18N::Editor::Level0, {std::to_string(static_cast<int>(level) + firstLevel)}).c_str());
             }
             ImGui::PopID();
         }
-        ImGui::BeginDisabled(value.values.size() >= static_cast<size_t>(MaxOptionLevel));
+        // Option levels 1 to 15, or the item levels 0 to 15.
+        ImGui::BeginDisabled(value.values.size() >= static_cast<size_t>(MaxOptionLevel + 1 - firstLevel));
         if (ImGui::SmallButton("+"))
         {
             const int step = value.values.size() >= 2 ? value.values.back() - value.values[value.values.size() - 2]
