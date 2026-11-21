@@ -22,23 +22,11 @@ namespace MuEditor::Monsters::MonsterChecks
 {
 namespace
 {
-std::vector<const Data::Monsters::MonsterDefinition*> AllMonsters()
-{
-    std::vector<const Data::Monsters::MonsterDefinition*> monsters;
-    for (int number = 0; number < Data::Monsters::MonsterNumberCount; ++number)
-    {
-        if (const Data::Monsters::MonsterDefinition* monster = g_MonsterDatabase.Find(number))
-            monsters.push_back(monster);
-    }
-    return monsters;
-}
-
 // A monster naming an item the item list does not have (D60).
 void ValidateItems(std::vector<Data::Items::ItemDataIssue>& issues)
 {
-    const std::vector<const Data::Monsters::MonsterDefinition*> monsters = AllMonsters();
     Data::Monsters::ValidateMonsterItems(
-        monsters, [](int itemType) { return g_ItemDatabase.FindEntry(itemType) != nullptr; },
+        g_MonsterDatabase.GetAll(), [](int itemType) { return g_ItemDatabase.FindEntry(itemType) != nullptr; },
         Data::Monsters::GetMonstersFile().generic_string(), issues);
 }
 
@@ -62,12 +50,13 @@ void RunMonsters(std::vector<Data::Items::ItemDataIssue>& issues)
     AttackChecks::Validate(issues);
     GroupChecks::Validate(issues);
     ValidateItems(issues);
-    Data::Monsters::ValidateMonsterLooks(AllMonsters(), RenderStyleExists, EffectExists,
+    Data::Monsters::ValidateMonsterLooks(g_MonsterDatabase.GetAll(), RenderStyleExists, EffectExists,
                                          Data::Monsters::GetMonstersFile().generic_string(), issues);
-    Data::Monsters::ValidateMonsterSetups(AllMonsters(), Data::Monsters::GetMonstersFile().generic_string(), issues);
-    Data::Monsters::ValidateMonsterTalkSteps(AllMonsters(), g_MonsterDatabase.GetTalkTexts(),
+    Data::Monsters::ValidateMonsterSetups(g_MonsterDatabase.GetAll(),
+                                          Data::Monsters::GetMonstersFile().generic_string(), issues);
+    Data::Monsters::ValidateMonsterTalkSteps(g_MonsterDatabase.GetAll(), g_MonsterDatabase.GetTalkTexts(),
                                              Data::Monsters::GetMonstersFile().generic_string(), issues);
-    Data::Monsters::ValidateMonsterTalkTexts(AllMonsters(), g_MonsterDatabase.GetTalkTexts(),
+    Data::Monsters::ValidateMonsterTalkTexts(g_MonsterDatabase.GetAll(), g_MonsterDatabase.GetTalkTexts(),
                                              I18N::GetAvailableLocales(),
                                              Data::Monsters::GetMonstersFile().generic_string(), issues);
 }

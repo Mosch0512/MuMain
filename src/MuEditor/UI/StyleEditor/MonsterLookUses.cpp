@@ -8,7 +8,6 @@
 #include "Data/GameData/MonsterData/MonsterDatabase.h"
 #include "Data/GameData/MonsterData/MonsterModelDatabase.h"
 
-#include <set>
 #include <vector>
 
 namespace MuEditor::Looks
@@ -29,17 +28,7 @@ void MonsterLookUses::Update()
     }
     m_monsterVersion = g_MonsterDatabase.GetVersion();
     m_modelVersion = g_MonsterModelDatabase.GetVersion();
-    // An entry with several numbers is found under each of them and counts once.
-    std::vector<const Data::Monsters::MonsterDefinition*> monsters;
-    std::set<const Data::Monsters::MonsterDefinition*> found;
-    for (int number = 0; number < Data::Monsters::MonsterNumberCount; ++number)
-    {
-        const Data::Monsters::MonsterDefinition* monster = g_MonsterDatabase.Find(number);
-        if (monster != nullptr && found.insert(monster).second)
-        {
-            monsters.push_back(monster);
-        }
-    }
+    const std::vector<const Data::Monsters::MonsterDefinition*> monsters = g_MonsterDatabase.GetAll();
     m_renderStyles = Data::Monsters::CountMonsterLookUses(monsters, g_MonsterModelDatabase.GetAll(), false);
     m_effects = Data::Monsters::CountMonsterLookUses(monsters, g_MonsterModelDatabase.GetAll(), true);
 }

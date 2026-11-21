@@ -42,16 +42,8 @@ constexpr std::string_view MonsterSoundsName = "monster sound sets";
 // read in place.
 void ValidateLinks(std::span<const MonsterSoundSet> sets, std::vector<Items::ItemDataIssue>& issues)
 {
-    std::vector<const MonsterDefinition*> monsters;
-    for (int number = 0; number < MonsterNumberCount; ++number)
-    {
-        if (const MonsterDefinition* monster = g_MonsterDatabase.Find(number))
-        {
-            monsters.push_back(monster);
-        }
-    }
-    ValidateMonsterSoundLinks(monsters, g_MonsterModelDatabase.GetAll(), sets, GetMonstersFile().generic_string(),
-                              GetMonsterSoundsFile().generic_string(), issues);
+    ValidateMonsterSoundLinks(g_MonsterDatabase.GetAll(), g_MonsterModelDatabase.GetAll(), sets,
+                              GetMonstersFile().generic_string(), GetMonsterSoundsFile().generic_string(), issues);
 }
 
 // The looks the monsters and their models name (MN8, ML1), once both tables are built: a name no look file has is
@@ -67,16 +59,8 @@ void ValidateLookNames(std::vector<Items::ItemDataIssue>& monsterIssues, std::ve
     { return Data::Looks::g_LookStore.FindRenderStyle(name) != nullptr; };
     const auto effectExists = [](std::string_view name)
     { return Data::Looks::g_LookStore.FindEffect(name) != nullptr; };
-    std::vector<const MonsterDefinition*> monsters;
-    for (int number = 0; number < MonsterNumberCount; ++number)
-    {
-        const MonsterDefinition* monster = g_MonsterDatabase.Find(number);
-        if (monster != nullptr && std::find(monsters.begin(), monsters.end(), monster) == monsters.end())
-        {
-            monsters.push_back(monster);
-        }
-    }
-    ValidateMonsterLooks(monsters, renderStyleExists, effectExists, GetMonstersFile().generic_string(), monsterIssues);
+    ValidateMonsterLooks(g_MonsterDatabase.GetAll(), renderStyleExists, effectExists,
+                         GetMonstersFile().generic_string(), monsterIssues);
     ValidateMonsterModelLooks(g_MonsterModelDatabase.GetAll(), renderStyleExists, effectExists,
                               GetMonsterModelsFile().generic_string(), modelIssues);
 }
