@@ -82,6 +82,16 @@ void ValidateLookNames(std::vector<Items::ItemDataIssue>& monsterIssues, std::ve
 }
 
 #ifdef _EDITOR
+// Whether two entries of a slot name the same looks (MN8); none names none. Only a look change makes the living
+// monsters take their looks again: the other fields reach them when the model is reopened.
+bool SameLooks(const MonsterModelDefinition* a, const MonsterModelDefinition* b)
+{
+    static const MonsterModelDefinition None;
+    const MonsterModelDefinition& left = a != nullptr ? *a : None;
+    const MonsterModelDefinition& right = b != nullptr ? *b : None;
+    return left.renderStyle == right.renderStyle && left.effect == right.effect;
+}
+
 // The entries of the table, sorted by number.
 std::vector<MonsterDefinition> CollectMonsters()
 {
@@ -510,6 +520,7 @@ std::optional<MonsterModelDefinition> MonsterDataHandler::ReadModel(int slot) co
 
 void MonsterDataHandler::RestoreModels(std::span<const MonsterModelSnapshot> snapshots)
 {
+    bool looksChanged = false;
     for (const MonsterModelSnapshot& snapshot : snapshots)
     {
         const std::string_view symbol = GetMonsterModelSymbol(snapshot.slot);
@@ -517,6 +528,8 @@ void MonsterDataHandler::RestoreModels(std::span<const MonsterModelSnapshot> sna
         {
             continue;
         }
+        const MonsterModelDefinition* old = g_MonsterModelDatabase.Find(snapshot.slot);
+        looksChanged = looksChanged || !SameLooks(old, snapshot.model.has_value() ? &*snapshot.model : nullptr);
         if (snapshot.model)
         {
             MonsterModelDefinition model = *snapshot.model;
@@ -529,7 +542,10 @@ void MonsterDataHandler::RestoreModels(std::span<const MonsterModelSnapshot> sna
         }
         m_modelsToReopen.push_back(snapshot.slot);
     }
-    NotifyModelLooksChanged();
+    if (looksChanged)
+    {
+        NotifyModelLooksChanged();
+    }
 }
 
 bool MonsterDataHandler::SaveModels(std::vector<Items::ItemDataIssue>& issues)
@@ -660,12 +676,14 @@ void MonsterDataHandler::UseModels(std::span<const MonsterModelDefinition> model
     // The slots whose entry the file changes, also those it removes.
     const std::map<int, MonsterModelDefinition> before = BySlot(CollectModels());
     const std::map<int, MonsterModelDefinition> after = BySlot(models);
+    bool looksChanged = false;
     for (const auto& [slot, model] : before)
     {
         const auto read = after.find(slot);
         if (read == after.end() || !(read->second == model))
         {
             m_modelsToReopen.push_back(slot);
+            looksChanged = looksChanged || !SameLooks(&model, read != after.end() ? &read->second : nullptr);
         }
     }
     for (const auto& [slot, model] : after)
@@ -673,10 +691,14 @@ void MonsterDataHandler::UseModels(std::span<const MonsterModelDefinition> model
         if (!before.contains(slot))
         {
             m_modelsToReopen.push_back(slot);
+            looksChanged = looksChanged || !SameLooks(nullptr, &model);
         }
     }
     g_MonsterModelDatabase.Build(models);
-    NotifyModelLooksChanged();
+    if (looksChanged)
+    {
+        NotifyModelLooksChanged();
+    }
 }
 
 void MonsterDataHandler::NotifyModelLooksChanged() const

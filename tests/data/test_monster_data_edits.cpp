@@ -74,6 +74,24 @@ public:
     NamesChangedListener& operator=(const NamesChangedListener&) = delete;
 };
 
+class MonstersChangedListener
+{
+public:
+    MonstersChangedListener()
+    {
+        g_toldNumbers.clear();
+        g_MonsterDataHandler.SetMonstersChangedCallback(&RememberNamesChanged);
+    }
+
+    ~MonstersChangedListener()
+    {
+        g_MonsterDataHandler.SetMonstersChangedCallback(nullptr);
+    }
+
+    MonstersChangedListener(const MonstersChangedListener&) = delete;
+    MonstersChangedListener& operator=(const MonstersChangedListener&) = delete;
+};
+
 const ItemDataIssue* FindIssue(const std::vector<ItemDataIssue>& issues, int number)
 {
     const auto found = std::ranges::find(issues, number, &ItemDataIssue::number);
@@ -175,6 +193,33 @@ TEST_CASE("Monster data: the editor reads monsters as snapshots and restores the
     g_toldNumbers.clear();
     g_MonsterDataHandler.RestoreMonsters(std::span<const MonsterSnapshot>());
     CHECK(g_toldNumbers.empty());
+}
+
+TEST_CASE("Monster data: a model edit makes the living monsters take their looks again only when a look it names "
+          "changes (MN8) [data][monsters][editor][looks]")
+{
+    using Data::Monsters::MonsterModelDefinition;
+    using Data::Monsters::MonsterModelSnapshot;
+    const int slot = MODEL_MONSTER01 + MONSTER_MODEL_BULL_FIGHTER;
+    const std::optional<MonsterModelDefinition> before = g_MonsterDataHandler.ReadModel(slot);
+    MonsterModelDefinition model = before.value_or(MonsterModelDefinition{});
+    const auto restore = [&](const std::optional<MonsterModelDefinition>& entry)
+    {
+        const std::array snapshots = {MonsterModelSnapshot{slot, entry}};
+        g_MonsterDataHandler.RestoreModels(snapshots);
+    };
+    {
+        MonstersChangedListener listener;
+        // A value no look depends on: the model is reopened, the living monsters are not told.
+        model.headBone = model.headBone.value_or(0) + 1;
+        restore(model);
+        CHECK(g_toldNumbers.empty());
+        model.renderStyle = model.renderStyle == "phantomKnight" ? "quarrel" : "phantomKnight";
+        restore(model);
+        CHECK(g_toldNumbers == std::vector<int>{MonsterDataHandler::AllNumbers});
+    }
+    restore(before);
+    g_MonsterDataHandler.ReopenChangedModels();
 }
 
 TEST_CASE("Monster data: the editor's checks are those of loading and saving [data][monsters][editor]")
