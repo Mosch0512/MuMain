@@ -69,9 +69,10 @@ bool IsOptionTurnedOn(const ITEM& item, ItemOptionType type, const ItemOption& o
         return IsExcellentBitSet(item.ExcellentFlags, option);
     case ItemOptionType::Luck:
         return true;
-    // The ancient types take no option slots (IsTurnedOn gives them none).
+    // The ancient types and harmony take no option slots (IsTurnedOn gives them none).
     case ItemOptionType::AncientOption:
     case ItemOptionType::AncientBonus:
+    case ItemOptionType::Harmony:
         break;
     }
     return false;
