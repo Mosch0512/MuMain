@@ -5983,4 +5983,25 @@
   <data name="The list goes by the item's level 0 to 15, not the option level" xml:space="preserve">
     <value>Die Liste geht nach der Stufe des Gegenstands 0 bis 15, nicht nach der Optionsstufe</value>
   </data>
+  <data name="First level" xml:space="preserve">
+    <value>Erste Stufe</value>
+  </data>
+  <data name="The list's first level" xml:space="preserve">
+    <value>Die Stufe des ersten Werts der Liste; darunter ist der Wert 0</value>
+  </data>
+  <data name="Only from the item's level" xml:space="preserve">
+    <value>Erst ab der Gegenstandsstufe</value>
+  </data>
+  <data name="Counts from the item's level" xml:space="preserve">
+    <value>Die Option zählt nur, solange die Gegenstandsstufe mindestens ihre eigene Stufe ist; darunter zeigt der Tooltip sie grau</value>
+  </data>
+  <data name="Zen per level" xml:space="preserve">
+    <value>Zen pro Stufe</value>
+  </data>
+  <data name="The removal mix's Zen" xml:space="preserve">
+    <value>Was die Mischung, die die Option entfernt, auf jeder Stufe ihres Werts kostet, ab der ersten; die letzte auch darüber</value>
+  </data>
+  <data name="OpenMU's pick weight" xml:space="preserve">
+    <value>Wie wahrscheinlich OpenMUs Server die Option wählt; das Spiel liest sie nicht</value>
+  </data>
 </root>

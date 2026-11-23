@@ -397,6 +397,16 @@ TEST_CASE("Fill levels makes a definition's value lists end at a level by their 
         CHECK_FALSE(FillOptionLevels(damage, 7));
     }
 
+    SUBCASE("a list from its own first level ends at the level too")
+    {
+        // A harmony option's list from level 9: levels 9 to 13.
+        damage.options[0].value = {.values = {3, 5, 7, 9, 10}, .isList = true, .firstLevel = 9};
+        CHECK(HighestOptionLevel(damage) == 13);
+        CHECK(FillOptionLevels(damage, 11));
+        CHECK(damage.options[0].value.values == std::vector<int>{3, 5, 7});
+        CHECK(HighestOptionLevel(damage) == 11);
+    }
+
     SUBCASE("shorter lists are cut")
     {
         CHECK(FillOptionLevels(damage, 2));

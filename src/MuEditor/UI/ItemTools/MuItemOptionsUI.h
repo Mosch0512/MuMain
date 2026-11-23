@@ -64,6 +64,7 @@ private:
     void RenderOption(Data::Items::ItemOptionDefinition& definition, size_t index);
     void RenderValue(Data::Items::ItemOptionValue& value, size_t option);
     void RenderTerms(Data::Items::ItemOptionValue& value);
+    void RenderZen(Data::Items::ItemOption& option);
     void RenderTexts(Data::Items::ItemOption& option);
     void RenderUsers(const std::string& name);
     void RenderApplyButtons();

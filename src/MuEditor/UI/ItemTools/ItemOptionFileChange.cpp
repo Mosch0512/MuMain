@@ -363,7 +363,7 @@ int HighestOptionLevel(const ItemOptionDefinition& definition)
         // A list by the item's level follows the item, not the option level.
         if (option.value.isList && option.value.levelType == Data::Items::ItemOptionLevelType::OptionLevel)
         {
-            highest = std::max(highest, static_cast<int>(option.value.values.size()));
+            highest = std::max(highest, static_cast<int>(option.value.values.size()) + option.value.FirstLevel() - 1);
         }
     }
     return highest;
@@ -372,10 +372,11 @@ int HighestOptionLevel(const ItemOptionDefinition& definition)
 bool FillOptionLevels(ItemOptionDefinition& definition, int level)
 {
     bool changed = false;
-    const size_t size = static_cast<size_t>(std::max(level, 1));
     for (Data::Items::ItemOption& option : definition.options)
     {
         std::vector<int>& values = option.value.values;
+        // The list's levels from its first one to `level`; one at least.
+        const auto size = static_cast<size_t>(std::max(level - option.value.FirstLevel() + 1, 1));
         if (!option.value.isList || option.value.levelType != Data::Items::ItemOptionLevelType::OptionLevel ||
             values.empty() || values.size() == size)
         {

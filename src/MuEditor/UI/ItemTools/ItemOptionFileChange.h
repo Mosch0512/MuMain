@@ -125,13 +125,13 @@ std::vector<Data::Items::ItemDefinition> FindItemListChanges(std::span<const Dat
 // Whether the two lists name the same definitions, in any order (as FollowItemOptions compares them).
 bool IsSameOptionList(std::span<const std::string> list, std::span<const std::string> other);
 
-// The highest level the definition's value lists give a value of their own (their longest list; a list's last entry
-// counts above it); 0 when its values are constants.
+// The highest level the definition's value lists give a value of their own (a list's first level plus its length,
+// minus one; its last entry counts above it); 0 when its values are constants.
 int HighestOptionLevel(const Data::Items::ItemOptionDefinition& definition);
 
-// Makes each value list of the definition end at `level` (1 or more): a shorter list goes on by the step between its
-// last two entries (a list of one entry by that entry), a longer one is cut. Constants stay. False when nothing
-// changed.
+// Makes each value list of the definition end at `level` (1 or more; a list keeps one entry at least, from its first
+// level): a shorter list goes on by the step between its last two entries (a list of one entry by that entry), a
+// longer one is cut. Constants stay. False when nothing changed.
 bool FillOptionLevels(Data::Items::ItemOptionDefinition& definition, int level);
 
 // Writes the value as a list from `fromLevel` to `toLevel`: `fromValue` at `fromLevel`, `step` more at each level
