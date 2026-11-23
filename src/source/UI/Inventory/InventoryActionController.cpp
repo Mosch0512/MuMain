@@ -9,7 +9,7 @@
 #include "UI/Dialogs/CustomMessageBox.h"
 #include "UI/Dialogs/GenericConfirmDialog.h"
 #include "Engine/Object/ZzzInventory.h"
-#include "UI/Inventory/UIJewelHarmony.h"
+#include "GameLogic/Items/ItemOptions.h"
 #include "GameLogic/Items/CSItemOption.h"
 #include "World/MapInfra/MapManager.h"
 #include "Network/Server/SocketSystem.h"
@@ -60,7 +60,8 @@ bool HarmonyAppliesTo(const ITEM* pItem)
     {
         return false;
     }
-    return g_pUIJewelHarmonyinfo->GetItemType(static_cast<int>(pItem->Type)) != SI_None;
+    // An item that links a harmony definition takes the jewel.
+    return GameLogic::Items::FindHarmonyDefinition(pItem->Type).has_value();
 }
 
 bool RefineStoneAppliesTo(const ITEM* pItem)

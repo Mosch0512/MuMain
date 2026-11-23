@@ -9,7 +9,7 @@
 #include "UI/Core/UIManager.h"
 #include "Engine/Object/ZzzInventory.h"
 #include "GameLogic/Items/CSItemOption.h"
-#include "UI/Inventory/UIJewelHarmony.h"
+#include "GameLogic/Items/ItemOptions.h"
 #include "Network/Server/SocketSystem.h"
 #include "GameLogic/Skills/SkillManager.h"
 #include "GameLogic/Items/ItemCategories.h"
@@ -1095,21 +1095,10 @@ void CMixRecipes::CalcMixReqZen(int iNumMixItems, CMixItem* pMixItems)
         break;
     case 'D':
     {
-        int iItemType = 0;
-        if (ITEM_SWORD <= pMixItems[0].m_sType && ITEM_STAFF > pMixItems[0].m_sType)
-        {
-            iItemType = SI_Weapon;
-        }
-        else if (ITEM_STAFF <= pMixItems[0].m_sType && ITEM_SHIELD > pMixItems[0].m_sType)
-        {
-            iItemType = SI_Staff;
-        }
-        else if (ITEM_SHIELD <= pMixItems[0].m_sType && ITEM_WING > pMixItems[0].m_sType)
-        {
-            iItemType = SI_Defense;
-        }
-        m_dwRequiredZen = g_pUIJewelHarmonyinfo->GetHarmonyJewelOptionInfo(iItemType,
-            pMixItems[0].m_wHarmonyOption).Zen[pMixItems[0].m_wHarmonyOptionLevel];
+        // The removal costs the Zen of the item's harmony option at its level (Harmony.json's "zen").
+        const Data::Items::ItemOption* harmony =
+            GameLogic::Items::FindHarmonyOptionOf(pMixItems[0].m_sType, pMixItems[0].m_wHarmonyOption);
+        m_dwRequiredZen = harmony != nullptr ? harmony->ZenAt(pMixItems[0].m_wHarmonyOptionLevel) : 0;
     }
     break;
     default:

@@ -26,6 +26,28 @@ struct ItemOptionEffect
 // The effect id of an option the client doesn't compute: its slot shows its line and adds nothing.
 constexpr WORD NoItemOptionEffect = 0xFFFF;
 
+// What a Jewel of Harmony option does in the client (its ItemOptionEffect::effect): the part of the item's
+// StrengthenCapability it raises (JewelHarmonyInfo::GetStrengthenCapability), or the critical damage bonus. Shown only:
+// the line, no stat (P11: SD, regeneration, PvP damage decrease and SD bypass).
+enum HarmonyEffect : WORD
+{
+    HarmonyStrengthRequirement,
+    HarmonyAgilityRequirement,
+    HarmonyMinimumDamage,
+    HarmonyMaximumDamage,
+    // The minimum and the maximum damage.
+    HarmonyDamage,
+    HarmonyWizardryDamage,
+    HarmonySkillDamage,
+    HarmonyAttackRate,
+    HarmonyCriticalDamage,
+    HarmonyDefense,
+    HarmonyMaximumAg,
+    HarmonyMaximumHealth,
+    HarmonyDefenseRate,
+    HarmonyShownOnly,
+};
+
 // The hero attributes a value's term (ItemOptionTerm, "per") can read, by their names in the data
 // (GameLogic::Items::ComputeOptionValue). A term on another attribute adds nothing.
 struct ItemOptionTermAttributeName

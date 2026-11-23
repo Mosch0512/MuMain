@@ -342,6 +342,66 @@ std::optional<AncientBonus> FindAncientBonus(const ITEM& item)
                         ComputeOptionValue(option.value, level)};
 }
 
+std::optional<Data::Items::ItemOptionIndex> FindHarmonyDefinition(int itemType)
+{
+    if (itemType < 0 || itemType >= MAX_ITEM)
+    {
+        return std::nullopt;
+    }
+    const Data::Items::ItemOptionDatabase& options = g_ItemDatabase.GetOptions();
+    for (const Data::Items::ItemOptionIndex link : g_ItemDatabase.GetOptionLinks(itemType))
+    {
+        if (options.Get(link).type == ItemOptionType::Harmony)
+        {
+            return link;
+        }
+    }
+    return std::nullopt;
+}
+
+const ItemOption* FindHarmonyOptionOf(int itemType, int number)
+{
+    const std::optional<Data::Items::ItemOptionIndex> definitionIndex = FindHarmonyDefinition(itemType);
+    if (!definitionIndex)
+    {
+        return nullptr;
+    }
+    const ItemOptionDefinition& definition = g_ItemDatabase.GetOptions().Get(*definitionIndex);
+    const auto found = std::ranges::find(definition.options, number, &ItemOption::number);
+    return found != definition.options.end() ? &*found : nullptr;
+}
+
+std::optional<HarmonyOption> FindHarmonyOption(const ITEM& item)
+{
+    if (item.Jewel_Of_Harmony_Option == 0)
+    {
+        return std::nullopt;
+    }
+    const std::optional<Data::Items::ItemOptionIndex> definitionIndex = FindHarmonyDefinition(item.Type);
+    if (!definitionIndex)
+    {
+        return std::nullopt;
+    }
+    const Data::Items::ItemOptionDatabase& options = g_ItemDatabase.GetOptions();
+    const ItemOptionDefinition& definition = options.Get(*definitionIndex);
+    for (size_t index = 0; index < definition.options.size(); ++index)
+    {
+        const ItemOption& option = definition.options[index];
+        if (option.number != item.Jewel_Of_Harmony_Option)
+        {
+            continue;
+        }
+        const int harmonyLevel = item.Jewel_Of_Harmony_OptionLevel;
+        // Its own level is the harmony level; a list by the item's level takes the item's + level, as every option
+        // does.
+        const int level =
+            option.value.levelType == Data::Items::ItemOptionLevelType::ItemLevel ? item.Level : harmonyLevel;
+        return HarmonyOption{&definition, &option, options.GetEffect(*definitionIndex, index).effect,
+                             ComputeOptionValue(option.value, level), option.CountsAt(item.Level, harmonyLevel)};
+    }
+    return std::nullopt;
+}
+
 int GetItemOptionValue(const ITEM& item, int slot)
 {
     if (const std::optional<SlotOption> slotOption = FindSlotOption(item, slot))

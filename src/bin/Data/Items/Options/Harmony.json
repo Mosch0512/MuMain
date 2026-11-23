@@ -1,0 +1,64 @@
+{
+  "formatVersion": 1,
+  "definitions": [
+    {
+      "name": "harmonyPhysicalAttack",
+      "type": "harmony",
+      "displayName": {
+        "en": "Harmony physical attack options"
+      },
+      "openMu": {"name": "Harmony Physical Attack Options"},
+      "server": {"addsRandomly": false, "addChance": 0.0, "maximumOptionsPerItem": 1},
+      "options": [
+        {"number": 1, "attribute": "minimumPhysBaseDmg", "add": {"firstLevel": 0, "values": [2, 3, 4, 5, 6, 7, 9, 11, 12, 14, 15, 16, 17, 20]}, "text": "harmonyMinimumAttack", "requiresItemLevel": true, "zen": [100000, 110000, 120000, 130000, 140000, 150000, 200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 40}},
+        {"number": 2, "attribute": "maximumPhysBaseDmg", "add": {"firstLevel": 0, "values": [3, 4, 5, 6, 7, 8, 10, 12, 14, 17, 20, 23, 26, 29]}, "text": "harmonyMaximumAttack", "requiresItemLevel": true, "zen": [100000, 110000, 120000, 130000, 140000, 150000, 200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 40}},
+        {"number": 3, "attribute": "requiredStrengthReduction", "add": {"firstLevel": 0, "values": [6, 8, 10, 12, 14, 16, 20, 23, 26, 29, 32, 35, 37, 40]}, "text": "harmonyStrengthRequirement", "requiresItemLevel": true, "zen": [100000, 110000, 120000, 130000, 140000, 150000, 200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 40}},
+        {"number": 4, "attribute": "requiredAgilityReduction", "add": {"firstLevel": 0, "values": [6, 8, 10, 12, 14, 16, 20, 23, 26, 29, 32, 35, 37, 40]}, "text": "harmonyAgilityRequirement", "requiresItemLevel": true, "zen": [100000, 110000, 120000, 130000, 140000, 150000, 200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 40}},
+        {"number": 5, "attribute": "physicalBaseDmg", "addFinal": {"firstLevel": 6, "values": [7, 8, 9, 11, 12, 14, 16, 19]}, "text": "harmonyAttack", "requiresItemLevel": true, "zen": [200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 30}},
+        {"number": 6, "attribute": "criticalDamageBonus", "add": {"firstLevel": 6, "values": [12, 14, 16, 18, 20, 22, 24, 30]}, "text": "harmonyCriticalDamage", "requiresItemLevel": true, "zen": [200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 30}},
+        {"number": 7, "attribute": "skillDamageBonus", "add": {"firstLevel": 9, "values": [12, 14, 16, 18, 22]}, "text": "harmonySkillAttack", "requiresItemLevel": true, "zen": [280000, 320000, 360000, 400000, 500000], "server": {"weight": 20}},
+        {"number": 8, "attribute": "attackRatePvp", "add": {"firstLevel": 9, "values": [5, 7, 9, 11, 14]}, "text": "harmonyAttackSuccessRatePvp", "requiresItemLevel": true, "zen": [280000, 320000, 360000, 400000, 500000], "server": {"weight": 20}},
+        {"number": 9, "attribute": "shieldDecreaseRateIncrease", "add": {"firstLevel": 9, "values": [3, 5, 7, 9, 10]}, "text": "harmonySdDecrement", "requiresItemLevel": true, "zen": [280000, 320000, 360000, 400000, 500000], "server": {"weight": 20}},
+        {"number": 10, "attribute": "shieldBypassChance", "percent": {"firstLevel": 13, "values": [10]}, "text": "harmonySdBypassRate", "requiresItemLevel": true, "zen": [500000], "server": {"weight": 10}}
+      ]
+    },
+    {
+      "name": "harmonyWizardryAttack",
+      "type": "harmony",
+      "displayName": {
+        "en": "Harmony wizardry attack options"
+      },
+      "openMu": {"name": "Harmony Wizardry Attack Options"},
+      "server": {"addsRandomly": false, "addChance": 0.0, "maximumOptionsPerItem": 1},
+      "options": [
+        {"number": 1, "attribute": "wizardryBaseDmg", "add": {"firstLevel": 0, "values": [6, 8, 10, 12, 14, 16, 17, 18, 19, 21, 23, 25, 27, 31]}, "text": "harmonyWizardry", "requiresItemLevel": true, "zen": [100000, 110000, 120000, 130000, 140000, 150000, 200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 40}},
+        {"number": 2, "attribute": "requiredStrengthReduction", "add": {"firstLevel": 0, "values": [6, 8, 10, 12, 14, 16, 20, 23, 26, 29, 32, 35, 37, 40]}, "text": "harmonyStrengthRequirement", "requiresItemLevel": true, "zen": [100000, 110000, 120000, 130000, 140000, 150000, 200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 40}},
+        {"number": 3, "attribute": "requiredAgilityReduction", "add": {"firstLevel": 0, "values": [6, 8, 10, 12, 14, 16, 20, 23, 26, 29, 32, 35, 37, 40]}, "text": "harmonyAgilityRequirement", "requiresItemLevel": true, "zen": [100000, 110000, 120000, 130000, 140000, 150000, 200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 40}},
+        {"number": 4, "attribute": "skillDamageBonus", "add": {"firstLevel": 6, "values": [7, 10, 13, 16, 19, 22, 25, 30]}, "text": "harmonySkillAttack", "requiresItemLevel": true, "zen": [200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 30}},
+        {"number": 5, "attribute": "criticalDamageBonus", "add": {"firstLevel": 6, "values": [10, 12, 14, 16, 18, 20, 22, 28]}, "text": "harmonyCriticalDamage", "requiresItemLevel": true, "zen": [200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 30}},
+        {"number": 6, "attribute": "shieldDecreaseRateIncrease", "add": {"firstLevel": 9, "values": [4, 6, 8, 10, 13]}, "text": "harmonySdDecrement", "requiresItemLevel": true, "zen": [280000, 320000, 360000, 400000, 500000], "server": {"weight": 20}},
+        {"number": 7, "attribute": "attackRatePvp", "add": {"firstLevel": 9, "values": [5, 7, 9, 11, 14]}, "text": "harmonyWizardryAttackSuccessRatePvp", "requiresItemLevel": true, "zen": [280000, 320000, 360000, 400000, 500000], "server": {"weight": 20}},
+        {"number": 8, "attribute": "shieldBypassChance", "percent": {"firstLevel": 13, "values": [15]}, "text": "harmonySdBypassRate", "requiresItemLevel": true, "zen": [500000], "server": {"weight": 10}}
+      ]
+    },
+    {
+      "name": "harmonyDefense",
+      "type": "harmony",
+      "displayName": {
+        "en": "Harmony defense options"
+      },
+      "openMu": {"name": "Harmony Defense Options"},
+      "server": {"addsRandomly": false, "addChance": 0.0, "maximumOptionsPerItem": 1},
+      "options": [
+        {"number": 1, "attribute": "defenseBase", "addFinal": {"firstLevel": 0, "values": [3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 25]}, "text": "harmonyDefense", "requiresItemLevel": true, "zen": [100000, 110000, 120000, 130000, 140000, 150000, 200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 50}},
+        {"number": 2, "attribute": "maximumAbility", "add": {"firstLevel": 3, "values": [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 25]}, "text": "harmonyMaximumAg", "requiresItemLevel": true, "zen": [130000, 140000, 150000, 200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 40}},
+        {"number": 3, "attribute": "maximumHealth", "add": {"firstLevel": 3, "values": [7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 30]}, "text": "harmonyMaximumHp", "requiresItemLevel": true, "zen": [130000, 140000, 150000, 200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 40}},
+        {"number": 4, "attribute": "healthRecoveryAbsolute", "add": {"firstLevel": 6, "values": [1, 2, 3, 4, 5, 6, 7, 8]}, "text": "harmonyLifeRecovery", "requiresItemLevel": true, "zen": [200000, 220000, 240000, 280000, 320000, 360000, 400000, 500000], "server": {"weight": 30}},
+        {"number": 5, "attribute": "manaRecoveryAbsolute", "add": {"firstLevel": 9, "values": [1, 2, 3, 4, 5]}, "text": "harmonyManaRecovery", "requiresItemLevel": true, "zen": [280000, 320000, 360000, 400000, 500000], "server": {"weight": 20}},
+        {"number": 6, "attribute": "defenseRatePvp", "add": {"firstLevel": 9, "values": [3, 4, 5, 6, 8]}, "text": "harmonyDefenseSuccessRatePvp", "requiresItemLevel": true, "zen": [280000, 320000, 360000, 400000, 500000], "server": {"weight": 20}},
+        {"number": 7, "attribute": "armorDamageDecrease", "percent": {"firstLevel": 9, "values": [3, 4, 5, 6, 7]}, "text": "harmonyDamageDecrement", "requiresItemLevel": true, "zen": [280000, 320000, 360000, 400000, 500000], "server": {"weight": 20}},
+        {"number": 8, "attribute": "shieldRateIncrease", "percent": {"firstLevel": 13, "values": [5]}, "text": "harmonySdRatio", "requiresItemLevel": true, "zen": [500000], "server": {"weight": 10}}
+      ]
+    }
+  ]
+}

@@ -15,6 +15,7 @@
 #include "World/MapInfra/MapManager.h"
 #include "GameLogic/Items/MixMgr.h"
 #include "GameLogic/Items/ItemCategories.h"
+#include "GameLogic/Items/ItemOptions.h"
 #include "UI/RmlBridge/RmlTooltip.h"
 #include "UI/Tooltip/LegacyTextListTooltip.h"
 
@@ -1073,9 +1074,9 @@ bool mu::ui::window::CInventoryCtrl::DropActsOn(ITEM* pPickItem, ITEM* pTargetIt
     {
         if (pTargetItem->Jewel_Of_Harmony_Option == 0)
         {
-            const StrengthenItem strengthitem = g_pUIJewelHarmonyinfo->GetItemType(static_cast<int>(pTargetItem->Type));
-            if ((strengthitem != SI_None) && (!g_SocketItemMgr.IsSocketItem(pTargetItem))
-                && (pTargetItem->AncientDiscriminator > 0))
+            // An item that links a harmony definition takes the jewel.
+            if (GameLogic::Items::FindHarmonyDefinition(pTargetItem->Type) &&
+                (!g_SocketItemMgr.IsSocketItem(pTargetItem)) && (pTargetItem->AncientDiscriminator > 0))
             {
                 bSuccess = true;
             }

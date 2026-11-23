@@ -92,4 +92,27 @@ struct AncientBonus
 // attackType picks until the item sets link one (Data::Items::ItemOptionDatabase::FindAncientBonus); nothing without
 // a bonus level or such a definition.
 std::optional<AncientBonus> FindAncientBonus(const ITEM& item);
+
+// An item's Jewel of Harmony option: its definition and option, the effect of its attribute
+// (Data::Items::HarmonyEffect, or NoItemOptionEffect for an attribute the client doesn't know), its value at the
+// harmony level, and whether it counts (requiresItemLevel: while the item's + level is at least the harmony level; the
+// tooltip shows it gray when it doesn't).
+struct HarmonyOption
+{
+    const Data::Items::ItemOptionDefinition* definition = nullptr;
+    const Data::Items::ItemOption* option = nullptr;
+    WORD effect = 0;
+    int value = 0;
+    bool counts = false;
+};
+
+// The item's harmony definition: the one it links of type harmony; nothing when it links none.
+std::optional<Data::Items::ItemOptionIndex> FindHarmonyDefinition(int itemType);
+
+// The option numbered `number` of the item type's harmony definition; nothing when it has none.
+const Data::Items::ItemOption* FindHarmonyOptionOf(int itemType, int number);
+
+// The item's harmony option when its harmony byte has a number (ITEM::Jewel_Of_Harmony_Option): the option of that
+// number of its harmony definition; nothing without a number, such a definition or such an option.
+std::optional<HarmonyOption> FindHarmonyOption(const ITEM& item);
 } // namespace GameLogic::Items

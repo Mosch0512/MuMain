@@ -23,7 +23,7 @@ struct EffectRow
 // (GameLogic::Combat::GetHeroCriticalDamageRate). The additional options write theirs. A magic sword's option
 // (baseDamageBonus) is one slot, AT_IMPROVE_DAMAGE, as before, which the stat code adds to the wizardry damage too;
 // its definition shows two lines.
-constexpr std::array<EffectRow, 38> EffectRows = {{
+constexpr std::array<EffectRow, 57> EffectRows = {{
     {ItemOptionType::Luck, "criticalDamageChance", ItemOptionAdd::Percent, {AT_LUCK, true}},
     {ItemOptionType::Option, "physicalBaseDmg", ItemOptionAdd::Add, {AT_IMPROVE_DAMAGE, true}},
     // The wings' damage adds after the other additions on OpenMU (AddFinal); in the client the same slot.
@@ -69,6 +69,27 @@ constexpr std::array<EffectRow, 38> EffectRows = {{
     {ItemOptionType::Wing, "fullyReflectDamageAfterHitChance", ItemOptionAdd::Percent, {AT_DAMAGE_REFLECTION, true}},
     {ItemOptionType::Wing, "fullyRecoverHealthAfterHitChance", ItemOptionAdd::Percent, {AT_RECOVER_FULL_LIFE, true}},
     {ItemOptionType::Wing, "fullyRecoverManaAfterHitChance", ItemOptionAdd::Percent, {AT_RECOVER_FULL_MANA, true}},
+    // The Jewel of Harmony's options take no slot: the item's StrengthenCapability and the critical damage bonus add
+    // them while they count (requiresItemLevel). The ones the client only shows are P11.
+    {ItemOptionType::Harmony, "requiredStrengthReduction", ItemOptionAdd::Add, {HarmonyStrengthRequirement, false}},
+    {ItemOptionType::Harmony, "requiredAgilityReduction", ItemOptionAdd::Add, {HarmonyAgilityRequirement, false}},
+    {ItemOptionType::Harmony, "minimumPhysBaseDmg", ItemOptionAdd::Add, {HarmonyMinimumDamage, false}},
+    {ItemOptionType::Harmony, "maximumPhysBaseDmg", ItemOptionAdd::Add, {HarmonyMaximumDamage, false}},
+    {ItemOptionType::Harmony, "physicalBaseDmg", ItemOptionAdd::AddFinal, {HarmonyDamage, false}},
+    {ItemOptionType::Harmony, "wizardryBaseDmg", ItemOptionAdd::Add, {HarmonyWizardryDamage, false}},
+    {ItemOptionType::Harmony, "skillDamageBonus", ItemOptionAdd::Add, {HarmonySkillDamage, false}},
+    {ItemOptionType::Harmony, "attackRatePvp", ItemOptionAdd::Add, {HarmonyAttackRate, false}},
+    {ItemOptionType::Harmony, "criticalDamageBonus", ItemOptionAdd::Add, {HarmonyCriticalDamage, false}},
+    {ItemOptionType::Harmony, "defenseBase", ItemOptionAdd::AddFinal, {HarmonyDefense, false}},
+    {ItemOptionType::Harmony, "maximumAbility", ItemOptionAdd::Add, {HarmonyMaximumAg, false}},
+    {ItemOptionType::Harmony, "maximumHealth", ItemOptionAdd::Add, {HarmonyMaximumHealth, false}},
+    {ItemOptionType::Harmony, "defenseRatePvp", ItemOptionAdd::Add, {HarmonyDefenseRate, false}},
+    {ItemOptionType::Harmony, "shieldDecreaseRateIncrease", ItemOptionAdd::Add, {HarmonyShownOnly, false}},
+    {ItemOptionType::Harmony, "shieldBypassChance", ItemOptionAdd::Percent, {HarmonyShownOnly, false}},
+    {ItemOptionType::Harmony, "healthRecoveryAbsolute", ItemOptionAdd::Add, {HarmonyShownOnly, false}},
+    {ItemOptionType::Harmony, "manaRecoveryAbsolute", ItemOptionAdd::Add, {HarmonyShownOnly, false}},
+    {ItemOptionType::Harmony, "armorDamageDecrease", ItemOptionAdd::Percent, {HarmonyShownOnly, false}},
+    {ItemOptionType::Harmony, "shieldRateIncrease", ItemOptionAdd::Percent, {HarmonyShownOnly, false}},
 }};
 } // namespace
 

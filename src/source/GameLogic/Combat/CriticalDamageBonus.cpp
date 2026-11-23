@@ -2,27 +2,22 @@
 
 #include "GameLogic/Combat/CriticalDamageBonus.h"
 
+#include "Data/GameData/ItemData/ItemOptionEffects.h"
 #include "Engine/Object/ZzzCharacter.h"
 #include "Engine/Object/ZzzInfomation.h"
 #include "GameLogic/Items/CSItemOption.h"
+#include "GameLogic/Items/ItemOptions.h"
 #include "GameLogic/Skills/SkillManager.h"
 #include "Network/Server/SocketSystem.h"
-#include "UI/Core/UIManager.h"
-#include "UI/Inventory/UIJewelHarmony.h"
 
 #include <array>
 #include <cmath>
-#include <iterator>
+#include <optional>
 
 namespace GameLogic::Combat
 {
 namespace
 {
-// The harmony options "Increase critical damage" of weapons and of staffs (JewelOfHarmonyOption_<lang>.bmd; OpenMU's
-// physical option 6 and wizardry option 5).
-constexpr int WeaponCriticalDamageHarmony = 6;
-constexpr int StaffCriticalDamageHarmony = 5;
-
 // Increase Critical Damage: 1 damage per 30 energy and per 25 command of its caster (OpenMU's
 // CriticalDamageIncreaseEffectInitializer).
 constexpr float EnergyPerDamage = 30.f;
@@ -38,28 +33,16 @@ constexpr std::array<eBuffState, 3> CriticalDamageBuffs{
 constexpr std::array<ActionSkillType, 4> CriticalDamageSkills{AT_SKILL_ADD_CRITICAL, AT_SKILL_ADD_CRITICAL_STR1,
                                                               AT_SKILL_ADD_CRITICAL_STR2, AT_SKILL_ADD_CRITICAL_STR3};
 
+// The item's harmony option when its attribute is the critical damage bonus (Harmony.json: physical option 6,
+// wizardry option 5) and it counts; its value at the harmony level.
 int HarmonyCriticalDamage(ITEM& item)
 {
-    if (item.Jewel_Of_Harmony_Option == 0 || g_pUIJewelHarmonyinfo == nullptr || !AreItemOptionsActive(&item) ||
-        item.Level < item.Jewel_Of_Harmony_OptionLevel)
+    if (!AreItemOptionsActive(&item))
     {
         return 0;
     }
-    const StrengthenItem type = g_pUIJewelHarmonyinfo->GetItemType(item.Type);
-    const bool critical = (type == SI_Weapon && item.Jewel_Of_Harmony_Option == WeaponCriticalDamageHarmony) ||
-                          (type == SI_Staff && item.Jewel_Of_Harmony_Option == StaffCriticalDamageHarmony);
-    if (!critical || !g_pUIJewelHarmonyinfo->IsHarmonyJewelOption(type, item.Jewel_Of_Harmony_Option))
-    {
-        return 0;
-    }
-    // The option's level has 4 bits (0 to 15), the table values for the levels 0 to 13 only.
-    const HARMONYJEWELOPTION& option =
-        g_pUIJewelHarmonyinfo->GetHarmonyJewelOptionInfo(type, item.Jewel_Of_Harmony_Option);
-    if (static_cast<size_t>(item.Jewel_Of_Harmony_OptionLevel) >= std::size(option.HarmonyJewelLevel))
-    {
-        return 0;
-    }
-    return option.HarmonyJewelLevel[item.Jewel_Of_Harmony_OptionLevel];
+    const std::optional<GameLogic::Items::HarmonyOption> harmony = GameLogic::Items::FindHarmonyOption(item);
+    return harmony && harmony->counts && harmony->effect == Data::Items::HarmonyCriticalDamage ? harmony->value : 0;
 }
 
 bool HasCriticalDamageBuff()
