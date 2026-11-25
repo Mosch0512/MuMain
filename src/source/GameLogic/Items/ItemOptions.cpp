@@ -241,12 +241,17 @@ int CountAdditionalOptionLevel(std::span<const Data::Items::ItemOptionIndex> lin
             if (IsAdditionalOptionSent(optionType, option))
             {
                 // Above a list its last level counts, as its value does; the list's levels start at its first
-                // level. A list by the item's level doesn't go by the option level.
+                // level, and below it no level counts (the value is 0 there). A list by the item's level doesn't
+                // go by the option level.
                 const Data::Items::ItemOptionValue& value = option.value;
                 if (!value.isList || value.values.empty() ||
                     value.levelType == Data::Items::ItemOptionLevelType::ItemLevel)
                 {
                     return optionLevel;
+                }
+                if (optionLevel < value.FirstLevel())
+                {
+                    return 0;
                 }
                 return std::min(optionLevel, value.FirstLevel() + static_cast<int>(value.values.size()) - 1);
             }
