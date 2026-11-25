@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "rules": [
-    {"options": ["harmonyPhysicalAttack"], "tags": ["ammunition"]},
+    {"options": [], "tags": ["ammunition"]},
     {"options": ["luck", "physicalAndWizardryDamageOption", "excellentPhysicalAttack", "harmonyPhysicalAttack"], "tags": ["magicSword"]},
     {"options": ["luck", "physicalDamageOption", "excellentPhysicalAttack", "harmonyPhysicalAttack"], "group": [0, 1, 2, 3, 4]},
     {"options": ["luck", "curseDamageOption", "excellentWizardryAttack", "harmonyWizardryAttack"], "group": [5], "tags": ["summonerBook"]},

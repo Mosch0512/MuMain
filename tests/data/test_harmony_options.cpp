@@ -292,7 +292,7 @@ TEST_CASE("A harmony option raises the stat part of its attribute while the item
     g_pUIJewelHarmonyinfo->GetStrengthenCapability(&topDefense, &top, 2);
     CHECK(topDefense.SI_SD.SI_defense == 25);
 
-    // Arrows (ammunition) link the physical attack options, as the bow group gave them.
-    CHECK(GameLogic::Items::FindHarmonyDefinition(Data::Items::MakeItemType(4, 15)));
+    // Arrows (ammunition) link no harmony definition, so they take no Jewel of Harmony.
+    CHECK_FALSE(GameLogic::Items::FindHarmonyDefinition(Data::Items::MakeItemType(4, 15)));
     CHECK(GameLogic::Items::FindHarmonyDefinition(KindItems[0]));
 }

@@ -1938,7 +1938,7 @@ TEST_CASE("Item editor changes go into the item database [data][items][editor]")
                                               "harmonyPhysicalAttack"};
         REQUIRE(g_ItemDatabase.Find(KrisType)->options == weapon);
         EditItem(KrisType, [](ItemDefinition& item) { item.tags.Set(ItemTag::Ammunition); });
-        CHECK(g_ItemDatabase.Find(KrisType)->options == std::vector<std::string>{"harmonyPhysicalAttack"});
+        CHECK(g_ItemDatabase.Find(KrisType)->options.empty());
         EditItem(KrisType, [](ItemDefinition& item) { item.tags.Set(ItemTag::Ammunition, false); });
         CHECK(g_ItemDatabase.Find(KrisType)->options == weapon);
 

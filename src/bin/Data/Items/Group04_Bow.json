@@ -229,7 +229,6 @@
         "pt": "Dardo"
       },
       "tags": ["ammunition"],
-      "options": ["harmonyPhysicalAttack"],
       "description": [
         {
           "text": "@numberOfItems"
@@ -483,7 +482,6 @@
         "pt": "Flecha"
       },
       "tags": ["ammunition"],
-      "options": ["harmonyPhysicalAttack"],
       "description": [
         {
           "text": "@numberOfItems"
