@@ -901,6 +901,11 @@ TEST_CASE("An additional option's level counts from its list's first level to it
 
     // Levels 2 and 3: below 2 no level counts (the value is 0), above 3 the last one counts, as the value does.
     CHECK(GameLogic::Items::CountAdditionalOptionLevel(ITEM_KRIS, 1, 0) == 0);
+    // Below the first level it takes no slot either, so no "+0" line; from it, its value.
+    CHECK(DefinitionSlots(MakeItemWithOption(ITEM_KRIS, 1)).empty());
+    const std::vector<OptionSlot> slots = DefinitionSlots(MakeItemWithOption(ITEM_KRIS, 2));
+    REQUIRE(slots.size() == 1);
+    CHECK(slots.front().value == 5);
     CHECK(GameLogic::Items::CountAdditionalOptionLevel(ITEM_KRIS, 2, 0) == 2);
     CHECK(GameLogic::Items::CountAdditionalOptionLevel(ITEM_KRIS, 3, 0) == 3);
     CHECK(GameLogic::Items::CountAdditionalOptionLevel(ITEM_KRIS, 7, 0) == 3);

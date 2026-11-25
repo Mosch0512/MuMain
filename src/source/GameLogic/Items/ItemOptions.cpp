@@ -148,8 +148,16 @@ void AddLinkedOptions(ITEM& item, ItemOptionType type)
             {
                 continue;
             }
-            const Data::Items::ItemOptionEffect& effect = options.GetEffect(link, option);
             const ItemOption& linked = definition.options[option];
+            // Below an option list's first level the additional option counts no level
+            // (CountAdditionalOptionLevel), so it takes no slot either.
+            if (type == ItemOptionType::Option && linked.value.isList &&
+                linked.value.levelType == Data::Items::ItemOptionLevelType::OptionLevel &&
+                item.OptionLevel < linked.value.FirstLevel())
+            {
+                continue;
+            }
+            const Data::Items::ItemOptionEffect& effect = options.GetEffect(link, option);
             const int value =
                 effect.writesValue ? ComputeOptionValue(linked.value, GetOptionLevel(item, type, linked)) : 0;
             AddOptionSlot(item, effect.effect, value, {link, static_cast<std::uint16_t>(option)});
