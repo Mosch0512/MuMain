@@ -195,11 +195,20 @@ struct ItemOption
     // of Harmony's roll); 0 when the file names none. The game doesn't read it; the exchange carries it.
     int serverWeight = 0;
 
-    // The Zen at `level`: 0 below the value's first level or without entries.
+    // The Zen at `level`: 0 below a list's first level or without entries; a constant's one entry at every level, as
+    // its value counts at every level.
     int ZenAt(int level) const
     {
+        if (zen.empty())
+        {
+            return 0;
+        }
+        if (!value.isList)
+        {
+            return zen.front();
+        }
         const int first = value.FirstLevel();
-        if (zen.empty() || level < first)
+        if (level < first)
         {
             return 0;
         }

@@ -1011,7 +1011,8 @@ into data one group at a time.
   of Harmony's rule); below it the tooltip shows it gray and it adds
   nothing. The other types don't read it.
   `zen` lists what the mix that removes the option costs at each level of
-  its value, from its first level (the last entry also above), and
+  its value, from its first level (the last entry also above; a constant's
+  one entry at every level), and
   `"server": {"weight": 40}` is OpenMU's weight of the option for the
   jewel's roll, which the game doesn't read.
 

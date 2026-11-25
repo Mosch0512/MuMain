@@ -274,6 +274,14 @@ TEST_CASE("Harmony options read their first level, the item level rule and their
     CHECK(defense.CountsAt(5, 5));
     CHECK_FALSE(defense.CountsAt(4, 5));
     CHECK(WriteItemOptionsJson(definitions) == HarmonyFile);
+
+    // A constant counts at every level, its one Zen entry too, harmony level 0 included.
+    ItemOption constant = defense;
+    constant.value = {{7}, false};
+    constant.zen = {300000};
+    CHECK(constant.value.At(0) == 7);
+    CHECK(constant.ZenAt(0) == 300000);
+    CHECK(constant.ZenAt(13) == 300000);
 }
 
 TEST_CASE("A harmony option's first level, item level rule and Zen report what is wrong with them [data][items]")
