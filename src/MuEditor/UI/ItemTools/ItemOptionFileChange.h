@@ -134,6 +134,10 @@ int HighestOptionLevel(const Data::Items::ItemOptionDefinition& definition);
 // longer one is cut. Constants stay. False when nothing changed.
 bool FillOptionLevels(Data::Items::ItemOptionDefinition& definition, int level);
 
+// Makes the option's Zen list (when it has one) as long as its value's levels: a list's entries, a constant's one. A
+// longer Zen list is cut, a shorter one goes on by its last entry. False when nothing changed.
+bool MatchZenToValue(Data::Items::ItemOption& option);
+
 // Writes the value as a list from `fromLevel` to `toLevel`: `fromValue` at `fromLevel`, `step` more at each level
 // after it; the levels below `fromLevel` keep their values (0 where the list had none). `fromLevel` is at least the
 // value's first level (1, or the item's level 0 for a list by it) and `toLevel` at least `fromLevel`.

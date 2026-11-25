@@ -407,6 +407,24 @@ TEST_CASE("Fill levels makes a definition's value lists end at a level by their 
         CHECK(HighestOptionLevel(damage) == 11);
     }
 
+    SUBCASE("the Zen list follows the value's levels")
+    {
+        Data::Items::ItemOption& option = damage.options[0];
+        option.value = {.values = {3, 5, 7, 9, 10}, .isList = true, .firstLevel = 9};
+        option.zen = {100, 200, 300, 400, 500};
+        CHECK(FillOptionLevels(damage, 11));
+        CHECK(option.zen == std::vector<int>{100, 200, 300});
+        CHECK(FillOptionLevels(damage, 14));
+        CHECK(option.zen == std::vector<int>{100, 200, 300, 300, 300, 300});
+        // A constant has one level, so one entry; no Zen list stays without one.
+        option.value = {.values = {7}, .isList = false};
+        CHECK(MatchZenToValue(option));
+        CHECK(option.zen == std::vector<int>{100});
+        option.zen.clear();
+        CHECK_FALSE(MatchZenToValue(option));
+        CHECK(option.zen.empty());
+    }
+
     SUBCASE("shorter lists are cut")
     {
         CHECK(FillOptionLevels(damage, 2));

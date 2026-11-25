@@ -394,9 +394,22 @@ bool FillOptionLevels(ItemOptionDefinition& definition, int level)
                 values.push_back(values.back() + step);
             }
         }
+        MatchZenToValue(option);
         changed = true;
     }
     return changed;
+}
+
+bool MatchZenToValue(Data::Items::ItemOption& option)
+{
+    std::vector<int>& zen = option.zen;
+    const size_t levels = option.value.isList ? option.value.values.size() : 1;
+    if (zen.empty() || levels == 0 || zen.size() == levels)
+    {
+        return false;
+    }
+    zen.resize(levels, zen.back());
+    return true;
 }
 
 void FillOptionValue(ItemOptionValue& value, int fromLevel, int fromValue, int step, int toLevel)

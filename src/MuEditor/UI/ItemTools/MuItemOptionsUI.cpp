@@ -732,7 +732,13 @@ void CMuItemOptionsUI::RenderOption(ItemOptionDefinition& definition, size_t ind
         ImGui::TextColored(WarningColor, "%s", I18N::Editor::TheClientComputesNothingForThisAttribute);
     }
     ImGui::Indent();
+    // The Zen list keeps one entry per level of the value when the value's levels change.
+    const size_t levelsBefore = option.value.isList ? option.value.values.size() : 1;
     RenderValue(option.value, index);
+    if ((option.value.isList ? option.value.values.size() : 1) != levelsBefore)
+    {
+        MatchZenToValue(option);
+    }
     RenderTexts(option);
     // The item level rule is read only for harmony options (the loader leaves it out elsewhere), a constant's too.
     const bool harmony = definition.type == Data::Items::ItemOptionType::Harmony;
