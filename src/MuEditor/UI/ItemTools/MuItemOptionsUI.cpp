@@ -913,14 +913,18 @@ void CMuItemOptionsUI::RenderZen(ItemOption& option)
         }
         if (ImGui::IsItemHovered())
         {
+            // A constant's one entry counts at every level, as its value does.
             ImGui::SetTooltip(
                 "%s",
-                I18N::Format(I18N::Editor::Level0, {std::to_string(static_cast<int>(level) + firstLevel)}).c_str());
+                option.value.isList
+                    ? I18N::Format(I18N::Editor::Level0, {std::to_string(static_cast<int>(level) + firstLevel)}).c_str()
+                    : I18N::Editor::EveryLevel);
         }
         ImGui::PopID();
     }
-    // One entry per level of the value, from its first level to 15.
-    ImGui::BeginDisabled(option.zen.size() >= static_cast<size_t>(MaxOptionLevel + 1 - firstLevel));
+    // One entry per level of the value: a list's entries, a constant's one.
+    const size_t levels = option.value.isList ? option.value.values.size() : 1;
+    ImGui::BeginDisabled(option.zen.size() >= levels);
     if (ImGui::SmallButton("+"))
     {
         option.zen.push_back(option.zen.empty() ? 0 : option.zen.back());

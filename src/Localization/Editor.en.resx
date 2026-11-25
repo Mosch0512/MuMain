@@ -6268,6 +6268,9 @@
   <data name="The list's first level" xml:space="preserve">
     <value>The level of the list's first value; below it the value is 0</value>
   </data>
+  <data name="Every level" xml:space="preserve">
+    <value>Every level</value>
+  </data>
   <data name="Only from the item's level" xml:space="preserve">
     <value>Only from the item's level</value>
   </data>

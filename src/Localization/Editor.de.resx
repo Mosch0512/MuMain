@@ -5989,6 +5989,9 @@
   <data name="The list's first level" xml:space="preserve">
     <value>Die Stufe des ersten Werts der Liste; darunter ist der Wert 0</value>
   </data>
+  <data name="Every level" xml:space="preserve">
+    <value>Jede Stufe</value>
+  </data>
   <data name="Only from the item's level" xml:space="preserve">
     <value>Erst ab der Gegenstandsstufe</value>
   </data>
