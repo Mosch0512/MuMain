@@ -439,6 +439,15 @@ void ItemOptionsReader::ReadOption(const OrderedJson& json, const std::string& f
     ReadNumber(json, field, type, option);
     ReadName(json, Keys::Attribute, field, option.attribute);
     ReadAdd(json, field, option);
+    // A first level does something only where the value goes by a level: a type with levels of its own, or a list by
+    // the item's level.
+    if (option.value.firstLevel && option.value.levelType == ItemOptionLevelType::OptionLevel && !HasOptionLevels(type))
+    {
+        AddIssue(ItemDataIssueSeverity::Warning,
+                 field + "." + ItemOptionAddKeys[static_cast<size_t>(option.add)] + ".firstLevel",
+                 "does nothing on this type, whose value is taken at level 1, so it is left out");
+        option.value.firstLevel.reset();
+    }
     const auto text = json.find(Keys::Text);
     if (text == json.end())
     {

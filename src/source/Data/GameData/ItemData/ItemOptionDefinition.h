@@ -83,6 +83,14 @@ constexpr ItemOptionNumberRange GetOptionNumberRange(ItemOptionType type)
     }
 }
 
+// Whether the type's options take their value at a level of their own: the additional option's level, the ancient
+// bonus level, the harmony level. The others take it at level 1 (or, by levelType, at the item's level), so for them a
+// first level counts only on a list by the item's level.
+constexpr bool HasOptionLevels(ItemOptionType type)
+{
+    return type == ItemOptionType::Option || type == ItemOptionType::AncientBonus || type == ItemOptionType::Harmony;
+}
+
 // How an option's value adds to its attribute: as it is, after the other additions (OpenMU's AddFinal), or in per
 // cent.
 enum class ItemOptionAdd : BYTE

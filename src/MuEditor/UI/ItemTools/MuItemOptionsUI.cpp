@@ -734,7 +734,7 @@ void CMuItemOptionsUI::RenderOption(ItemOptionDefinition& definition, size_t ind
     ImGui::Indent();
     // The Zen list keeps one entry per level of the value when the value's levels change.
     const size_t levelsBefore = option.value.isList ? option.value.values.size() : 1;
-    RenderValue(option.value, index);
+    RenderValue(option.value, index, Data::Items::HasOptionLevels(definition.type));
     if ((option.value.isList ? option.value.values.size() : 1) != levelsBefore)
     {
         MatchZenToValue(option);
@@ -767,7 +767,7 @@ void CMuItemOptionsUI::RenderOption(ItemOptionDefinition& definition, size_t ind
     ImGui::Spacing();
 }
 
-void CMuItemOptionsUI::RenderValue(ItemOptionValue& value, size_t option)
+void CMuItemOptionsUI::RenderValue(ItemOptionValue& value, size_t option, bool hasLevels)
 {
     bool isList = value.isList;
     if (ImGui::Checkbox(I18N::Editor::OneValuePerLevel, &isList))
@@ -812,26 +812,34 @@ void CMuItemOptionsUI::RenderValue(ItemOptionValue& value, size_t option)
         {
             ImGui::SetTooltip("%s", I18N::Editor::TheListGoesByTheItemSLevel0To15NotTheOptionLevel);
         }
-        ImGui::SameLine();
-        int first = value.FirstLevel();
-        if (InputNumber(I18N::Editor::FirstLevel, first, 0, MaxOptionLevel, Fields::NumberWidth * 0.6f))
+        // A type without levels of its own takes the value at level 1: a first level only counts by the item's level.
+        if (hasLevels || value.levelType == ItemOptionLevelType::ItemLevel)
         {
-            // The level type's own first level is left unset, so it isn't written.
-            value.firstLevel.reset();
-            if (first != value.FirstLevel())
+            ImGui::SameLine();
+            int first = value.FirstLevel();
+            if (InputNumber(I18N::Editor::FirstLevel, first, 0, MaxOptionLevel, Fields::NumberWidth * 0.6f))
             {
-                value.firstLevel = first;
+                // The level type's own first level is left unset, so it isn't written.
+                value.firstLevel.reset();
+                if (first != value.FirstLevel())
+                {
+                    value.firstLevel = first;
+                }
+                // The levels go from the first to 15.
+                const auto levels = static_cast<size_t>(MaxOptionLevel + 1 - first);
+                if (value.values.size() > levels)
+                {
+                    value.values.resize(levels);
+                }
             }
-            // The levels go from the first to 15.
-            const auto levels = static_cast<size_t>(MaxOptionLevel + 1 - first);
-            if (value.values.size() > levels)
+            if (ImGui::IsItemHovered())
             {
-                value.values.resize(levels);
+                ImGui::SetTooltip("%s", I18N::Editor::TheListSFirstLevel);
             }
         }
-        if (ImGui::IsItemHovered())
+        else
         {
-            ImGui::SetTooltip("%s", I18N::Editor::TheListSFirstLevel);
+            value.firstLevel.reset();
         }
         const int firstLevel = value.FirstLevel();
         ImGui::SameLine();

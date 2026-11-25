@@ -1418,7 +1418,9 @@ other than `{value}` and `{divisor}` (the lines that name it are left
 out). Warnings:
 unknown fields, an attribute the client does not compute, a term on a hero
 attribute the client does not read, a `levelType` or `firstLevel` on one
-value (it is left out), a `requiresItemLevel` on an option that is no
+value (it is left out), a `firstLevel` on a luck, excellent, wing or
+ancient set option's list that doesn't go by the item's level (they take
+their value at level 1; it is left out), a `requiresItemLevel` on an option that is no
 harmony option (it is left out), a list longer than its levels from its first level
 to 15 (the rest is never used), a `zen` with another number of entries than
 the value has levels, an item that is no wing linking wing options (its excellent

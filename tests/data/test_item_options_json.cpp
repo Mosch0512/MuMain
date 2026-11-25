@@ -343,6 +343,28 @@ TEST_CASE("A harmony option's first level, item level rule and Zen report what i
     CHECK(only(issues, Severity::Warning, option + ".requiresItemLevel"));
     REQUIRE(definitions.size() == 1);
     CHECK_FALSE(definitions[0].options[0].requiresItemLevel);
+
+    // A first level on a type whose value is taken at level 1 does nothing: it warns and is left out; by the item's
+    // level it counts.
+    const auto readExcellent = [&](const std::string& value)
+    {
+        definitions.clear();
+        issues.clear();
+        ReadItemOptionsJson(
+            R"({"formatVersion": 1, "definitions": [{"name": "excellentDefense", "type": "excellent", )"
+            R"("displayName": {"en": "Excellent"}, "options": [{"number": 1, "attribute": "defenseBase", )"
+            R"("add": )" +
+                value + R"(, "text": "t"}]}]})",
+            "Options/Excellent.json", "Excellent.json", definitions, issues);
+    };
+    readExcellent(R"({"firstLevel": 2, "values": [4, 8]})");
+    CHECK(only(issues, Severity::Warning, option + ".add.firstLevel"));
+    REQUIRE(definitions.size() == 1);
+    CHECK_FALSE(definitions[0].options[0].value.firstLevel);
+    readExcellent(R"({"levelType": "itemLevel", "firstLevel": 2, "values": [4, 8]})");
+    CHECK(issues.empty());
+    REQUIRE(definitions.size() == 1);
+    CHECK(definitions[0].options[0].value.firstLevel == 2);
 }
 
 TEST_CASE("Option definition file errors stop the start [data][items]")
