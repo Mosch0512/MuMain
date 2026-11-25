@@ -313,6 +313,18 @@ TEST_CASE("A harmony option's first level, item level rule and Zen report what i
     // A list from its first level is as long as its levels to 15.
     CHECK(only(read(R"("addFinal": {"firstLevel": 13, "values": [1, 2, 3, 4]}, "text": "t")"), Severity::Warning,
                option + ".addFinal.values"));
+
+    // Only harmony options read the item level rule: on another type it warns and is left out.
+    std::vector<ItemOptionDefinition> definitions;
+    std::vector<ItemDataIssue> issues;
+    ReadItemOptionsJson(R"({"formatVersion": 1, "definitions": [{"name": "defenseOption", "type": "option", )"
+                        R"("displayName": {"en": "Option"}, "options": [{"number": 0, "attribute": "defenseBase", )"
+                        R"("add": {"values": [4, 8]}, )"
+                        R"("text": "t", "requiresItemLevel": true}]}]})",
+                        "Options/Option.json", "Option.json", definitions, issues);
+    CHECK(only(issues, Severity::Warning, option + ".requiresItemLevel"));
+    REQUIRE(definitions.size() == 1);
+    CHECK_FALSE(definitions[0].options[0].requiresItemLevel);
 }
 
 TEST_CASE("Option definition file errors stop the start [data][items]")

@@ -734,7 +734,9 @@ void CMuItemOptionsUI::RenderOption(ItemOptionDefinition& definition, size_t ind
     ImGui::Indent();
     RenderValue(option.value, index);
     RenderTexts(option);
-    if (option.value.isList || option.requiresItemLevel)
+    // The item level rule is read only for harmony options (the loader leaves it out elsewhere).
+    const bool harmony = definition.type == Data::Items::ItemOptionType::Harmony;
+    if (harmony && (option.value.isList || option.requiresItemLevel))
     {
         ImGui::Checkbox(I18N::Editor::OnlyFromTheItemSLevel, &option.requiresItemLevel);
         if (ImGui::IsItemHovered())
@@ -743,7 +745,6 @@ void CMuItemOptionsUI::RenderOption(ItemOptionDefinition& definition, size_t ind
         }
     }
     // The Jewel of Harmony's removal Zen and OpenMU's weight, for harmony options and any option that has them.
-    const bool harmony = definition.type == Data::Items::ItemOptionType::Harmony;
     if (harmony || !option.zen.empty())
     {
         RenderZen(option);

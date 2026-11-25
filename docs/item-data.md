@@ -1006,9 +1006,10 @@ into data one group at a time.
   the tooltip or the stats ask, so it grows with the hero, and stops at 0
   and 65535, what an option slot holds. `text`
   names its tooltip lines in `Tooltips/OptionTexts.json`, one name or a
-  list in their order. `"requiresItemLevel": true` lets an option count only
-  while the item's + level is at least its own level (the Jewel of
-  Harmony's rule); below it the tooltip shows it gray and it adds nothing.
+  list in their order. `"requiresItemLevel": true` lets a harmony option
+  count only while the item's + level is at least its own level (the Jewel
+  of Harmony's rule); below it the tooltip shows it gray and it adds
+  nothing. The other types don't read it.
   `zen` lists what the mix that removes the option costs at each level of
   its value, from its first level (the last entry also above), and
   `"server": {"weight": 40}` is OpenMU's weight of the option for the
@@ -1416,7 +1417,8 @@ other than `{value}` and `{divisor}` (the lines that name it are left
 out). Warnings:
 unknown fields, an attribute the client does not compute, a term on a hero
 attribute the client does not read, a `levelType` or `firstLevel` on one
-value (it is left out), a list longer than its levels from its first level
+value (it is left out), a `requiresItemLevel` on an option that is no
+harmony option (it is left out), a list longer than its levels from its first level
 to 15 (the rest is never used), a `zen` with another number of entries than
 the value has levels, an item that is no wing linking wing options (its excellent
 byte holds excellent options), a text with `{divisor}` on an option

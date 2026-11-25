@@ -127,7 +127,8 @@ private:
     void ReadAdd(const OrderedJson& json, const std::string& field, ItemOption& option);
     bool ReadWholeNumber(const OrderedJson& json, const std::string& field, int minimum, int maximum, int& value);
     void ReadTexts(const OrderedJson& json, const std::string& field, std::vector<std::string>& texts);
-    void ReadRequiresItemLevel(const OrderedJson& json, const std::string& field, ItemOption& option);
+    void ReadRequiresItemLevel(const OrderedJson& json, const std::string& field, ItemOptionType type,
+                               ItemOption& option);
     void ReadZen(const OrderedJson& json, const std::string& field, ItemOption& option);
     void ReadOptionServer(const OrderedJson& json, const std::string& field, ItemOption& option);
 
@@ -278,16 +279,25 @@ bool ItemOptionsReader::ReadWholeNumber(const OrderedJson& json, const std::stri
                                         { AddFatal(errorField, message); });
 }
 
-void ItemOptionsReader::ReadRequiresItemLevel(const OrderedJson& json, const std::string& field, ItemOption& option)
+void ItemOptionsReader::ReadRequiresItemLevel(const OrderedJson& json, const std::string& field, ItemOptionType type,
+                                              ItemOption& option)
 {
     const auto requiresLevel = json.find(Keys::RequiresItemLevel);
     if (requiresLevel == json.end())
     {
         return;
     }
+    const std::string levelField = field + "." + Keys::RequiresItemLevel;
     if (!requiresLevel->is_boolean())
     {
-        AddFatal(field + "." + Keys::RequiresItemLevel, "must be true or false");
+        AddFatal(levelField, "must be true or false");
+        return;
+    }
+    // Only the harmony options are read by their level (FindHarmonyOption); elsewhere the rule would do nothing.
+    if (type != ItemOptionType::Harmony)
+    {
+        AddIssue(ItemDataIssueSeverity::Warning, levelField,
+                 "counts only on harmony options: the other types don't read it, so it is left out");
         return;
     }
     option.requiresItemLevel = requiresLevel->get<bool>();
@@ -438,7 +448,7 @@ void ItemOptionsReader::ReadOption(const OrderedJson& json, const std::string& f
     {
         ReadTexts(*text, field + "." + Keys::Text, option.texts);
     }
-    ReadRequiresItemLevel(json, field, option);
+    ReadRequiresItemLevel(json, field, type, option);
     ReadZen(json, field, option);
     ReadOptionServer(json, field, option);
     WarnAboutUnknownKeys(json, OptionKeys, field);
