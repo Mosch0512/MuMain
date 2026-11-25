@@ -126,7 +126,9 @@ std::vector<Data::Items::ItemDefinition> FindItemListChanges(std::span<const Dat
 bool IsSameOptionList(std::span<const std::string> list, std::span<const std::string> other);
 
 // The highest level the definition's value lists give a value of their own (a list's first level plus its length,
-// minus one; its last entry counts above it); 0 when its values are constants.
+// minus one; its last entry counts above it): 0 for a list of one entry from level 0. NoOptionLevels when it has no
+// list by the option level (constants, or lists by the item's level).
+constexpr int NoOptionLevels = -1;
 int HighestOptionLevel(const Data::Items::ItemOptionDefinition& definition);
 
 // Makes each value list of the definition end at `level` (1 or more; a list keeps one entry at least, from its first

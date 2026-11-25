@@ -385,7 +385,15 @@ TEST_CASE("Fill levels makes a definition's value lists end at a level by their 
     ItemOptionDefinition& jewelry = files.definitions[2];
     CHECK(HighestOptionLevel(damage) == 4);
     CHECK(HighestOptionLevel(jewelry) == 3);
-    CHECK(HighestOptionLevel(files.definitions[0]) == 0);
+    CHECK(HighestOptionLevel(files.definitions[0]) == NoOptionLevels);
+
+    SUBCASE("a list of one entry from level 0 has a level to fill from")
+    {
+        damage.options[0].value = {.values = {2}, .isList = true, .firstLevel = 0};
+        CHECK(HighestOptionLevel(damage) == 0);
+        CHECK(FillOptionLevels(damage, 2));
+        CHECK(damage.options[0].value.values == std::vector<int>{2, 4, 6});
+    }
 
     SUBCASE("longer lists go on by the step between their last two entries")
     {

@@ -357,7 +357,7 @@ bool IsSameOptionList(std::span<const std::string> list, std::span<const std::st
 
 int HighestOptionLevel(const ItemOptionDefinition& definition)
 {
-    int highest = 0;
+    int highest = NoOptionLevels;
     for (const Data::Items::ItemOption& option : definition.options)
     {
         // A list by the item's level follows the item, not the option level.

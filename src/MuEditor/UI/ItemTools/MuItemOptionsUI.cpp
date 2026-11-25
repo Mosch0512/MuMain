@@ -135,7 +135,7 @@ bool InputNumber(const char* label, int& value, int minimum, int maximum, float 
 std::string HighestLevelText(const ItemOptionDefinition& definition)
 {
     const int highest = HighestOptionLevel(definition);
-    return highest > 0 ? std::to_string(highest) : std::string("-");
+    return highest != NoOptionLevels ? std::to_string(highest) : std::string("-");
 }
 
 } // namespace
@@ -428,7 +428,7 @@ void CMuItemOptionsUI::RenderListRow(const ItemOptionDefinition& definition, boo
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
     bool marked = m_marked.contains(definition.name);
-    const bool hasList = HighestOptionLevel(definition) > 0;
+    const bool hasList = HighestOptionLevel(definition) != NoOptionLevels;
     ImGui::BeginDisabled(!hasList);
     if (ImGui::Checkbox("##Mark", &marked))
     {
