@@ -816,7 +816,12 @@ void CMuItemOptionsUI::RenderValue(ItemOptionValue& value, size_t option)
         int first = value.FirstLevel();
         if (InputNumber(I18N::Editor::FirstLevel, first, 0, MaxOptionLevel, Fields::NumberWidth * 0.6f))
         {
-            value.firstLevel = first;
+            // The level type's own first level is left unset, so it isn't written.
+            value.firstLevel.reset();
+            if (first != value.FirstLevel())
+            {
+                value.firstLevel = first;
+            }
             // The levels go from the first to 15.
             const auto levels = static_cast<size_t>(MaxOptionLevel + 1 - first);
             if (value.values.size() > levels)

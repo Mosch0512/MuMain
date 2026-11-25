@@ -3,6 +3,7 @@
 #include "doctest.h"
 
 #include "Data/GameData/ItemData/ItemOptionsJson.h"
+#include "Data/GameData/ItemData/ItemOptionValueJson.h"
 #include "Data/GameData/ItemData/ItemStatsJson.h"
 #include "Data/GameData/ItemData/OptionRulesJson.h"
 #include "Data/GameData/ItemData/OptionTextsJson.h"
@@ -274,6 +275,15 @@ TEST_CASE("Harmony options read their first level, the item level rule and their
     CHECK(defense.CountsAt(5, 5));
     CHECK_FALSE(defense.CountsAt(4, 5));
     CHECK(WriteItemOptionsJson(definitions) == HarmonyFile);
+
+    // A first level that is the level type's own is left out when written.
+    ItemOptionValue fromOne = defense.value;
+    fromOne.firstLevel = 1;
+    CHECK_FALSE(Data::Items::Json::WriteOptionValue(fromOne).contains("firstLevel"));
+    fromOne.levelType = ItemOptionLevelType::ItemLevel;
+    CHECK(Data::Items::Json::WriteOptionValue(fromOne)["firstLevel"] == 1);
+    fromOne.firstLevel = 0;
+    CHECK_FALSE(Data::Items::Json::WriteOptionValue(fromOne).contains("firstLevel"));
 
     // A constant counts at every level, its one Zen entry too, harmony level 0 included.
     ItemOption constant = defense;

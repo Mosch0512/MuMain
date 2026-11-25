@@ -164,7 +164,8 @@ OrderedJson WriteOptionValue(const ItemOptionValue& value)
     {
         json[ValueKey::LevelType] = ItemLevelType;
     }
-    if (value.firstLevel)
+    // Left out when it is the level type's own first level (1, or the item's level 0).
+    if (value.firstLevel && *value.firstLevel != (value.levelType == ItemOptionLevelType::ItemLevel ? 0 : 1))
     {
         json[ValueKey::FirstLevel] = *value.firstLevel;
     }
