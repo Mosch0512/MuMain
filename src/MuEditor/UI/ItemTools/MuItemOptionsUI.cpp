@@ -1125,8 +1125,10 @@ void CMuItemOptionsUI::RenderValueFill()
     ImGui::BeginDisabled(!valid);
     if (ImGui::Button(I18N::Editor::Fill))
     {
-        FillOptionValue(definition->options[m_valueFillOption].value, m_valueFillFrom, m_valueFillStart,
-                        m_valueFillStep, m_valueFillTo);
+        ItemOption& option = definition->options[m_valueFillOption];
+        FillOptionValue(option.value, m_valueFillFrom, m_valueFillStart, m_valueFillStep, m_valueFillTo);
+        // The Zen list keeps one entry per level of the filled value.
+        MatchZenToValue(option);
         ImGui::CloseCurrentPopup();
     }
     ImGui::EndDisabled();
