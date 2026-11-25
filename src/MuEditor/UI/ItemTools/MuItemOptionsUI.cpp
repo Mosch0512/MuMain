@@ -922,19 +922,20 @@ void CMuItemOptionsUI::RenderZen(ItemOption& option)
         }
         ImGui::PopID();
     }
-    // One entry per level of the value: a list's entries, a constant's one.
+    // One entry per level of the value (a list's entries, a constant's one) or none: "+" gives every level an entry,
+    // "-" takes the removal Zen away.
     const size_t levels = option.value.isList ? option.value.values.size() : 1;
     ImGui::BeginDisabled(option.zen.size() >= levels);
     if (ImGui::SmallButton("+"))
     {
-        option.zen.push_back(option.zen.empty() ? 0 : option.zen.back());
+        option.zen.resize(levels, option.zen.empty() ? 0 : option.zen.back());
     }
     ImGui::EndDisabled();
     ImGui::SameLine();
     ImGui::BeginDisabled(option.zen.empty());
     if (ImGui::SmallButton("-"))
     {
-        option.zen.pop_back();
+        option.zen.clear();
     }
     ImGui::EndDisabled();
     ImGui::PopID();
