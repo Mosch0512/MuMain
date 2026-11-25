@@ -734,9 +734,9 @@ void CMuItemOptionsUI::RenderOption(ItemOptionDefinition& definition, size_t ind
     ImGui::Indent();
     RenderValue(option.value, index);
     RenderTexts(option);
-    // The item level rule is read only for harmony options (the loader leaves it out elsewhere).
+    // The item level rule is read only for harmony options (the loader leaves it out elsewhere), a constant's too.
     const bool harmony = definition.type == Data::Items::ItemOptionType::Harmony;
-    if (harmony && (option.value.isList || option.requiresItemLevel))
+    if (harmony)
     {
         ImGui::Checkbox(I18N::Editor::OnlyFromTheItemSLevel, &option.requiresItemLevel);
         if (ImGui::IsItemHovered())
