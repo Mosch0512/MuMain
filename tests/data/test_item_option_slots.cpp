@@ -878,6 +878,32 @@ TEST_CASE("An additional option with a constant value counts at its option level
     CHECK(slots.front().value == 6);
 }
 
+// A list that starts at a later level ends later too: the level counted is capped at its last level, not its length.
+TEST_CASE("An additional option's level is capped at its list's last level from its first level [data][items]")
+{
+    ClientDataScope client(ClientDirectory);
+    I18N::SetLocale("en");
+    std::string errorMessage;
+    REQUIRE(g_ItemDataHandler.Load(errorMessage));
+    HeroScope hero;
+
+    const ItemOptionsScope options;
+    const Data::Items::ItemOptionDatabase& shipped = options.Saved();
+    std::vector<Data::Items::ItemOptionDefinition> definitions(shipped.GetDefinitions().begin(),
+                                                               shipped.GetDefinitions().end());
+    const int physical = shipped.Find("physicalDamageOption");
+    REQUIRE(physical != Data::Items::ItemOptionDatabase::NoDefinition);
+    Data::Items::ItemOptionValue& value = definitions[static_cast<size_t>(physical)].options[0].value;
+    value = {{5, 6}, true};
+    value.firstLevel = 2;
+    g_ItemDatabase.SetOptions(Data::Items::ItemOptionDatabase(std::move(definitions), shipped.GetTexts()));
+
+    // Levels 2 and 3: above 3 the last one counts, as the value does.
+    CHECK(GameLogic::Items::CountAdditionalOptionLevel(ITEM_KRIS, 2, 0) == 2);
+    CHECK(GameLogic::Items::CountAdditionalOptionLevel(ITEM_KRIS, 3, 0) == 3);
+    CHECK(GameLogic::Items::CountAdditionalOptionLevel(ITEM_KRIS, 7, 0) == 3);
+}
+
 namespace
 {
 // The value with its terms' attributes resolved, as the option database has it.
