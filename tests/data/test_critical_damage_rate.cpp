@@ -13,13 +13,13 @@
 #include "GameLogic/Combat/CriticalDamageBonus.h"
 #include "GameLogic/Combat/CriticalDamageRate.h"
 #include "GameLogic/Items/CSItemOption.h"
+#include "GameLogic/Items/ItemOptions.h"
 #include "I18N/All.h"
 #include "Network/Server/SocketSystem.h"
 #include "UI/Character/CriticalDamageRateLine.h"
 #include "UI/Character/CriticalHitTexts.h"
 #include "UI/Character/DamageHint.h"
 #include "UI/Core/UIManager.h"
-#include "UI/Inventory/UIJewelHarmony.h"
 #include "UI/Inventory/ItemMng.h"
 
 #include <algorithm>
@@ -376,20 +376,20 @@ TEST_CASE("The critical damage bonus adds up the worn items' set, harmony and so
     kris.HasHarmonyOption = true;
     kris.HarmonyOptionType = WeaponCriticalDamageHarmony;
     kris.HarmonyOptionLevel = 13;
-    const HARMONYJEWELOPTION& harmony =
-        g_pUIJewelHarmonyinfo->GetHarmonyJewelOptionInfo(SI_Weapon, WeaponCriticalDamageHarmony);
-    std::wstring name = harmony.Name;
-    std::transform(name.begin(), name.end(), name.begin(), [](wchar_t c) { return std::towlower(c); });
-    CHECK(name.find(L"critical") != std::wstring::npos);
-    REQUIRE(harmony.HarmonyJewelLevel[13] > 0);
+    const Data::Items::ItemOption* harmony =
+        GameLogic::Items::FindHarmonyOptionOf(Data::Items::MakeItemType(0, 0), WeaponCriticalDamageHarmony);
+    REQUIRE(harmony != nullptr);
+    CHECK(harmony->attribute == "criticalDamageBonus");
+    REQUIRE(harmony->value.At(13) > 0);
     ITEM& weapon = equipment.Wear(EQUIPMENT_WEAPON_RIGHT, kris);
-    CHECK(GetHeroCriticalDamageBonus().harmonyOptions == harmony.HarmonyJewelLevel[13]);
+    CHECK(GetHeroCriticalDamageBonus().harmonyOptions == harmony->value.At(13));
+    // Below the harmony level it doesn't count (requiresItemLevel).
     weapon.Level = 12;
     CHECK(GetHeroCriticalDamageBonus().harmonyOptions == 0);
-    // An item +15 with the option at level 15, past the table's levels 0 to 13.
+    // An item +15 with the option at level 15, past the list's levels to 13: its last value counts.
     weapon.Level = 15;
     weapon.Jewel_Of_Harmony_OptionLevel = 15;
-    CHECK(GetHeroCriticalDamageBonus().harmonyOptions == 0);
+    CHECK(GetHeroCriticalDamageBonus().harmonyOptions == harmony->value.At(13));
 
     ItemCreationParams flamberge = Item(0, 26);
     flamberge.SocketCount = 2;
@@ -422,12 +422,11 @@ TEST_CASE("A staff's harmony option adds critical damage like a weapon's [data][
     hero.Hero().Class = CLASS_SOULMASTER;
     hero.HeroCharacter().Class = CLASS_SOULMASTER;
 
-    const HARMONYJEWELOPTION& harmony =
-        g_pUIJewelHarmonyinfo->GetHarmonyJewelOptionInfo(SI_Staff, StaffCriticalDamageHarmony);
-    std::wstring name = harmony.Name;
-    std::transform(name.begin(), name.end(), name.begin(), [](wchar_t c) { return std::towlower(c); });
-    CHECK(name.find(L"critical") != std::wstring::npos);
-    REQUIRE(harmony.HarmonyJewelLevel[13] > 0);
+    const Data::Items::ItemOption* harmony =
+        GameLogic::Items::FindHarmonyOptionOf(Data::Items::MakeItemType(5, 0), StaffCriticalDamageHarmony);
+    REQUIRE(harmony != nullptr);
+    CHECK(harmony->attribute == "criticalDamageBonus");
+    REQUIRE(harmony->value.At(13) > 0);
 
     // A Skull Staff +13 with the option at its top level.
     ItemCreationParams staff = Item(5, 0);
@@ -436,9 +435,9 @@ TEST_CASE("A staff's harmony option adds critical damage like a weapon's [data][
     staff.HarmonyOptionType = StaffCriticalDamageHarmony;
     staff.HarmonyOptionLevel = 13;
     ITEM& worn = equipment.Wear(EQUIPMENT_WEAPON_RIGHT, staff);
-    CHECK(GetHeroCriticalDamageBonus().harmonyOptions == harmony.HarmonyJewelLevel[13]);
+    CHECK(GetHeroCriticalDamageBonus().harmonyOptions == harmony->value.At(13));
 
-    // The item's kind picks the table: a staff's option 6 and a weapon's option 5 are other options.
+    // The item's harmony definition picks the option: a staff's option 6 and a weapon's option 5 are other options.
     worn.Jewel_Of_Harmony_Option = WeaponCriticalDamageHarmony;
     CHECK(GetHeroCriticalDamageBonus().harmonyOptions == 0);
     hero.Hero().Class = CLASS_BLADEKNIGHT;

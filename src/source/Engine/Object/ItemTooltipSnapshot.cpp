@@ -32,6 +32,13 @@ void ApplyOption(ItemCreationParams& params, BYTE level, BYTE type)
     params.OptionType = type;
 }
 
+void ApplyHarmony(ItemCreationParams& params, BYTE number, BYTE level)
+{
+    params.HasHarmonyOption = true;
+    params.HarmonyOptionType = number;
+    params.HarmonyOptionLevel = level;
+}
+
 void ApplyAncientBonus(ItemCreationParams& params, BYTE level)
 {
     params.IsAncient = true;
@@ -62,13 +69,25 @@ constexpr TooltipVariant TooltipVariants[] = {
     {"ancient bonus 1", [](ItemCreationParams& params) { ApplyAncientBonus(params, 1); }},
     {"ancient bonus 2", [](ItemCreationParams& params) { ApplyAncientBonus(params, 2); }},
     {"ancient bonus 3", [](ItemCreationParams& params) { ApplyAncientBonus(params, 3); }},
-    {"harmony",
-     [](ItemCreationParams& params)
-     {
-         params.HasHarmonyOption = true;
-         params.HarmonyOptionType = 1;
-         params.HarmonyOptionLevel = 13;
-     }},
+    {"harmony", [](ItemCreationParams& params) { ApplyHarmony(params, 1, 13); }},
+    // Each other Jewel of Harmony option at the last level (weapons have 1 to 10, staffs and defense items 1 to 8, so 9
+    // and 10 are their error line), and lower levels: the first ones options 1 to 4 have, and below an option's first
+    // level (option 5's is 6).
+    {"harmony 2", [](ItemCreationParams& params) { ApplyHarmony(params, 2, 13); }},
+    {"harmony 3", [](ItemCreationParams& params) { ApplyHarmony(params, 3, 13); }},
+    {"harmony 4", [](ItemCreationParams& params) { ApplyHarmony(params, 4, 13); }},
+    {"harmony 5", [](ItemCreationParams& params) { ApplyHarmony(params, 5, 13); }},
+    {"harmony 6", [](ItemCreationParams& params) { ApplyHarmony(params, 6, 13); }},
+    {"harmony 7", [](ItemCreationParams& params) { ApplyHarmony(params, 7, 13); }},
+    {"harmony 8", [](ItemCreationParams& params) { ApplyHarmony(params, 8, 13); }},
+    {"harmony 9", [](ItemCreationParams& params) { ApplyHarmony(params, 9, 13); }},
+    {"harmony 10", [](ItemCreationParams& params) { ApplyHarmony(params, 10, 13); }},
+    {"harmony 1 level 0", [](ItemCreationParams& params) { ApplyHarmony(params, 1, 0); }},
+    {"harmony 1 level 6", [](ItemCreationParams& params) { ApplyHarmony(params, 1, 6); }},
+    {"harmony 3 level 0", [](ItemCreationParams& params) { ApplyHarmony(params, 3, 0); }},
+    {"harmony 2 level 3", [](ItemCreationParams& params) { ApplyHarmony(params, 2, 3); }},
+    {"harmony 5 level 0", [](ItemCreationParams& params) { ApplyHarmony(params, 5, 0); }},
+    {"harmony 5 level 9", [](ItemCreationParams& params) { ApplyHarmony(params, 5, 9); }},
     // Each of the full item's parts alone, since a line can depend on one of them only.
     {"luck", [](ItemCreationParams& params) { params.WithLuck = true; }},
     {"skill", [](ItemCreationParams& params) { params.WithSkill = true; }},

@@ -36,6 +36,10 @@ enum class ItemOptionType : BYTE
     // The second and third tier wings' and the capes' options in the excellent byte (ITEM::ExcellentFlags), OpenMU's
     // Wing type: numbered 1 to 6, each on with the byte's bit number - 1, as excellent options.
     Wing,
+    // The Jewel of Harmony's option: the harmony byte's high four bits are its number (ITEM::Jewel_Of_Harmony_Option,
+    // 1 to 15; Season 6 has 1 to 10), its low four bits its level (ITEM::Jewel_Of_Harmony_OptionLevel, 0 to 15; Season
+    // 6 sends 0 to 13). It takes no option slot; GameLogic::Items::FindHarmonyOption finds it.
+    Harmony,
 };
 
 // An excellent option's number - 1 is its bit of the excellent byte, whose bits 0 to 5 hold them.
@@ -50,8 +54,9 @@ constexpr bool HasOptionNumbers(ItemOptionType type)
 }
 
 // The numbers the options of a type take, as the loader checks them: the additional option's the option types the
-// server sends (0 to 15), excellent and wing options the excellent byte's bits (1 to 6), an ancient set's options from
-// 1 in the order the set gives them.
+// server sends (0 to 15), excellent and wing options the excellent byte's bits (1 to 6), harmony options the harmony
+// byte's high four bits but 0, which means none (1 to 15), an ancient set's options from 1 in the order the set gives
+// them.
 struct ItemOptionNumberRange
 {
     int minimum = 0;
@@ -69,11 +74,21 @@ constexpr ItemOptionNumberRange GetOptionNumberRange(ItemOptionType type)
     case ItemOptionType::Excellent:
     case ItemOptionType::Wing:
         return {1, MaxExcellentOptionNumber};
+    case ItemOptionType::Harmony:
+        return {1, MaxOptionTypeNumber};
     case ItemOptionType::AncientOption:
         return {1, MaxNumber};
     default:
         return {0, MaxNumber};
     }
+}
+
+// Whether the type's options take their value at a level of their own: the additional option's level, the ancient
+// bonus level, the harmony level. The others take it at level 1 (or, by levelType, at the item's level), so for them a
+// first level counts only on a list by the item's level.
+constexpr bool HasOptionLevels(ItemOptionType type)
+{
+    return type == ItemOptionType::Option || type == ItemOptionType::AncientBonus || type == ItemOptionType::Harmony;
 }
 
 // How an option's value adds to its attribute: as it is, after the other additions (OpenMU's AddFinal), or in per
@@ -124,9 +139,10 @@ enum class ItemOptionLevelType : BYTE
     ItemLevel,
 };
 
-// An option's value: a constant, or a list with one value per level from level 1 (from the item's level 0 with
-// levelType ItemLevel), whose last entry also counts above it; plus its terms on hero attributes, computed when the
-// value is asked (GameLogic::Items::ComputeOptionValue).
+// An option's value: a constant, or a list with one value per level from its first level (level 1, the item's level 0
+// with levelType ItemLevel, or the level firstLevel names), whose last entry also counts above it and which gives 0
+// below its first level; plus its terms on hero attributes, computed when the value is asked
+// (GameLogic::Items::ComputeOptionValue).
 struct ItemOptionValue
 {
     std::vector<int> values;
@@ -134,10 +150,17 @@ struct ItemOptionValue
     bool isList = false;
     std::vector<ItemOptionTerm> per;
     ItemOptionLevelType levelType = ItemOptionLevelType::OptionLevel;
+    // The level of the list's first entry when the file names one (a harmony option from its own first level, 0 to
+    // 15); else FirstLevel's default.
+    std::optional<int> firstLevel;
 
-    // The level the list's first entry is for: 1, or the item's level 0.
+    // The level the list's first entry is for: firstLevel, else 1, or the item's level 0.
     int FirstLevel() const
     {
+        if (firstLevel)
+        {
+            return *firstLevel;
+        }
         return levelType == ItemOptionLevelType::ItemLevel ? 0 : 1;
     }
 
@@ -170,6 +193,42 @@ struct ItemOption
     ItemOptionValue value;
     // The names of its tooltip lines in Data/Items/Tooltips/OptionTexts.json, in their order.
     std::vector<std::string> texts;
+    // The option counts only while the item's + level is at least its own level (the Jewel of Harmony's rule: OpenMU's
+    // RequiredItemLevel equal to the level); below it the tooltip shows it gray and it adds nothing.
+    bool requiresItemLevel = false;
+    // The Zen the mix that removes the option costs, one entry per level of the value from its first level, the last
+    // one also above them (the Jewel of Harmony's refine removal); empty when the mix costs none. Client only.
+    std::vector<int> zen;
+    // OpenMU's IncreasableItemOption.Weight: how likely the server picks it among the definition's options (the Jewel
+    // of Harmony's roll); 0 when the file names none. The game doesn't read it; the exchange carries it.
+    int serverWeight = 0;
+
+    // The Zen at `level`: 0 below a list's first level or without entries; a constant's one entry at every level, as
+    // its value counts at every level.
+    int ZenAt(int level) const
+    {
+        if (zen.empty())
+        {
+            return 0;
+        }
+        if (!value.isList)
+        {
+            return zen.front();
+        }
+        const int first = value.FirstLevel();
+        if (level < first)
+        {
+            return 0;
+        }
+        const auto index = static_cast<size_t>(level - first);
+        return index < zen.size() ? zen[index] : zen.back();
+    }
+
+    // Whether the option counts on an item of this + level at this option level (requiresItemLevel).
+    bool CountsAt(int itemLevel, int optionLevel) const
+    {
+        return !requiresItemLevel || itemLevel >= optionLevel;
+    }
 
     bool operator==(const ItemOption& other) const = default;
 };

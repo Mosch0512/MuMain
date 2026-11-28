@@ -1,28 +1,8 @@
 #pragma once
 
-#define MAXHARMONYJEWELOPTIONTYPE 3
-#define MAXHARMONYJEWELOPTIONINDEX 10
-
-// #define IS_BUTTON_SORT
-
-struct HarmonyJewelOption
-{
-    int OptionType;
-    wchar_t Name[60];
-    int Minlevel;
-    int HarmonyJewelLevel[14];
-    int Zen[14];
-
-    HarmonyJewelOption() : OptionType(-1), Minlevel(-1)
-    {
-        memset(Name, 0, sizeof(Name));
-        for (int i = 0; i < 14; ++i)
-        {
-            HarmonyJewelLevel[i] = -1;
-            Zen[i] = -1;
-        }
-    }
-};
+// The Jewel of Harmony's options as the stat code adds them: the item's harmony option
+// (GameLogic::Items::FindHarmonyOption, from Data/Items/Options/Harmony.json) split into the stat parts the callers
+// read.
 
 struct NaturalAbility
 {
@@ -69,40 +49,16 @@ struct StrengthenCapability
     StrengthenCapability() : SI_isNB(false), SI_isSP(false), SI_isSD(false) {}
 };
 
-enum StrengthenItem
-{
-    SI_Weapon = 0,
-    SI_Staff,
-    SI_Defense,
-    SI_None,
-};
-
-typedef HarmonyJewelOption HARMONYJEWELOPTION;
-
 class JewelHarmonyInfo
 {
 public:
     virtual ~JewelHarmonyInfo();
     static JewelHarmonyInfo* MakeInfo();
 
-public:
-    const StrengthenItem GetItemType(int type);
-    const HARMONYJEWELOPTION& GetHarmonyJewelOptionInfo(int type, int option);
+    // Adds the item's harmony option to `pitemSC`'s part `index` (0 the requirement reductions, 1 the attack, 2 the
+    // defense) by its effect, while it counts (requiresItemLevel); the part's flag says the item has one that counts.
     void GetStrengthenCapability(StrengthenCapability* pitemSC, const ITEM* pitem, const int index);
 
-public:
-    const bool IsHarmonyJewelOption(int type, int option);
-
 private:
-    JewelHarmonyInfo();
-    // What is wrong with the file, e.g. L"file not found."; nullptr when it loaded.
-    const wchar_t* OpenJewelHarmonyInfoFile(const std::wstring& filename);
-
-private:
-    HARMONYJEWELOPTION m_OptionData[MAXHARMONYJEWELOPTIONTYPE][MAXHARMONYJEWELOPTIONINDEX];
+    JewelHarmonyInfo() = default;
 };
-
-inline const HARMONYJEWELOPTION& JewelHarmonyInfo::GetHarmonyJewelOptionInfo(int type, int option)
-{
-    return m_OptionData[type][option - 1];
-}

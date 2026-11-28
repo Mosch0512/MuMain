@@ -385,7 +385,15 @@ TEST_CASE("Fill levels makes a definition's value lists end at a level by their 
     ItemOptionDefinition& jewelry = files.definitions[2];
     CHECK(HighestOptionLevel(damage) == 4);
     CHECK(HighestOptionLevel(jewelry) == 3);
-    CHECK(HighestOptionLevel(files.definitions[0]) == 0);
+    CHECK(HighestOptionLevel(files.definitions[0]) == NoOptionLevels);
+
+    SUBCASE("a list of one entry from level 0 has a level to fill from")
+    {
+        damage.options[0].value = {.values = {2}, .isList = true, .firstLevel = 0};
+        CHECK(HighestOptionLevel(damage) == 0);
+        CHECK(FillOptionLevels(damage, 2));
+        CHECK(damage.options[0].value.values == std::vector<int>{2, 4, 6});
+    }
 
     SUBCASE("longer lists go on by the step between their last two entries")
     {
@@ -395,6 +403,34 @@ TEST_CASE("Fill levels makes a definition's value lists end at a level by their 
         CHECK(jewelry.options[0].value.values == std::vector<int>{1, 2, 3, 4, 5, 6, 7});
         CHECK(HighestOptionLevel(damage) == 7);
         CHECK_FALSE(FillOptionLevels(damage, 7));
+    }
+
+    SUBCASE("a list from its own first level ends at the level too")
+    {
+        // A harmony option's list from level 9: levels 9 to 13.
+        damage.options[0].value = {.values = {3, 5, 7, 9, 10}, .isList = true, .firstLevel = 9};
+        CHECK(HighestOptionLevel(damage) == 13);
+        CHECK(FillOptionLevels(damage, 11));
+        CHECK(damage.options[0].value.values == std::vector<int>{3, 5, 7});
+        CHECK(HighestOptionLevel(damage) == 11);
+    }
+
+    SUBCASE("the Zen list follows the value's levels")
+    {
+        Data::Items::ItemOption& option = damage.options[0];
+        option.value = {.values = {3, 5, 7, 9, 10}, .isList = true, .firstLevel = 9};
+        option.zen = {100, 200, 300, 400, 500};
+        CHECK(FillOptionLevels(damage, 11));
+        CHECK(option.zen == std::vector<int>{100, 200, 300});
+        CHECK(FillOptionLevels(damage, 14));
+        CHECK(option.zen == std::vector<int>{100, 200, 300, 300, 300, 300});
+        // A constant has one level, so one entry; no Zen list stays without one.
+        option.value = {.values = {7}, .isList = false};
+        CHECK(MatchZenToValue(option));
+        CHECK(option.zen == std::vector<int>{100});
+        option.zen.clear();
+        CHECK_FALSE(MatchZenToValue(option));
+        CHECK(option.zen.empty());
     }
 
     SUBCASE("shorter lists are cut")

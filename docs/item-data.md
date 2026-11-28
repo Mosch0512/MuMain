@@ -932,11 +932,12 @@ file per option group, and each item names the ones it can have in its
 `options` list. Which of them an item has comes from the server: its item
 data turns them on (luck by the luck flag, the additional option by its
 level, the excellent options by the excellent byte, the ancient bonus by
-the ancient byte's bonus level). Luck, the additional options, the
-excellent options, the wings' options and the ancient bonus are in data so
-far; the Horn of Dinorant's options, the Wizard's rings', the harmony,
-guardian, socket and pet options and the ancient set options are still code
-and move into data one group at a time.
+the ancient byte's bonus level, the Jewel of Harmony's option by the harmony
+byte). Luck, the additional options, the excellent options, the wings'
+options, the Jewel of Harmony's options and the ancient bonus are in data so
+far; the Horn of Dinorant's options, the Wizard's rings', the guardian,
+socket and pet options and the ancient set options are still code and move
+into data one group at a time.
 
 ```json
 {
@@ -975,7 +976,10 @@ and move into data one group at a time.
   item that links both, the one its byte holds counts and the loader
   reports the other, as for two definitions of one type; the loader also
   reports wing options on a horn, an error, and on any other item that is
-  no wing, a warning). Each option group
+  no wing, a warning); `harmony` is the Jewel of Harmony's option, the
+  harmony byte: its high four bits the option's number (1 to 15; Season 6
+  has 1 to 10), its low four bits its level (Season 6 sends 0 to 13); it
+  takes no option slot. Each option group
   brings its type when it moves into data. An item links at most one
   definition of a type.
 - `displayName`: the definition's name by language, English first.
@@ -989,7 +993,9 @@ and move into data one group at a time.
   `{"values": 5}` is 5 at every level, `{"values": [4, 8, 12, 16]}` one
   value per level from level 1, the last one also above the list.
   `"levelType": "itemLevel"` takes the list by the item's + level from
-  level 0 instead (the wings' HP, mana and command). `per`
+  level 0 instead (the wings' HP, mana and command), and `"firstLevel": 6`
+  starts the list at that level (0 to 15; the harmony options start at 0,
+  3, 6, 9 or 13); below its first level the value is 0. `per`
   adds terms on the hero's attributes, each rounded down on its own:
   `{"values": 0, "per": [{"attribute": "level", "divisor": 20}]}` is the
   hero's level / 20 (`times` multiplies instead). The client reads `level`,
@@ -1000,7 +1006,15 @@ and move into data one group at a time.
   the tooltip or the stats ask, so it grows with the hero, and stops at 0
   and 65535, what an option slot holds. `text`
   names its tooltip lines in `Tooltips/OptionTexts.json`, one name or a
-  list in their order.
+  list in their order. `"requiresItemLevel": true` lets a harmony option
+  count only while the item's + level is at least its own level (the Jewel
+  of Harmony's rule); below it the tooltip shows it gray and it adds
+  nothing. The other types don't read it.
+  `zen` lists what the mix that removes the option costs at each level of
+  its value, from its first level (the last entry also above; a constant's
+  one entry at every level), and
+  `"server": {"weight": 40}` is OpenMU's weight of the option for the
+  jewel's roll, which the game doesn't read.
 
 What an option does in the client is code, by its type, attribute and way
 of adding: luck's option fills the item's luck slot with its value, which
@@ -1103,6 +1117,34 @@ The Zen option is +30 %, Season 6's value; OpenMU has +40 %. "Level / 20"
 divides level plus master level (`totalLevel`), rounded down, as the
 Season 6 servers and OpenMU do; the client before divided the hero's level
 only, so a level 400 hero with 200 master levels now gets +30, not +20.
+
+`Options/Harmony.json` holds the Jewel of Harmony's options, from
+`JewelOfHarmonyOption_<lang>.bmd` and as OpenMU's (`HarmonyOptions.cs`, its
+attributes and weights; one option per item): `harmonyPhysicalAttack` (10
+options) for groups 0 to 4, `harmonyWizardryAttack` (8) for group 5, the
+summoner's books too, and `harmonyDefense` (8) for groups 6 to 11. Arrows
+and bolts link none, so they take no jewel. Each option's value runs from
+its first level to 13 with `requiresItemLevel`, and `zen` holds the
+removal's cost. The tooltip shows the option's line yellow and bold while
+the item's level reaches it, else gray. The stats add the requirement
+reductions, the minimum and maximum damage, the wizardry, the skill damage,
+the attack and defense success rates (PvP), the defense and the critical
+damage by the option's attribute; the client only shows the SD,
+regeneration, damage decrease, max AG and max HP options (the server
+computes them).
+
+| Number | `harmonyPhysicalAttack` | `harmonyWizardryAttack` | `harmonyDefense` |
+|---|---|---|---|
+| 1 | Min. attack +2 to +20 (from 0) | Wizardry +6 to +31 (from 0) | Defense +3 to +25 (from 0) |
+| 2 | Max. attack +3 to +29 (from 0) | Required strength −6 to −40 (from 0) | Max. AG +4 to +25 (from 3) |
+| 3 | Required strength −6 to −40 (from 0) | Required agility −6 to −40 (from 0) | Max. HP +7 to +30 (from 3) |
+| 4 | Required agility −6 to −40 (from 0) | Skill attack +7 to +30 (from 6) | Life recovery +1 to +8 (from 6) |
+| 5 | Attack (min. and max.) +7 to +19 (from 6) | Critical damage +10 to +28 (from 6) | Mana recovery +1 to +5 (from 9) |
+| 6 | Critical damage +12 to +30 (from 6) | SD decrement +4 to +13 (from 9) | Defense success rate (PvP) +3 to +8 (from 9) |
+| 7 | Skill attack +12 to +22 (from 9) | Attack success rate (PvP) +5 to +14 (from 9) | Damage decrement +3 % to +7 % (from 9) |
+| 8 | Attack success rate (PvP) +5 to +14 (from 9) | SD bypass rate +15 (13) | SD ratio +5 (13) |
+| 9 | SD decrement +3 to +10 (from 9) | – | – |
+| 10 | SD bypass rate +10 (13) | – | – |
 
 "Excellent" (the name's prefix and green colour, the excellent +15
 durability, the tooltip state `excellent`, the ground label's excellent
@@ -1357,8 +1399,11 @@ an option without `attribute` or with none or more than one of `add`,
 0 to 65535 or that has `perLevel`, a term (`per`) without `attribute` or
 without exactly one of `times` and `divisor` (whole numbers from 1), a
 number used twice in a definition, an additional option's number above 15,
-an excellent or wing option's number outside 1 to 6, a `levelType`
-other than `itemLevel`, an ancient set option's
+an excellent or wing option's number outside 1 to 6, a harmony option's
+outside 1 to 15, a `levelType` other than `itemLevel`, a `firstLevel`
+outside 0 to 15, a `requiresItemLevel` that is no true or false, a `zen`
+that is no list of whole numbers from 0 to 2000000000, a `server` weight
+outside 1 to 255, an ancient set option's
 number below 1, a luck or ancient bonus definition with more than one
 option or a numbered one, OpenMU
 labels or server values of the wrong kind, and a rule naming a
@@ -1372,8 +1417,13 @@ the texts do not have, and a text without English or with a placeholder
 other than `{value}` and `{divisor}` (the lines that name it are left
 out). Warnings:
 unknown fields, an attribute the client does not compute, a term on a hero
-attribute the client does not read, a `levelType` on one value (it is
-left out), a list longer than its levels (more than 15 values, or 16 by the item's level: the rest is never used), an item that is no wing linking wing options (its excellent
+attribute the client does not read, a `levelType` or `firstLevel` on one
+value (it is left out), a `firstLevel` on a luck, excellent, wing or
+ancient set option's list that doesn't go by the item's level (they take
+their value at level 1; it is left out), a `requiresItemLevel` on an option that is no
+harmony option (it is left out), a list longer than its levels from its first level
+to 15 (the rest is never used), a `zen` with another number of entries than
+the value has levels, an item that is no wing linking wing options (its excellent
 byte holds excellent options), a text with `{divisor}` on an option
 without a term that has a divisor (the line shows 0 there) or with several
 (it shows the first one's), a definition no

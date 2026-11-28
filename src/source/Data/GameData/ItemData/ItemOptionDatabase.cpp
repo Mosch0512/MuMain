@@ -12,11 +12,11 @@ namespace
 {
 // The order the game takes an item's definitions in, by type (the tooltip shows the option slots' lines in it): wing
 // options, the skill (no definition), luck, the additional option, the Dark Horse, excellent options, fixed options.
-// The ancient types follow them only for the order of a saved list (names of no definition last): they take no slot,
-// and the tooltip shows the ancient bonus above the slots' lines.
-constexpr std::array<ItemOptionType, 6> TakeOrder = {ItemOptionType::Wing,          ItemOptionType::Luck,
-                                                     ItemOptionType::Option,        ItemOptionType::Excellent,
-                                                     ItemOptionType::AncientOption, ItemOptionType::AncientBonus};
+// The ancient types and harmony follow them only for the order of a saved list (names of no definition last): they
+// take no slot, and the tooltip shows the harmony option and the ancient bonus above the slots' lines.
+constexpr std::array<ItemOptionType, 7> TakeOrder = {
+    ItemOptionType::Wing,          ItemOptionType::Luck,         ItemOptionType::Option, ItemOptionType::Excellent,
+    ItemOptionType::AncientOption, ItemOptionType::AncientBonus, ItemOptionType::Harmony};
 
 // The part of the server's item data a type reads, as one of the types that read it: excellent and wing options both
 // read the excellent byte.

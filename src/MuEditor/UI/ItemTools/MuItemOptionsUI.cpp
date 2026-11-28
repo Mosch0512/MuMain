@@ -65,6 +65,10 @@ constexpr int LevelsPerRow = 8;
 // The option byte's level has four bits: a list longer than 15 gives levels no server sends.
 constexpr int MaxOptionLevel = 15;
 constexpr int MaxValue = 1000000;
+// The most Zen a level's removal costs (what the loader reads) and OpenMU's highest weight.
+constexpr int MaxZen = 2000000000;
+constexpr int MaxWeight = 255;
+constexpr float ZenWidth = 90.0f;
 constexpr int MaxOptionsPerItem = 255;
 
 // The lowest number of the type's range no option of the definition has, or none when every number is taken (the loader
@@ -131,7 +135,7 @@ bool InputNumber(const char* label, int& value, int minimum, int maximum, float 
 std::string HighestLevelText(const ItemOptionDefinition& definition)
 {
     const int highest = HighestOptionLevel(definition);
-    return highest > 0 ? std::to_string(highest) : std::string("-");
+    return highest != NoOptionLevels ? std::to_string(highest) : std::string("-");
 }
 
 } // namespace
@@ -424,7 +428,7 @@ void CMuItemOptionsUI::RenderListRow(const ItemOptionDefinition& definition, boo
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
     bool marked = m_marked.contains(definition.name);
-    const bool hasList = HighestOptionLevel(definition) > 0;
+    const bool hasList = HighestOptionLevel(definition) != NoOptionLevels;
     ImGui::BeginDisabled(!hasList);
     if (ImGui::Checkbox("##Mark", &marked))
     {
@@ -728,13 +732,42 @@ void CMuItemOptionsUI::RenderOption(ItemOptionDefinition& definition, size_t ind
         ImGui::TextColored(WarningColor, "%s", I18N::Editor::TheClientComputesNothingForThisAttribute);
     }
     ImGui::Indent();
-    RenderValue(option.value, index);
+    // The Zen list keeps one entry per level of the value when the value's levels change.
+    const size_t levelsBefore = option.value.isList ? option.value.values.size() : 1;
+    RenderValue(option.value, index, Data::Items::HasOptionLevels(definition.type));
+    if ((option.value.isList ? option.value.values.size() : 1) != levelsBefore)
+    {
+        MatchZenToValue(option);
+    }
     RenderTexts(option);
+    // The item level rule is read only for harmony options (the loader leaves it out elsewhere), a constant's too.
+    const bool harmony = definition.type == Data::Items::ItemOptionType::Harmony;
+    if (harmony)
+    {
+        ImGui::Checkbox(I18N::Editor::OnlyFromTheItemSLevel, &option.requiresItemLevel);
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("%s", I18N::Editor::CountsFromTheItemSLevel);
+        }
+    }
+    // The Jewel of Harmony's removal Zen and OpenMU's weight, for harmony options and any option that has them.
+    if (harmony || !option.zen.empty())
+    {
+        RenderZen(option);
+    }
+    if (harmony || option.serverWeight > 0)
+    {
+        InputNumber(I18N::Editor::Weight, option.serverWeight, 0, MaxWeight, Fields::NumberWidth * 0.6f);
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("%s", I18N::Editor::OpenMUSPickWeight);
+        }
+    }
     ImGui::Unindent();
     ImGui::Spacing();
 }
 
-void CMuItemOptionsUI::RenderValue(ItemOptionValue& value, size_t option)
+void CMuItemOptionsUI::RenderValue(ItemOptionValue& value, size_t option, bool hasLevels)
 {
     bool isList = value.isList;
     if (ImGui::Checkbox(I18N::Editor::OneValuePerLevel, &isList))
@@ -746,9 +779,10 @@ void CMuItemOptionsUI::RenderValue(ItemOptionValue& value, size_t option)
         }
         if (!isList)
         {
-            // A constant has no levels, and no level type either.
+            // A constant has no levels, and no level type or first level either.
             value.values.resize(1);
             value.levelType = ItemOptionLevelType::OptionLevel;
+            value.firstLevel.reset();
         }
     }
     if (!value.isList)
@@ -767,15 +801,45 @@ void CMuItemOptionsUI::RenderValue(ItemOptionValue& value, size_t option)
         if (ImGui::Checkbox(I18N::Editor::ByTheItemSLevel, &byItemLevel))
         {
             value.levelType = byItemLevel ? ItemOptionLevelType::ItemLevel : ItemOptionLevelType::OptionLevel;
-            // The item levels go 0 to 15, the option levels 1 to 15: drop what no option level reaches.
-            if (!byItemLevel && value.values.size() > static_cast<size_t>(MaxOptionLevel))
+            // The item levels go 0 to 15, the option levels 1 to 15: drop what no level from the first reaches.
+            const auto levels = static_cast<size_t>(MaxOptionLevel + 1 - value.FirstLevel());
+            if (value.values.size() > levels)
             {
-                value.values.resize(MaxOptionLevel);
+                value.values.resize(levels);
             }
         }
         if (ImGui::IsItemHovered())
         {
             ImGui::SetTooltip("%s", I18N::Editor::TheListGoesByTheItemSLevel0To15NotTheOptionLevel);
+        }
+        // A type without levels of its own takes the value at level 1: a first level only counts by the item's level.
+        if (hasLevels || value.levelType == ItemOptionLevelType::ItemLevel)
+        {
+            ImGui::SameLine();
+            int first = value.FirstLevel();
+            if (InputNumber(I18N::Editor::FirstLevel, first, 0, MaxOptionLevel, Fields::NumberWidth * 0.6f))
+            {
+                // The level type's own first level is left unset, so it isn't written.
+                value.firstLevel.reset();
+                if (first != value.FirstLevel())
+                {
+                    value.firstLevel = first;
+                }
+                // The levels go from the first to 15.
+                const auto levels = static_cast<size_t>(MaxOptionLevel + 1 - first);
+                if (value.values.size() > levels)
+                {
+                    value.values.resize(levels);
+                }
+            }
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("%s", I18N::Editor::TheListSFirstLevel);
+            }
+        }
+        else
+        {
+            value.firstLevel.reset();
         }
         const int firstLevel = value.FirstLevel();
         ImGui::SameLine();
@@ -831,6 +895,58 @@ void CMuItemOptionsUI::RenderValue(ItemOptionValue& value, size_t option)
         }
     }
     RenderTerms(value);
+}
+
+void CMuItemOptionsUI::RenderZen(ItemOption& option)
+{
+    ImGui::PushID("zen");
+    ImGui::TextUnformatted(I18N::Editor::ZenPerLevel);
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::SetTooltip("%s", I18N::Editor::TheRemovalMixSZen);
+    }
+    const int firstLevel = option.value.FirstLevel();
+    for (size_t level = 0; level < option.zen.size(); ++level)
+    {
+        if (level % LevelsPerRow != 0)
+        {
+            ImGui::SameLine();
+        }
+        ImGui::PushID(static_cast<int>(level));
+        ImGui::SetNextItemWidth(Fields::ScaledWidth(ZenWidth));
+        int entry = option.zen[level];
+        if (ImGui::InputInt("##zen", &entry, 0, 0))
+        {
+            option.zen[level] = std::clamp(entry, 0, MaxZen);
+        }
+        if (ImGui::IsItemHovered())
+        {
+            // A constant's one entry counts at every level, as its value does.
+            ImGui::SetTooltip(
+                "%s",
+                option.value.isList
+                    ? I18N::Format(I18N::Editor::Level0, {std::to_string(static_cast<int>(level) + firstLevel)}).c_str()
+                    : I18N::Editor::EveryLevel);
+        }
+        ImGui::PopID();
+    }
+    // One entry per level of the value (a list's entries, a constant's one) or none: "+" gives every level an entry,
+    // "-" takes the removal Zen away.
+    const size_t levels = option.value.isList ? option.value.values.size() : 1;
+    ImGui::BeginDisabled(option.zen.size() >= levels);
+    if (ImGui::SmallButton("+"))
+    {
+        option.zen.resize(levels, option.zen.empty() ? 0 : option.zen.back());
+    }
+    ImGui::EndDisabled();
+    ImGui::SameLine();
+    ImGui::BeginDisabled(option.zen.empty());
+    if (ImGui::SmallButton("-"))
+    {
+        option.zen.clear();
+    }
+    ImGui::EndDisabled();
+    ImGui::PopID();
 }
 
 void CMuItemOptionsUI::RenderTerms(ItemOptionValue& value)
@@ -1022,8 +1138,10 @@ void CMuItemOptionsUI::RenderValueFill()
     ImGui::BeginDisabled(!valid);
     if (ImGui::Button(I18N::Editor::Fill))
     {
-        FillOptionValue(definition->options[m_valueFillOption].value, m_valueFillFrom, m_valueFillStart,
-                        m_valueFillStep, m_valueFillTo);
+        ItemOption& option = definition->options[m_valueFillOption];
+        FillOptionValue(option.value, m_valueFillFrom, m_valueFillStart, m_valueFillStep, m_valueFillTo);
+        // The Zen list keeps one entry per level of the filled value.
+        MatchZenToValue(option);
         ImGui::CloseCurrentPopup();
     }
     ImGui::EndDisabled();

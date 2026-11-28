@@ -3,6 +3,7 @@
 #include "doctest.h"
 
 #include "Data/GameData/ItemData/ItemOptionsJson.h"
+#include "Data/GameData/ItemData/ItemOptionValueJson.h"
 #include "Data/GameData/ItemData/ItemStatsJson.h"
 #include "Data/GameData/ItemData/OptionRulesJson.h"
 #include "Data/GameData/ItemData/OptionTextsJson.h"
@@ -223,6 +224,147 @@ TEST_CASE("Each option type's numbers are the ones its byte can turn on [data][i
     CHECK_FALSE(HasOptionNumbers(ItemOptionType::Luck));
     CHECK_FALSE(HasOptionNumbers(ItemOptionType::AncientBonus));
     CHECK(HasOptionNumbers(ItemOptionType::Wing));
+    // The harmony byte's high four bits, 0 meaning none.
+    CHECK(GetOptionNumberRange(ItemOptionType::Harmony).minimum == 1);
+    CHECK(GetOptionNumberRange(ItemOptionType::Harmony).maximum == 15);
+    CHECK(HasOptionNumbers(ItemOptionType::Harmony));
+}
+
+TEST_CASE("Harmony options read their first level, the item level rule and their Zen and write them back [data][items]")
+{
+    constexpr const char* HarmonyFile = R"({
+  "formatVersion": 1,
+  "definitions": [
+    {
+      "name": "harmonyDefense",
+      "type": "harmony",
+      "displayName": {
+        "en": "Harmony defense options"
+      },
+      "options": [
+        {"number": 1, "attribute": "defenseBase", "addFinal": {"firstLevel": 0, "values": [3, 4, 5]}, "text": "harmonyDefenseIncrease", "requiresItemLevel": true, "zen": [100000, 110000, 120000], "server": {"weight": 50}},
+        {"number": 8, "attribute": "shieldRateIncrease", "percent": {"firstLevel": 13, "values": [5]}, "text": "harmonySdRatioIncrease", "requiresItemLevel": true, "zen": [500000]}
+      ]
+    }
+  ]
+}
+)";
+    std::vector<ItemOptionDefinition> definitions;
+    std::vector<ItemDataIssue> issues;
+    ReadItemOptionsJson(HarmonyFile, "Options/Harmony.json", "Harmony.json", definitions, issues);
+    CHECK(issues.empty());
+    REQUIRE(definitions.size() == 1);
+    CHECK(definitions[0].type == ItemOptionType::Harmony);
+    REQUIRE(definitions[0].options.size() == 2);
+    const ItemOption& defense = definitions[0].options[0];
+    CHECK(defense.requiresItemLevel);
+    // From harmony level 0; above the list its last entry.
+    CHECK(defense.value.At(0) == 3);
+    CHECK(defense.value.At(2) == 5);
+    CHECK(defense.value.At(13) == 5);
+    CHECK(defense.ZenAt(1) == 110000);
+    CHECK(defense.ZenAt(13) == 120000);
+    CHECK(defense.serverWeight == 50);
+    const ItemOption& shield = definitions[0].options[1];
+    // Below its first level 0, as the old file held it.
+    CHECK(shield.value.At(12) == 0);
+    CHECK(shield.value.At(13) == 5);
+    CHECK(shield.ZenAt(12) == 0);
+    CHECK(shield.ZenAt(13) == 500000);
+    // The item level rule: an option level counts while the item's + level is at least it.
+    CHECK(defense.CountsAt(5, 5));
+    CHECK_FALSE(defense.CountsAt(4, 5));
+    CHECK(WriteItemOptionsJson(definitions) == HarmonyFile);
+
+    // A first level that is the level type's own is left out when written.
+    ItemOptionValue fromOne = defense.value;
+    fromOne.firstLevel = 1;
+    CHECK_FALSE(Data::Items::Json::WriteOptionValue(fromOne).contains("firstLevel"));
+    fromOne.levelType = ItemOptionLevelType::ItemLevel;
+    CHECK(Data::Items::Json::WriteOptionValue(fromOne)["firstLevel"] == 1);
+    fromOne.firstLevel = 0;
+    CHECK_FALSE(Data::Items::Json::WriteOptionValue(fromOne).contains("firstLevel"));
+
+    // A constant counts at every level, its one Zen entry too, harmony level 0 included.
+    ItemOption constant = defense;
+    constant.value = {{7}, false};
+    constant.zen = {300000};
+    CHECK(constant.value.At(0) == 7);
+    CHECK(constant.ZenAt(0) == 300000);
+    CHECK(constant.ZenAt(13) == 300000);
+}
+
+TEST_CASE("A harmony option's first level, item level rule and Zen report what is wrong with them [data][items]")
+{
+    const auto read = [](const std::string& option)
+    {
+        std::vector<ItemOptionDefinition> definitions;
+        std::vector<ItemDataIssue> issues;
+        ReadItemOptionsJson(
+            R"({"formatVersion": 1, "definitions": [{"name": "harmonyDefense", "type": "harmony", )"
+            R"("displayName": {"en": "Harmony"}, "options": [{"number": 1, "attribute": "defenseBase", )" +
+                option + "}]}]}",
+            "Options/Harmony.json", "Harmony.json", definitions, issues);
+        return issues;
+    };
+    const auto only =
+        [](const std::vector<ItemDataIssue>& issues, ItemDataIssueSeverity severity, const std::string& field)
+    { return issues.size() == 1 && issues[0].severity == severity && issues[0].field == field; };
+    using Severity = ItemDataIssueSeverity;
+    const std::string option = "definitions[0].options[0]";
+
+    CHECK(only(read(R"("addFinal": {"firstLevel": 16, "values": [3]}, "text": "t")"), Severity::Fatal,
+               option + ".addFinal.firstLevel"));
+    // One value has no levels: the first level does nothing, so it warns and is left out.
+    CHECK(only(read(R"("addFinal": {"firstLevel": 3, "values": 3}, "text": "t")"), Severity::Warning,
+               option + ".addFinal.firstLevel"));
+    CHECK(only(read(R"("addFinal": {"values": [3]}, "text": "t", "requiresItemLevel": 1)"), Severity::Fatal,
+               option + ".requiresItemLevel"));
+    CHECK(only(read(R"("addFinal": {"values": [3]}, "text": "t", "zen": 5)"), Severity::Fatal, option + ".zen"));
+    CHECK(only(read(R"("addFinal": {"values": [3]}, "text": "t", "server": {"weight": 0})"), Severity::Fatal,
+               option + ".server.weight"));
+    CHECK(only(read(R"("addFinal": {"values": [3]}, "text": "t", "server": {"chance": 1})"), Severity::Warning,
+               option + ".server.chance"));
+    CHECK(only(read(R"("addFinal": {"values": [3]}, "text": "t", "zen": [-1])"), Severity::Fatal, option + ".zen[0]"));
+    // Not one entry per level: a level past them takes the last one.
+    CHECK(only(read(R"("addFinal": {"values": [3, 4]}, "text": "t", "zen": [1])"), Severity::Warning, option + ".zen"));
+    // A list from its first level is as long as its levels to 15.
+    CHECK(only(read(R"("addFinal": {"firstLevel": 13, "values": [1, 2, 3, 4]}, "text": "t")"), Severity::Warning,
+               option + ".addFinal.values"));
+
+    // Only harmony options read the item level rule: on another type it warns and is left out.
+    std::vector<ItemOptionDefinition> definitions;
+    std::vector<ItemDataIssue> issues;
+    ReadItemOptionsJson(R"({"formatVersion": 1, "definitions": [{"name": "defenseOption", "type": "option", )"
+                        R"("displayName": {"en": "Option"}, "options": [{"number": 0, "attribute": "defenseBase", )"
+                        R"("add": {"values": [4, 8]}, )"
+                        R"("text": "t", "requiresItemLevel": true}]}]})",
+                        "Options/Option.json", "Option.json", definitions, issues);
+    CHECK(only(issues, Severity::Warning, option + ".requiresItemLevel"));
+    REQUIRE(definitions.size() == 1);
+    CHECK_FALSE(definitions[0].options[0].requiresItemLevel);
+
+    // A first level on a type whose value is taken at level 1 does nothing: it warns and is left out; by the item's
+    // level it counts.
+    const auto readExcellent = [&](const std::string& value)
+    {
+        definitions.clear();
+        issues.clear();
+        ReadItemOptionsJson(
+            R"({"formatVersion": 1, "definitions": [{"name": "excellentDefense", "type": "excellent", )"
+            R"("displayName": {"en": "Excellent"}, "options": [{"number": 1, "attribute": "defenseBase", )"
+            R"("add": )" +
+                value + R"(, "text": "t"}]}]})",
+            "Options/Excellent.json", "Excellent.json", definitions, issues);
+    };
+    readExcellent(R"({"firstLevel": 2, "values": [4, 8]})");
+    CHECK(only(issues, Severity::Warning, option + ".add.firstLevel"));
+    REQUIRE(definitions.size() == 1);
+    CHECK_FALSE(definitions[0].options[0].value.firstLevel);
+    readExcellent(R"({"levelType": "itemLevel", "firstLevel": 2, "values": [4, 8]})");
+    CHECK(issues.empty());
+    REQUIRE(definitions.size() == 1);
+    CHECK(definitions[0].options[0].value.firstLevel == 2);
 }
 
 TEST_CASE("Option definition file errors stop the start [data][items]")
@@ -235,7 +377,7 @@ TEST_CASE("Option definition file errors stop the start [data][items]")
     };
 
     fatal(R"({"type": "luck", "displayName": {"en": "Luck"}, )" + std::string(LuckOption) + "}", "definitions[0].name");
-    fatal(R"({"name": "luck", "type": "harmony", "displayName": {"en": "Luck"}, )" + std::string(LuckOption) + "}",
+    fatal(R"({"name": "luck", "type": "sparkle", "displayName": {"en": "Luck"}, )" + std::string(LuckOption) + "}",
           "definitions[0].type");
     fatal(R"({"name": "luck", "type": "luck", )" + std::string(LuckOption) + "}", "definitions[0].displayName");
     fatal(R"({"name": "luck", "type": "luck", "displayName": {"de": "Glück"}, )" + std::string(LuckOption) + "}",

@@ -10,6 +10,7 @@ namespace ValueKey
 {
 constexpr const char* Values = "values";
 constexpr const char* LevelType = "levelType";
+constexpr const char* FirstLevel = "firstLevel";
 constexpr const char* PerLevel = "perLevel";
 constexpr const char* Per = "per";
 constexpr const char* Attribute = "attribute";
@@ -24,7 +25,8 @@ constexpr const char* ItemLevelType = "itemLevel";
 constexpr int MaxLevel = 15;
 
 // perLevel has an error of its own, so it is no unknown field.
-const KeySet ValueFields = {ValueKey::LevelType, ValueKey::Values, ValueKey::PerLevel, ValueKey::Per};
+const KeySet ValueFields = {ValueKey::LevelType, ValueKey::FirstLevel, ValueKey::Values, ValueKey::PerLevel,
+                            ValueKey::Per};
 const KeySet TermFields = {ValueKey::Attribute, ValueKey::Times, ValueKey::Divisor};
 
 void ReadTerms(const OrderedJson& json, const std::string& field, std::vector<ItemOptionTerm>& terms,
@@ -102,6 +104,14 @@ void ReadOptionValue(const OrderedJson& json, const std::string& field, ItemOpti
                       "\" (the item's + level), or left out (the option's own level)");
         }
     }
+    if (const auto firstLevel = json.find(ValueKey::FirstLevel); firstLevel != json.end())
+    {
+        int level = 0;
+        if (ReadWholeNumberInRange(*firstLevel, field + "." + ValueKey::FirstLevel, 0, MaxLevel, level, fatal))
+        {
+            value.firstLevel = level;
+        }
+    }
     value.isList = values->is_array();
     if (!value.isList && value.levelType == ItemOptionLevelType::ItemLevel)
     {
@@ -109,6 +119,12 @@ void ReadOptionValue(const OrderedJson& json, const std::string& field, ItemOpti
         warning(field + "." + ValueKey::LevelType, "does nothing on one value, only on a list of one value per level: "
                                                    "it is left out");
         value.levelType = ItemOptionLevelType::OptionLevel;
+    }
+    if (!value.isList && value.firstLevel)
+    {
+        warning(field + "." + ValueKey::FirstLevel, "does nothing on one value, only on a list of one value per level: "
+                                                    "it is left out");
+        value.firstLevel.reset();
     }
     if (!value.isList)
     {
@@ -147,6 +163,11 @@ OrderedJson WriteOptionValue(const ItemOptionValue& value)
     if (value.levelType == ItemOptionLevelType::ItemLevel)
     {
         json[ValueKey::LevelType] = ItemLevelType;
+    }
+    // Left out when it is the level type's own first level (1, or the item's level 0).
+    if (value.firstLevel && *value.firstLevel != (value.levelType == ItemOptionLevelType::ItemLevel ? 0 : 1))
+    {
+        json[ValueKey::FirstLevel] = *value.firstLevel;
     }
     if (value.isList)
     {

@@ -769,51 +769,31 @@ void mu::ui::window::CCharacterInfoWindow::BuildAttributeLines()
 
     StrengthenCapability SC_r, SC_l;
 
-    int rlevel = pWeaponRight->Level;
+    g_pUIJewelHarmonyinfo->GetStrengthenCapability(&SC_r, pWeaponRight, 1);
 
-    if (rlevel >= pWeaponRight->Jewel_Of_Harmony_OptionLevel)
+    if (SC_r.SI_isSP)
     {
-        g_pUIJewelHarmonyinfo->GetStrengthenCapability(&SC_r, pWeaponRight, 1);
-
-        if (SC_r.SI_isSP)
-        {
-            iMinIndex = SC_r.SI_SP.SI_minattackpower;
-            iMaxIndex = SC_r.SI_SP.SI_maxattackpower;
-            iMagicalIndex = SC_r.SI_SP.SI_magicalpower;
-        }
+        iMinIndex = SC_r.SI_SP.SI_minattackpower;
+        iMaxIndex = SC_r.SI_SP.SI_maxattackpower;
+        iMagicalIndex = SC_r.SI_SP.SI_magicalpower;
     }
 
-    int llevel = pWeaponLeft->Level;
+    g_pUIJewelHarmonyinfo->GetStrengthenCapability(&SC_l, pWeaponLeft, 1);
 
-    if (llevel >= pWeaponLeft->Jewel_Of_Harmony_OptionLevel)
+    if (SC_l.SI_isSP)
     {
-        g_pUIJewelHarmonyinfo->GetStrengthenCapability(&SC_l, pWeaponLeft, 1);
-
-        if (SC_l.SI_isSP)
-        {
-            iMinIndex += SC_l.SI_SP.SI_minattackpower;
-            iMaxIndex += SC_l.SI_SP.SI_maxattackpower;
-            iMagicalIndex += SC_l.SI_SP.SI_magicalpower;
-        }
+        iMinIndex += SC_l.SI_SP.SI_minattackpower;
+        iMaxIndex += SC_l.SI_SP.SI_maxattackpower;
+        iMagicalIndex += SC_l.SI_SP.SI_magicalpower;
     }
 
     int iDefenseRate = 0, iAttackPowerRate = 0;
 
     StrengthenCapability rightinfo, leftinfo;
 
-    int iRightLevel = pWeaponRight->Level;
+    g_pUIJewelHarmonyinfo->GetStrengthenCapability(&rightinfo, pWeaponRight, 1);
 
-    if (iRightLevel >= pWeaponRight->Jewel_Of_Harmony_OptionLevel)
-    {
-        g_pUIJewelHarmonyinfo->GetStrengthenCapability(&rightinfo, pWeaponRight, 1);
-    }
-
-    int iLeftLevel = pWeaponLeft->Level;
-
-    if (iLeftLevel >= pWeaponLeft->Jewel_Of_Harmony_OptionLevel)
-    {
-        g_pUIJewelHarmonyinfo->GetStrengthenCapability(&leftinfo, pWeaponLeft, 1);
-    }
+    g_pUIJewelHarmonyinfo->GetStrengthenCapability(&leftinfo, pWeaponLeft, 1);
 
     if (rightinfo.SI_isSP)
     {
@@ -830,12 +810,7 @@ void mu::ui::window::CCharacterInfoWindow::BuildAttributeLines()
 
         ITEM* pItem = &CharacterMachine->Equipment[k];
 
-        int eqlevel = pItem->Level;
-
-        if (eqlevel >= pItem->Jewel_Of_Harmony_OptionLevel)
-        {
-            g_pUIJewelHarmonyinfo->GetStrengthenCapability(&defenseinfo, pItem, 2);
-        }
+        g_pUIJewelHarmonyinfo->GetStrengthenCapability(&defenseinfo, pItem, 2);
 
         if (defenseinfo.SI_isSD)
         {
@@ -1121,17 +1096,13 @@ void mu::ui::window::CCharacterInfoWindow::BuildAttributeLines()
 
     for (int j = 0; j < MAX_EQUIPMENT; ++j)
     {
-        int TempLevel = CharacterMachine->Equipment[j].Level;
-        if (TempLevel >= CharacterMachine->Equipment[j].Jewel_Of_Harmony_OptionLevel)
+        StrengthenCapability SC;
+
+        g_pUIJewelHarmonyinfo->GetStrengthenCapability(&SC, &CharacterMachine->Equipment[j], 2);
+
+        if (SC.SI_isSD)
         {
-            StrengthenCapability SC;
-
-            g_pUIJewelHarmonyinfo->GetStrengthenCapability(&SC, &CharacterMachine->Equipment[j], 2);
-
-            if (SC.SI_isSD)
-            {
-                maxdefense += SC.SI_SD.SI_defense;
-            }
+            maxdefense += SC.SI_SD.SI_defense;
         }
     }
 
@@ -1391,17 +1362,13 @@ void mu::ui::window::CCharacterInfoWindow::BuildAttributeLines()
 
         for (int j = 0; j < MAX_EQUIPMENT; ++j)
         {
-            int TempLevel = CharacterMachine->Equipment[j].Level;
 
-            if (TempLevel >= CharacterMachine->Equipment[j].Jewel_Of_Harmony_OptionLevel)
+            StrengthenCapability SC;
+            g_pUIJewelHarmonyinfo->GetStrengthenCapability(&SC, &CharacterMachine->Equipment[j], 1);
+
+            if (SC.SI_isSP)
             {
-                StrengthenCapability SC;
-                g_pUIJewelHarmonyinfo->GetStrengthenCapability(&SC, &CharacterMachine->Equipment[j], 1);
-
-                if (SC.SI_isSP)
-                {
-                    maxMg += SC.SI_SP.SI_magicalpower;
-                }
+                maxMg += SC.SI_SP.SI_magicalpower;
             }
         }
 

@@ -62,8 +62,11 @@ private:
     void RenderDisplayName(Data::Items::ItemOptionDefinition& definition);
     void RenderServer(Data::Items::ItemOptionDefinition& definition);
     void RenderOption(Data::Items::ItemOptionDefinition& definition, size_t index);
-    void RenderValue(Data::Items::ItemOptionValue& value, size_t option);
+    // `hasLevels`: the type takes the value at a level of its own (Data::Items::HasOptionLevels), so a first level
+    // counts on any list; else only on a list by the item's level.
+    void RenderValue(Data::Items::ItemOptionValue& value, size_t option, bool hasLevels);
     void RenderTerms(Data::Items::ItemOptionValue& value);
+    void RenderZen(Data::Items::ItemOption& option);
     void RenderTexts(Data::Items::ItemOption& option);
     void RenderUsers(const std::string& name);
     void RenderApplyButtons();

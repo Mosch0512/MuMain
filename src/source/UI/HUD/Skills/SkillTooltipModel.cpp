@@ -198,9 +198,9 @@ DamageContext BuildDamageContext(int skillType)
     StrengthenCapability rightinfo{}, leftinfo{};
     ITEM* rightweapon = &CharacterMachine->Equipment[EQUIPMENT_WEAPON_RIGHT];
     ITEM* leftweapon = &CharacterMachine->Equipment[EQUIPMENT_WEAPON_LEFT];
-    if (g_pUIJewelHarmonyinfo && rightweapon->Level >= rightweapon->Jewel_Of_Harmony_OptionLevel)
+    if (g_pUIJewelHarmonyinfo)
         g_pUIJewelHarmonyinfo->GetStrengthenCapability(&rightinfo, rightweapon, 1);
-    if (g_pUIJewelHarmonyinfo && leftweapon->Level >= leftweapon->Jewel_Of_Harmony_OptionLevel)
+    if (g_pUIJewelHarmonyinfo)
         g_pUIJewelHarmonyinfo->GetStrengthenCapability(&leftinfo, leftweapon, 1);
     if (rightinfo.SI_isSP)
     {

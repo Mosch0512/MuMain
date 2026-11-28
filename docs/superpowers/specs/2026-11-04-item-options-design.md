@@ -32,6 +32,24 @@
 > file saved before 9a1 keeps its items without lists in the editor too, since
 > an empty list differs from the rules' (O33): Item Basics' "Use the rules"
 > (9a5) writes them.
+>
+> **9b2 as built (2026-11-23).** `Harmony.json` holds `harmonyPhysicalAttack`,
+> `harmonyWizardryAttack` and `harmonyDefense`, linked by the rules of groups
+> 0 to 4, 5 and 6 to 11 (as the client's kinds and OpenMU's links); the
+> ammunition rule links none, so arrows and bolts take no jewel (their
+> harmony variants of the snapshot change). Each option's list starts at
+> `firstLevel` (the bmd's `Minlevel`) and ends at 13, the last value counting
+> at 14 and 15 (the client read past the table there); `requiresItemLevel` is
+> on every option; `zen` is a list of the removal's Zen per level of the
+> value, on the option; OpenMU's weight is the option's `server.weight` and
+> the definitions' `server` holds OpenMU's one option per item. The English
+> texts stay the bmd's, typos too ("sucess"), so the tooltip snapshot keeps
+> its lines; Portuguese and Spanish come from their bmds, the other eight
+> languages are new. The stats add an option by its attribute's effect
+> (`HarmonyEffect`); P11's options keep showing only. Item Tooltip gets no
+> harmony controls: it previews the name and the ground label, which harmony
+> doesn't change; the control API's `tooltip` takes `harmony` and
+> `harmony_level`.
 
 ## Goal
 
@@ -386,7 +404,7 @@ camelCase.
 | `wing` | Wing | excellent byte | 1 to 4, bit `number - 1` (O9; the second tier wings ship 1 to 3, O26) | 9b1 |
 | `ancientOption` | AncientOption | ancient byte (with phase 10's sets) | 1 to n, in the order the set gives them | 10 |
 | `ancientBonus` | AncientBonus | ancient byte, high nibble = level | – (one option) | 9a4 |
-| `harmony` | HarmonyOption | harmony byte, high nibble = number, low nibble = level | 1 to 10 | 9b2 |
+| `harmony` | HarmonyOption | harmony byte, high nibble = number, low nibble = level | 1 to 10 (the loader takes 1 to 15) | 9b2 |
 | `guardian` | GuardianOption | flag 0x40 (no byte): all options of the item's guardian definition | the item group (OpenMU: 0xF0 for weapons, 7 to 11 for armour); both options of a definition have the same number | 9b3 |
 | `socket` | SocketOption | socket bytes: `(sphere level - 1) * 50 + element offset + number` | 0-based within its element | 9b4 |
 | `socketBonus` | SocketBonusOption | socket header, high nibble | 0 to 5, unique across the bonus definitions | 9b4 |

@@ -434,21 +434,16 @@ bool CMyInventory::IsEquipable(int iIndex, ITEM* pItem) const
     const WORD wCharisma = CharacterAttribute->Charisma + CharacterAttribute->AddCharisma;
     const WORD wLevel = CharacterAttribute->Level;
 
-    const int iItemLevel = pItem->Level;
-
     int iDecNeedStrength = 0, iDecNeedDex = 0;
 
     extern JewelHarmonyInfo* g_pUIJewelHarmonyinfo;
-    if (iItemLevel >= pItem->Jewel_Of_Harmony_OptionLevel)
-    {
-        StrengthenCapability SC;
-        g_pUIJewelHarmonyinfo->GetStrengthenCapability(&SC, pItem, 0);
+    StrengthenCapability SC;
+    g_pUIJewelHarmonyinfo->GetStrengthenCapability(&SC, pItem, 0);
 
-        if (SC.SI_isNB)
-        {
-            iDecNeedStrength = SC.SI_NB.SI_force;
-            iDecNeedDex = SC.SI_NB.SI_activity;
-        }
+    if (SC.SI_isNB)
+    {
+        iDecNeedStrength = SC.SI_NB.SI_force;
+        iDecNeedDex = SC.SI_NB.SI_activity;
     }
     if (pItem->SocketCount > 0)
     {

@@ -30,10 +30,7 @@ namespace
 StrengthenCapability HarmonyBonus(const ITEM& item, int kind)
 {
     StrengthenCapability capability{};
-    if (item.Level >= item.Jewel_Of_Harmony_OptionLevel)
-    {
-        g_pUIJewelHarmonyinfo->GetStrengthenCapability(&capability, &item, kind);
-    }
+    g_pUIJewelHarmonyinfo->GetStrengthenCapability(&capability, &item, kind);
     return capability;
 }
 

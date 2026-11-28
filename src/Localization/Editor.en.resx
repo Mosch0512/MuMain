@@ -6262,4 +6262,28 @@
   <data name="The list goes by the item's level 0 to 15, not the option level" xml:space="preserve">
     <value>The list goes by the item's level 0 to 15, not the option level</value>
   </data>
+  <data name="First level" xml:space="preserve">
+    <value>First level</value>
+  </data>
+  <data name="The list's first level" xml:space="preserve">
+    <value>The level of the list's first value; below it the value is 0</value>
+  </data>
+  <data name="Every level" xml:space="preserve">
+    <value>Every level</value>
+  </data>
+  <data name="Only from the item's level" xml:space="preserve">
+    <value>Only from the item's level</value>
+  </data>
+  <data name="Counts from the item's level" xml:space="preserve">
+    <value>The option counts only while the item's level is at least its own level; below it the tooltip shows it gray</value>
+  </data>
+  <data name="Zen per level" xml:space="preserve">
+    <value>Zen per level</value>
+  </data>
+  <data name="The removal mix's Zen" xml:space="preserve">
+    <value>What the mix that removes the option costs at each level of its value, from the first; the last also above</value>
+  </data>
+  <data name="OpenMU's pick weight" xml:space="preserve">
+    <value>How likely OpenMU's server picks the option; the game doesn't read it</value>
+  </data>
 </root>

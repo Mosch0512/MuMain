@@ -1099,6 +1099,24 @@ std::optional<int> WriteDefinitionOptionLines(const ITEM& item, int slot, int te
                             rowLimit);
 }
 
+namespace
+{
+// The place of the harmony definition among the option database's harmony definitions, in their order.
+int HarmonyDefinitionPlace(Data::Items::ItemOptionIndex definition)
+{
+    const Data::Items::ItemOptionDatabase& options = g_ItemDatabase.GetOptions();
+    int place = 0;
+    for (Data::Items::ItemOptionIndex index = 0; index < definition; ++index)
+    {
+        if (options.Get(index).type == Data::Items::ItemOptionType::Harmony)
+        {
+            ++place;
+        }
+    }
+    return place;
+}
+} // namespace
+
 int WriteOptionLines(const Data::Items::ItemOption& option, int value, int textNum, int rowLimit)
 {
     Engine::Items::OptionLines::LineValues values;
@@ -2121,29 +2139,22 @@ static ItemTooltipBuild BuildItemTooltipText(const ITEM* ip, bool Sell, int Inve
     else
         if (ip->Jewel_Of_Harmony_Option != 0)
         {
-            StrengthenItem type = g_pUIJewelHarmonyinfo->GetItemType(static_cast<int>(ip->Type));
-
-            if (type < SI_None)
+            if (const std::optional<Data::Items::ItemOptionIndex> definition =
+                    GameLogic::Items::FindHarmonyDefinition(ip->Type))
             {
-                if (g_pUIJewelHarmonyinfo->IsHarmonyJewelOption(type, ip->Jewel_Of_Harmony_Option))
+                if (const std::optional<GameLogic::Items::HarmonyOption> harmony =
+                        GameLogic::Items::FindHarmonyOption(*ip))
                 {
                     mu_swprintf(TextList[TextNum], L"\n"); TextNum++; SkipNum++;
 
-                    HARMONYJEWELOPTION harmonyjewel = g_pUIJewelHarmonyinfo->GetHarmonyJewelOptionInfo(type, ip->Jewel_Of_Harmony_Option);
-
-                    if (type == SI_Defense && ip->Jewel_Of_Harmony_Option == 7)
+                    // Its texts, yellow and bold while it counts (requiresItemLevel), else gray.
+                    const int rows = WriteOptionLines(*harmony->option, harmony->value, TextNum, MaxTextListRows);
+                    for (int row = TextNum; row < TextNum + rows; ++row)
                     {
-                        mu_swprintf(TextList[TextNum], L"%ls +%d%%", harmonyjewel.Name, harmonyjewel.HarmonyJewelLevel[ip->Jewel_Of_Harmony_OptionLevel]);
+                        TextListColor[row] = harmony->counts ? TEXT_COLOR_YELLOW : TEXT_COLOR_GRAY;
+                        TextBold[row] = true;
                     }
-                    else
-                    {
-                        mu_swprintf(TextList[TextNum], L"%ls +%d", harmonyjewel.Name, harmonyjewel.HarmonyJewelLevel[ip->Jewel_Of_Harmony_OptionLevel]);
-                    }
-
-                    if (Level >= ip->Jewel_Of_Harmony_OptionLevel) TextListColor[TextNum] = TEXT_COLOR_YELLOW;
-                    else TextListColor[TextNum] = TEXT_COLOR_GRAY;
-
-                    TextBold[TextNum] = true; TextNum++;
+                    TextNum += rows;
 
                     mu_swprintf(TextList[TextNum], L"\n"); TextNum++; SkipNum++;
                 }
@@ -2151,12 +2162,11 @@ static ItemTooltipBuild BuildItemTooltipText(const ITEM* ip, bool Sell, int Inve
                 {
                     mu_swprintf(TextList[TextNum], L"\n"); TextNum++; SkipNum++;
 
-                    mu_swprintf(TextList[TextNum], L"%ls : %d %d %d"
-                        , I18N::Game::ReinforcementOptionError
-                        , (int)type
-                        , (int)ip->Jewel_Of_Harmony_Option
-                        , (int)ip->Jewel_Of_Harmony_OptionLevel
-                    );
+                    // A number the definition has no option of; the first number is the definition's place among the
+                    // harmony definitions (the old file's kind: 0 weapons, 1 staffs, 2 defense items).
+                    mu_swprintf(TextList[TextNum], L"%ls : %d %d %d", I18N::Game::ReinforcementOptionError,
+                                HarmonyDefinitionPlace(*definition), (int)ip->Jewel_Of_Harmony_Option,
+                                (int)ip->Jewel_Of_Harmony_OptionLevel);
 
                     TextListColor[TextNum] = TEXT_COLOR_DARKRED;
                     TextBold[TextNum] = true; TextNum++;

@@ -34,9 +34,16 @@ constexpr const char* Options = "options";
 constexpr const char* Number = "number";
 constexpr const char* Attribute = "attribute";
 constexpr const char* Text = "text";
+constexpr const char* RequiresItemLevel = "requiresItemLevel";
+constexpr const char* Zen = "zen";
+constexpr const char* Weight = "weight";
 } // namespace Keys
 
 constexpr int MaxOptionsPerItem = 255;
+// OpenMU's weights are a byte.
+constexpr int MaxWeight = 255;
+// The most Zen a mix costs, what the client's Zen counter holds.
+constexpr int MaxZen = 2'000'000'000;
 // OpenMU's GUIDs: 8, 4, 4, 4 and 12 hexadecimal digits.
 constexpr std::array<size_t, 5> GuidGroupLengths = {8, 4, 4, 4, 12};
 
@@ -44,8 +51,10 @@ const KeySet RootKeys = {Json::Keys::FormatVersion, Keys::Definitions};
 const KeySet DefinitionKeys = {Keys::Name, Keys::Type, Keys::DisplayName, Keys::OpenMu, Keys::Server, Keys::Options};
 const KeySet OpenMuKeys = {Keys::Id, Keys::Name};
 const KeySet ServerKeys = {Keys::AddsRandomly, Keys::AddChance, Keys::MaximumOptionsPerItem};
-const KeySet OptionKeys = {Keys::Number,         Keys::Attribute,      ItemOptionAddKeys[0],
-                           ItemOptionAddKeys[1], ItemOptionAddKeys[2], Keys::Text};
+const KeySet OptionKeys = {Keys::Number,         Keys::Attribute, ItemOptionAddKeys[0],    ItemOptionAddKeys[1],
+                           ItemOptionAddKeys[2], Keys::Text,      Keys::RequiresItemLevel, Keys::Zen,
+                           Keys::Server};
+const KeySet OptionServerKeys = {Keys::Weight};
 
 // Whether a definition of the type has one option only.
 bool HasOneOption(ItemOptionType type)
@@ -118,6 +127,10 @@ private:
     void ReadAdd(const OrderedJson& json, const std::string& field, ItemOption& option);
     bool ReadWholeNumber(const OrderedJson& json, const std::string& field, int minimum, int maximum, int& value);
     void ReadTexts(const OrderedJson& json, const std::string& field, std::vector<std::string>& texts);
+    void ReadRequiresItemLevel(const OrderedJson& json, const std::string& field, ItemOptionType type,
+                               ItemOption& option);
+    void ReadZen(const OrderedJson& json, const std::string& field, ItemOption& option);
+    void ReadOptionServer(const OrderedJson& json, const std::string& field, ItemOption& option);
 
     const std::string& m_source;
     std::vector<ItemDataIssue>& m_issues;
@@ -266,6 +279,79 @@ bool ItemOptionsReader::ReadWholeNumber(const OrderedJson& json, const std::stri
                                         { AddFatal(errorField, message); });
 }
 
+void ItemOptionsReader::ReadRequiresItemLevel(const OrderedJson& json, const std::string& field, ItemOptionType type,
+                                              ItemOption& option)
+{
+    const auto requiresLevel = json.find(Keys::RequiresItemLevel);
+    if (requiresLevel == json.end())
+    {
+        return;
+    }
+    const std::string levelField = field + "." + Keys::RequiresItemLevel;
+    if (!requiresLevel->is_boolean())
+    {
+        AddFatal(levelField, "must be true or false");
+        return;
+    }
+    // Only the harmony options are read by their level (FindHarmonyOption); elsewhere the rule would do nothing.
+    if (type != ItemOptionType::Harmony)
+    {
+        AddIssue(ItemDataIssueSeverity::Warning, levelField,
+                 "counts only on harmony options: the other types don't read it, so it is left out");
+        return;
+    }
+    option.requiresItemLevel = requiresLevel->get<bool>();
+}
+
+void ItemOptionsReader::ReadZen(const OrderedJson& json, const std::string& field, ItemOption& option)
+{
+    const auto zen = json.find(Keys::Zen);
+    if (zen == json.end())
+    {
+        return;
+    }
+    const std::string zenField = field + "." + Keys::Zen;
+    if (!zen->is_array() || zen->empty())
+    {
+        AddFatal(zenField, "must be a list of the Zen per level, from the value's first level: [200000, 220000]");
+        return;
+    }
+    for (size_t index = 0; index < zen->size(); ++index)
+    {
+        int entry = 0;
+        ReadWholeNumber((*zen)[index], zenField + "[" + std::to_string(index) + "]", 0, MaxZen, entry);
+        option.zen.push_back(entry);
+    }
+    // One entry per level of the value: a list's levels, or a constant's one.
+    const size_t levels = option.value.isList ? option.value.values.size() : 1;
+    if (option.zen.size() != levels)
+    {
+        AddIssue(ItemDataIssueSeverity::Warning, zenField,
+                 "has " + std::to_string(option.zen.size()) + " entries for the value's " + std::to_string(levels) +
+                     " levels: a level past them takes the last entry");
+    }
+}
+
+void ItemOptionsReader::ReadOptionServer(const OrderedJson& json, const std::string& field, ItemOption& option)
+{
+    const auto server = json.find(Keys::Server);
+    if (server == json.end())
+    {
+        return;
+    }
+    const std::string serverField = field + "." + Keys::Server;
+    if (!server->is_object())
+    {
+        AddFatal(serverField, R"(must be an object: {"weight": 40})");
+        return;
+    }
+    if (const auto weight = server->find(Keys::Weight); weight != server->end())
+    {
+        ReadWholeNumber(*weight, serverField + "." + Keys::Weight, 1, MaxWeight, option.serverWeight);
+    }
+    WarnAboutUnknownKeys(*server, OptionServerKeys, serverField);
+}
+
 void ItemOptionsReader::ReadTexts(const OrderedJson& json, const std::string& field, std::vector<std::string>& texts)
 {
     constexpr const char* Message = "must be the name of a text of OptionTexts.json, or a list of them";
@@ -353,6 +439,15 @@ void ItemOptionsReader::ReadOption(const OrderedJson& json, const std::string& f
     ReadNumber(json, field, type, option);
     ReadName(json, Keys::Attribute, field, option.attribute);
     ReadAdd(json, field, option);
+    // A first level does something only where the value goes by a level: a type with levels of its own, or a list by
+    // the item's level.
+    if (option.value.firstLevel && option.value.levelType == ItemOptionLevelType::OptionLevel && !HasOptionLevels(type))
+    {
+        AddIssue(ItemDataIssueSeverity::Warning,
+                 field + "." + ItemOptionAddKeys[static_cast<size_t>(option.add)] + ".firstLevel",
+                 "does nothing on this type, whose value is taken at level 1, so it is left out");
+        option.value.firstLevel.reset();
+    }
     const auto text = json.find(Keys::Text);
     if (text == json.end())
     {
@@ -362,6 +457,9 @@ void ItemOptionsReader::ReadOption(const OrderedJson& json, const std::string& f
     {
         ReadTexts(*text, field + "." + Keys::Text, option.texts);
     }
+    ReadRequiresItemLevel(json, field, type, option);
+    ReadZen(json, field, option);
+    ReadOptionServer(json, field, option);
     WarnAboutUnknownKeys(json, OptionKeys, field);
 }
 
@@ -424,6 +522,18 @@ OrderedJson WriteOption(const ItemOption& option, ItemOptionType type)
     json[Keys::Attribute] = option.attribute;
     json[ItemOptionAddKeys[static_cast<size_t>(option.add)]] = Json::WriteOptionValue(option.value);
     json[Keys::Text] = option.texts.size() == 1 ? OrderedJson(option.texts.front()) : OrderedJson(option.texts);
+    if (option.requiresItemLevel)
+    {
+        json[Keys::RequiresItemLevel] = true;
+    }
+    if (!option.zen.empty())
+    {
+        json[Keys::Zen] = option.zen;
+    }
+    if (option.serverWeight > 0)
+    {
+        json[Keys::Server] = {{Keys::Weight, option.serverWeight}};
+    }
     return json;
 }
 

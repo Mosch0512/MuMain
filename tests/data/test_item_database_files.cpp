@@ -1928,12 +1928,14 @@ TEST_CASE("Item editor changes go into the item database [data][items][editor]")
         CHECK(g_ItemDatabase.GetWeaponKind(MakeItemType(3, 100)) == WeaponKind::Spear);
         // And the options the option rules give it.
         CHECK(g_ItemDatabase.Find(3, 100)->options == std::vector<std::string>{"luck", "physicalDamageOption",
-                                                                                   "excellentPhysicalAttack"});
+                                                                               "excellentPhysicalAttack",
+                                                                               "harmonyPhysicalAttack"});
     }
 
     SUBCASE("an item's option list follows its data, and a list an edit picked stays")
     {
-        const std::vector<std::string> weapon{"luck", "physicalDamageOption", "excellentPhysicalAttack"};
+        const std::vector<std::string> weapon{"luck", "physicalDamageOption", "excellentPhysicalAttack",
+                                              "harmonyPhysicalAttack"};
         REQUIRE(g_ItemDatabase.Find(KrisType)->options == weapon);
         EditItem(KrisType, [](ItemDefinition& item) { item.tags.Set(ItemTag::Ammunition); });
         CHECK(g_ItemDatabase.Find(KrisType)->options.empty());

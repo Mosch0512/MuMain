@@ -69,9 +69,10 @@ bool IsOptionTurnedOn(const ITEM& item, ItemOptionType type, const ItemOption& o
         return IsExcellentBitSet(item.ExcellentFlags, option);
     case ItemOptionType::Luck:
         return true;
-    // The ancient types take no option slots (IsTurnedOn gives them none).
+    // The ancient types and harmony take no option slots (IsTurnedOn gives them none).
     case ItemOptionType::AncientOption:
     case ItemOptionType::AncientBonus:
+    case ItemOptionType::Harmony:
         break;
     }
     return false;
@@ -147,8 +148,16 @@ void AddLinkedOptions(ITEM& item, ItemOptionType type)
             {
                 continue;
             }
-            const Data::Items::ItemOptionEffect& effect = options.GetEffect(link, option);
             const ItemOption& linked = definition.options[option];
+            // Below an option list's first level the additional option counts no level
+            // (CountAdditionalOptionLevel), so it takes no slot either.
+            if (type == ItemOptionType::Option && linked.value.isList &&
+                linked.value.levelType == Data::Items::ItemOptionLevelType::OptionLevel &&
+                item.OptionLevel < linked.value.FirstLevel())
+            {
+                continue;
+            }
+            const Data::Items::ItemOptionEffect& effect = options.GetEffect(link, option);
             const int value =
                 effect.writesValue ? ComputeOptionValue(linked.value, GetOptionLevel(item, type, linked)) : 0;
             AddOptionSlot(item, effect.effect, value, {link, static_cast<std::uint16_t>(option)});
@@ -239,9 +248,20 @@ int CountAdditionalOptionLevel(std::span<const Data::Items::ItemOptionIndex> lin
         {
             if (IsAdditionalOptionSent(optionType, option))
             {
-                // Above a list its last level counts, as its value does.
-                return option.value.isList ? std::min(optionLevel, static_cast<int>(option.value.values.size()))
-                                           : optionLevel;
+                // Above a list its last level counts, as its value does; the list's levels start at its first
+                // level, and below it no level counts (the value is 0 there). A list by the item's level doesn't
+                // go by the option level.
+                const Data::Items::ItemOptionValue& value = option.value;
+                if (!value.isList || value.values.empty() ||
+                    value.levelType == Data::Items::ItemOptionLevelType::ItemLevel)
+                {
+                    return optionLevel;
+                }
+                if (optionLevel < value.FirstLevel())
+                {
+                    return 0;
+                }
+                return std::min(optionLevel, value.FirstLevel() + static_cast<int>(value.values.size()) - 1);
             }
         }
     }
@@ -339,6 +359,66 @@ std::optional<AncientBonus> FindAncientBonus(const ITEM& item)
         option.value.levelType == Data::Items::ItemOptionLevelType::ItemLevel ? item.Level : item.AncientBonusOption;
     return AncientBonus{&definition, &option, options.GetEffect(definitionIndex, 0).effect,
                         ComputeOptionValue(option.value, level)};
+}
+
+std::optional<Data::Items::ItemOptionIndex> FindHarmonyDefinition(int itemType)
+{
+    if (itemType < 0 || itemType >= MAX_ITEM)
+    {
+        return std::nullopt;
+    }
+    const Data::Items::ItemOptionDatabase& options = g_ItemDatabase.GetOptions();
+    for (const Data::Items::ItemOptionIndex link : g_ItemDatabase.GetOptionLinks(itemType))
+    {
+        if (options.Get(link).type == ItemOptionType::Harmony)
+        {
+            return link;
+        }
+    }
+    return std::nullopt;
+}
+
+const ItemOption* FindHarmonyOptionOf(int itemType, int number)
+{
+    const std::optional<Data::Items::ItemOptionIndex> definitionIndex = FindHarmonyDefinition(itemType);
+    if (!definitionIndex)
+    {
+        return nullptr;
+    }
+    const ItemOptionDefinition& definition = g_ItemDatabase.GetOptions().Get(*definitionIndex);
+    const auto found = std::ranges::find(definition.options, number, &ItemOption::number);
+    return found != definition.options.end() ? &*found : nullptr;
+}
+
+std::optional<HarmonyOption> FindHarmonyOption(const ITEM& item)
+{
+    if (item.Jewel_Of_Harmony_Option == 0)
+    {
+        return std::nullopt;
+    }
+    const std::optional<Data::Items::ItemOptionIndex> definitionIndex = FindHarmonyDefinition(item.Type);
+    if (!definitionIndex)
+    {
+        return std::nullopt;
+    }
+    const Data::Items::ItemOptionDatabase& options = g_ItemDatabase.GetOptions();
+    const ItemOptionDefinition& definition = options.Get(*definitionIndex);
+    for (size_t index = 0; index < definition.options.size(); ++index)
+    {
+        const ItemOption& option = definition.options[index];
+        if (option.number != item.Jewel_Of_Harmony_Option)
+        {
+            continue;
+        }
+        const int harmonyLevel = item.Jewel_Of_Harmony_OptionLevel;
+        // Its own level is the harmony level; a list by the item's level takes the item's + level, as every option
+        // does.
+        const int level =
+            option.value.levelType == Data::Items::ItemOptionLevelType::ItemLevel ? item.Level : harmonyLevel;
+        return HarmonyOption{&definition, &option, options.GetEffect(*definitionIndex, index).effect,
+                             ComputeOptionValue(option.value, level), option.CountsAt(item.Level, harmonyLevel)};
+    }
+    return std::nullopt;
 }
 
 int GetItemOptionValue(const ITEM& item, int slot)

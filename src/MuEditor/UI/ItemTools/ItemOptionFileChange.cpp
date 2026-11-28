@@ -357,13 +357,13 @@ bool IsSameOptionList(std::span<const std::string> list, std::span<const std::st
 
 int HighestOptionLevel(const ItemOptionDefinition& definition)
 {
-    int highest = 0;
+    int highest = NoOptionLevels;
     for (const Data::Items::ItemOption& option : definition.options)
     {
         // A list by the item's level follows the item, not the option level.
         if (option.value.isList && option.value.levelType == Data::Items::ItemOptionLevelType::OptionLevel)
         {
-            highest = std::max(highest, static_cast<int>(option.value.values.size()));
+            highest = std::max(highest, static_cast<int>(option.value.values.size()) + option.value.FirstLevel() - 1);
         }
     }
     return highest;
@@ -372,10 +372,11 @@ int HighestOptionLevel(const ItemOptionDefinition& definition)
 bool FillOptionLevels(ItemOptionDefinition& definition, int level)
 {
     bool changed = false;
-    const size_t size = static_cast<size_t>(std::max(level, 1));
     for (Data::Items::ItemOption& option : definition.options)
     {
         std::vector<int>& values = option.value.values;
+        // The list's levels from its first one to `level`; one at least.
+        const auto size = static_cast<size_t>(std::max(level - option.value.FirstLevel() + 1, 1));
         if (!option.value.isList || option.value.levelType != Data::Items::ItemOptionLevelType::OptionLevel ||
             values.empty() || values.size() == size)
         {
@@ -393,9 +394,22 @@ bool FillOptionLevels(ItemOptionDefinition& definition, int level)
                 values.push_back(values.back() + step);
             }
         }
+        MatchZenToValue(option);
         changed = true;
     }
     return changed;
+}
+
+bool MatchZenToValue(Data::Items::ItemOption& option)
+{
+    std::vector<int>& zen = option.zen;
+    const size_t levels = option.value.isList ? option.value.values.size() : 1;
+    if (zen.empty() || levels == 0 || zen.size() == levels)
+    {
+        return false;
+    }
+    zen.resize(levels, zen.back());
+    return true;
 }
 
 void FillOptionValue(ItemOptionValue& value, int fromLevel, int fromValue, int step, int toLevel)

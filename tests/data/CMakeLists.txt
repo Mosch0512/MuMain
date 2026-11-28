@@ -229,6 +229,7 @@ mu_add_test(
         test_colors_window.cpp
         test_command_hint.cpp
         test_critical_damage_rate.cpp
+        test_harmony_options.cpp
         test_style_editor.cpp
         test_dark_lord_pet_tooltip.cpp
         test_item_bytes.cpp
